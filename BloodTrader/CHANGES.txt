@@ -1,0 +1,10 @@
+------------------------------------------------------------------------
+r26 | cybermind@gmail.com | 2017-10-28 02:49:03 -0500 (Sat, 28 Oct 2017) | 2 lines
+Changed paths:
+   M /trunk/BloodTrader.lua
+   M /trunk/BloodTrader.toc
+
+- removed multiple-of-stack handling since that is in vanilla UI
+- added basic support for primal trader: no confirmation for right-click buying, shows primal sargerite as currency at bottom of window
+------------------------------------------------------------------------
+

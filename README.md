@@ -8,6 +8,7 @@ You can use the following command to accomplish this:
 
 ## Addons
 - AskMrRobot-54
+- BloodTrader-v2.2
 - CanIMogIt-7.3.2v1.1
 - Coordinates_1_23
 - CrucibleWeight_v18
