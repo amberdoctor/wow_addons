@@ -16,6 +16,7 @@ You can use the following command to accomplish this:
 - DBM-PvP-r68
 - DBM-SpellTimers-v4-r111
 - DBM-TimelessIsle-r37-alpha
+- GoFish-7.3.0.1
 - mOnArs_WardrobeHelper 1.17.1
 - NomiCakes-7.3.0.1
 - Recount-v7.3.2a

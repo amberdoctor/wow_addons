@@ -1,0 +1,23 @@
+## Interface: 70300
+## Version: 7.3.0.1
+
+## Title: GoFish
+## Notes: Click-cast fishing and enhanced fishing sounds.
+## Notes-deDE: Angelt schnell per Doppelklick, und erhöht Fischerei Soundeffekte.
+## Notes-esES: Pescar rápidamente por doble clic, y aumentar los sonidos de pesca.
+## Notes-esMX: Pescar rápidamente por doble clic, y aumentar los sonidos de pesca.
+
+## Author: Phanx, Akkorian
+## X-Email: armordecai@protonmail.com
+## X-License: All rights reserved. OK to fork and modify on GitHub. Ask about anything else.
+## X-Website: https://github.com/phanx-wow/GoFish
+## X-Curse-Project-ID: 56393
+## X-WoWI-ID: 22270
+
+## SavedVariables: GoFishDB
+
+Localization.lua
+Data.lua
+
+Addon.lua
+Options.lua
