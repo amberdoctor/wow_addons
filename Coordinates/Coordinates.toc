@@ -1,0 +1,10 @@
+## Interface: 70300
+## Title: Coordinates
+
+## Version: 1.23
+## Author: Szandos
+## Notes: Adds coordinates to the minimap and the world map
+## SavedVariables: CoordinatesDB
+
+Coordinates.lua
+
