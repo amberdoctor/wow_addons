@@ -1,0 +1,12 @@
+tag 0ae7951d341460642ea063e9c710f95837418daa v70300-1.0.0
+Author:	Jim Whitehead <jnwhiteh@gmail.com>
+Date:	Mon Nov 13 22:26:57 2017 +0100
+
+Tagging v70300-1.0.0
+
+commit 17dabc91c2b2bae4573ca542a7e943104b05ef8e
+Author: Jim Whitehead <jnwhiteh@gmail.com>
+Date:   Mon Nov 13 22:25:50 2017 +0100
+
+    Update for 7.3
+
