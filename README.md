@@ -6,5 +6,6 @@ This repo assumes that you will be using this repository on a Windows machine.  
 You can use the following command to accomplish this:
 $ git config --local core.autocrlf false
 
-##Addons
+## Addons
+DBM-Archaeology-r28-alpha
 DBM-Core-7.3.7
