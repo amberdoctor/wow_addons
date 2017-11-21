@@ -7,6 +7,7 @@ You can use the following command to accomplish this:
 `$ git config --local core.autocrlf false`
 
 ## Addons
+- AskMrRobot-54
 - DBM-Archaeology-r28-alpha
 - DBM-Challenges-r94
 - DBM-Core-7.3.7
