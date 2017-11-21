@@ -8,4 +8,5 @@ $ git config --local core.autocrlf false
 
 ## Addons
 DBM-Archaeology-r28-alpha
+DBM-Challenges-r94
 DBM-Core-7.3.7
