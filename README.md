@@ -17,4 +17,5 @@ You can use the following command to accomplish this:
 - DBM-SpellTimers-v4-r111
 - DBM-TimelessIsle-r37-alpha
 - mOnArs_WardrobeHelper 1.17.1
+- NomiCakes-7.3.0.1
 - TomTom-v70300-1.0.0
