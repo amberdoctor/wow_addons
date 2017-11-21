@@ -8,6 +8,7 @@ You can use the following command to accomplish this:
 
 ## Addons
 - AskMrRobot-54
+- CanIMogIt-7.3.2v1.1
 - DBM-Archaeology-r28-alpha
 - DBM-Challenges-r94
 - DBM-Core-7.3.7
