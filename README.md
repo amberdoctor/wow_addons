@@ -29,3 +29,9 @@ You can use the following command to accomplish this:
 - TomTom-v70300-1.0.0
 - WorldQuestsList49
 
+## Addon Notes by Addon
+
+### Excavatinator
+Type /Arch in the main window to launch
+
+
