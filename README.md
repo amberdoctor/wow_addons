@@ -7,6 +7,7 @@ You can use the following command to accomplish this:
 `$ git config --local core.autocrlf false`
 
 ## Addons
+- Archy-7.3.0.2
 - AskMrRobot-54
 - BloodTrader-v2.2
 - CanIMogIt-7.3.2v1.1
@@ -20,9 +21,10 @@ You can use the following command to accomplish this:
 - DBM-TimelessIsle-r37-alpha
 - GarrisonMissionManager-v55
 - GoFish-7.3.0.1
+- ISBoxer
 - mOnArs_WardrobeHelper 1.17.1
 - NomiCakes-7.3.0.1
 - Recount-v7.3.2a
 - TomTom-v70300-1.0.0
 - WorldQuestsList49
-- ISBoxer 
+
