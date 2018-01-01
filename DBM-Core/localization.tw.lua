@@ -1,13 +1,7 @@
 if GetLocale() ~= "zhTW" then return end
 
-DBM_CORE_NEED_LOCALS				= "你是否擁有良好的程式開發或語言能力? 如果是的話, DBM需要你的本地化翻譯。如果你能幫忙，拜訪DBM討論區或到DBM Discrod聯繫MysticalOS。"
-DBM_CORE_NEED_LOGS					= "DBM需要Transcriptor (http://www.wowace.com/addons/transcriptor/) 去紀錄此戰鬥紀錄讓插件更加完美。如果你願意幫忙，請使用transcriptor去紀錄這些戰鬥過程然後將記錄發佈在DBM討論區或Discord。"
 DBM_HOW_TO_USE_MOD					= "歡迎使用DBM。在聊天頻道輸入 /dbm 打開設定開始設定。你可以載入特定區域後為任何首領設定你喜歡的特別設置。DBM會在設定你的職業天賦的預設值，但有些選項可能需要調整。"
 DBM_SILENT_REMINDER					= "提醒：DBM正處於無聲模式。"
-
-DBM_FORUMS_MESSAGE					= "發現臭蟲或錯誤的計時器?你希望能讓某些模組有新的警告，計時器或是特別功能?\n拜訪DBM討論區或到DBM Discord伺服器給些回饋。"
-DBM_FORUMS_COPY_URL_DIALOG			= "來拜訪我們新的討論與支援討論區"
-DBM_FORUMS_COPY_URL_DIALOG_NEWS		= "想知道新功能以及如何運作，拜訪我們的討論區"
 
 DBM_CORE_LOAD_MOD_ERROR				= "載入%s模組時發生錯誤：%s"
 DBM_CORE_LOAD_MOD_SUCCESS			= "成功載入%s模組。輸入/dbm 可自訂警告音效和個人化註記。"
@@ -18,8 +12,6 @@ DBM_CORE_BAD_LOAD					= "DBM偵測到你的此副本的模組在戰鬥中讀取�
 DBM_CORE_LOAD_MOD_VER_MISMATCH		= "%s不能被讀取因為你的DBM核心未達需求，請更新版本。"
 DBM_CORE_LOAD_MOD_DISABLED			= "%s已安裝但目前停用中。此模組不會載入除非你啟用它。"
 DBM_CORE_LOAD_MOD_DISABLED_PLURAL	= "%s已安裝但目前停用中。這些模組不會載入除非你啟用它們。"
-
-DBM_CORE_WHATS_NEW					= "'計時條向上延伸'和'填滿計時條'選項能夠獨立設定計時條類型(小大計時條)而非統一設定。試試看！"
 
 --Post Patch 7.1
 DBM_CORE_NO_RANGE					= "距離雷達不能在副本中使用，使用傳統文字距離框架取代"
@@ -253,6 +245,8 @@ DBM_CORE_UNKNOWN					= "未知"
 DBM_CORE_LEFT						= "左"
 DBM_CORE_RIGHT						= "右"
 DBM_CORE_BACK						= "後"
+DBM_CORE_TOP						= "上"
+DBM_CORE_BOTTOM						= "下"
 DBM_CORE_MIDDLE						= "中"
 DBM_CORE_FRONT						= "前"
 DBM_CORE_EAST						= "東"
@@ -354,7 +348,7 @@ DBM_CORE_AUTO_SPEC_WARN_TEXTS.switch		= "%s - 快更換目標!"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.switchcount	= "%s - 快更換目標!(%%s)"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.gtfo			= "注意%%s - 快移動"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.Adds			= "小怪來了 - 快更換目標!"
-DBM_CORE_AUTO_SPEC_WARN_TEXTS.Addscustom	= "小怪來了 - %s"
+DBM_CORE_AUTO_SPEC_WARN_TEXTS.Addscustom	= "小怪來了 - %%s"
 
 DBM_CORE_AUTO_SPEC_WARN_OPTIONS.spell		= "為$spell:%s顯示特別警告"
 DBM_CORE_AUTO_SPEC_WARN_OPTIONS.ends 		= "為$spell:%s結束顯示特別警告"
@@ -397,7 +391,7 @@ DBM_CORE_AUTO_TIMER_TEXTS.active			= "%s結束"
 DBM_CORE_AUTO_TIMER_TEXTS.fades				= "%s消退"
 DBM_CORE_AUTO_TIMER_TEXTS.ai				= "%sAI"
 DBM_CORE_AUTO_TIMER_TEXTS.cd				= "%s冷卻"
-DBM_CORE_AUTO_TIMER_TEXTS.cdcount			= "%s冷卻 (%%d)"
+DBM_CORE_AUTO_TIMER_TEXTS.cdcount			= "%s冷卻 (%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.cdsource			= "%s冷卻:>%%s<"
 DBM_CORE_AUTO_TIMER_TEXTS.cdspecial			= "特別技能冷卻"
 DBM_CORE_AUTO_TIMER_TEXTS.next 				= "下一次%s"
@@ -407,7 +401,7 @@ DBM_CORE_AUTO_TIMER_TEXTS.nextspecial		= "下一次特別技能"
 DBM_CORE_AUTO_TIMER_TEXTS.achievement		= "%s"
 DBM_CORE_AUTO_TIMER_TEXTS.stage				= "下一個階段"
 DBM_CORE_AUTO_TIMER_TEXTS.adds				= "下一次小怪到來"
-DBM_CORE_AUTO_TIMER_TEXTS.addscustom  		= "小怪到來(%s)"
+DBM_CORE_AUTO_TIMER_TEXTS.addscustom  		= "小怪到來(%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.roleplay			= GUILD_INTEREST_RP
 
 DBM_CORE_AUTO_TIMER_OPTIONS.target			= "為$spell:%s顯示減益計時器"

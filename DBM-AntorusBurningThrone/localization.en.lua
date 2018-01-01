@@ -20,7 +20,7 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(1987)
 
 L:SetOptionLocalization({
-	SequenceTimers =	"Squence the cooldown timers off previous ability casts instead of current ability cast to reduce timer clutter at expense of minor timer accuracy (1-2sec early)"
+	SequenceTimers =	"Squence the cooldown timers on heroic/mythic difficulty off previous ability casts instead of current ability cast to reduce timer clutter at expense of minor timer accuracy (1-2sec early)"
 })
 
 ---------------------------
@@ -33,9 +33,27 @@ L= DBM:GetModLocalization(1997)
 ---------------------------
 L= DBM:GetModLocalization(2025)
 
+L:SetTimerLocalization({
+	timerObfuscator		=	"Next Obfuscator (%s)",
+	timerDestructor 	=	"Next Destructor (%s)",
+	timerPurifier 		=	"Next Purifier (%s)",
+	timerBats	 		=	"Next Bats (%s)"
+})
+
+L:SetOptionLocalization({
+	timerObfuscator		=	DBM_CORE_AUTO_TIMER_OPTIONS["cdcount"]:format("ej16501"),
+	timerDestructor 	=	DBM_CORE_AUTO_TIMER_OPTIONS["cdcount"]:format("ej16502"),
+	timerPurifier 		=	DBM_CORE_AUTO_TIMER_OPTIONS["cdcount"]:format("ej16500"),
+	timerBats	 		=	DBM_CORE_AUTO_TIMER_OPTIONS["cdcount"]:format("ej17039")
+})
+
 L:SetMiscLocalization({
-	Obfuscators =	"Obfuscators",
-	Destructors =	"Destructors"
+	Obfuscators =	"Obfuscator",
+	Destructors =	"Destructor",
+	Purifiers 	=	"Purifier",
+	Bats 		=	"Bats",
+	EonarHealth	= 	"Eonar Health",
+	EonarPower	= 	"Eonar Power"
 })
 
 ---------------------------
@@ -52,13 +70,18 @@ L:SetOptionLocalization({
 ---------------------------
 L= DBM:GetModLocalization(2009)
 
+L:SetMiscLocalization({
+	DispelMe =		"Dispel Me!"
+})
+
 ---------------------------
 -- Kin'garoth --
 ---------------------------
 L= DBM:GetModLocalization(2004)
 
 L:SetOptionLocalization({
-	InfoFrame =	"Show InfoFrame for fight overview"
+	InfoFrame =	"Show InfoFrame for fight overview",
+	UseAddTime = "Always show timers for what's coming next when boss leaves initialisation phase instead of hiding them. (If disabled, correct timers will resume when boss becomes active again, but may leave little warning if any cooldowns only had 1-2 seconds left)"
 })
 
 ---------------------------
@@ -83,6 +106,12 @@ L:SetOptionLocalization({
 -- Aggramar --
 ---------------------------
 L= DBM:GetModLocalization(1984)
+
+L:SetMiscLocalization({
+	Foe			=	"Foe",
+	Rend		=	"Rend",
+	Tempest 	=	"Tempest"
+})
 
 ---------------------------
 -- Argus the Unmaker --

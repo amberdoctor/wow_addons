@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1738, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 16780 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 16987 $"):sub(12, -3))
 mod:SetCreatureID(105393)
 mod:SetEncounterID(1873)
 mod:SetZone()
@@ -46,7 +46,7 @@ local warnCursedBlood				= mod:NewTargetAnnounce(215128, 3)
 local specWarnNightmareCorruption	= mod:NewSpecialWarningMove(212886, nil, nil, nil, 1, 2)
 local specWarnFixate				= mod:NewSpecialWarningMoveTo(210099, nil, nil, nil, 1, 2)
 local specWarnNightmareHorror		= mod:NewSpecialWarningSwitch("ej13188", "-Healer", nil, nil, 1, 2)--spellId for summon 210289
-local specWarnEyeOfFate				= mod:NewSpecialWarningStack(210984, nil, 2)
+local specWarnEyeOfFate				= mod:NewSpecialWarningStack(210984, nil, 2, nil, nil, 1, 6)
 local specWarnEyeOfFateOther		= mod:NewSpecialWarningTaunt(210984, nil, nil, nil, 1, 2)
 local specWarnMindFlay				= mod:NewSpecialWarningInterrupt(208697, "HasInterrupt", nil, 2, 1, 2)
 --local specWarnCorruptorTentacle		= mod:NewSpecialWarningSwitch("ej13191", false, nil, nil, 1)
@@ -114,7 +114,7 @@ mod.vb.IchorCount = 0
 mod.vb.DeathglareSpawn = 0
 mod.vb.CorruptorSpawn = 0
 local UnitExists, UnitGUID, UnitDetailedThreatSituation = UnitExists, UnitGUID, UnitDetailedThreatSituation
-local eyeName = EJ_GetSectionInfo(13185)
+local eyeName = DBM:EJ_GetSectionInfo(13185)
 local addsTable = {}
 local phase1EasyDeathglares = {26, 62, 85, 55}--Normal/LFR OCT 16
 local phase1HeroicDeathglares = {21, 51.5, 51}--VERIFIED Nov 18
@@ -152,7 +152,7 @@ do
 		lines[key] = value
 		sortedLines[#sortedLines + 1] = key
 	end
-	local DominatorTentacle, CorruptorTentacle, DeathglareTentacle, NightmareHorror, NightmareIchor = EJ_GetSectionInfo(13189), EJ_GetSectionInfo(13191), EJ_GetSectionInfo(13190), EJ_GetSectionInfo(13188), EJ_GetSectionInfo(13186)
+	local DominatorTentacle, CorruptorTentacle, DeathglareTentacle, NightmareHorror, NightmareIchor = DBM:EJ_GetSectionInfo(13189), DBM:EJ_GetSectionInfo(13191), DBM:EJ_GetSectionInfo(13190), DBM:EJ_GetSectionInfo(13188), DBM:EJ_GetSectionInfo(13186)
 	updateInfoFrame = function()
 		table.wipe(lines)
 		table.wipe(sortedLines)
@@ -462,6 +462,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			if amount >= 2 then
 				if args:IsPlayer() then--At this point the other tank SHOULD be clear.
 					specWarnEyeOfFate:Show(amount)
+					voiceEyeOfFate:Play("stackhigh")
 				else--Taunt as soon as stacks are clear, regardless of stack count.
 					local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
 					if not UnitIsDeadOrGhost("player") and (not expireTime or expireTime and expireTime-GetTime() < 10) then
@@ -614,7 +615,7 @@ end
 
 do
 	--This method is still 4 seconds faster than using Seeping Corruption
-	local NightmareHorror = EJ_GetSectionInfo(13188)
+	local NightmareHorror = DBM:EJ_GetSectionInfo(13188)
 	function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, targetname)
 		if targetname == NightmareHorror then
 			specWarnNightmareHorror:Show()

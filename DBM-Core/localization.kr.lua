@@ -1,13 +1,7 @@
 if (GetLocale() == "koKR") then
 
-DBM_CORE_NEED_LOCALS				= "프로그래밍 혹은 어학 능력이 출중하신가요? 그렇다면 DBM은 더 많은 언어를 지원하기 위해 당신의 도움이 필요합니다. 저희를 돕고 싶다면 DBM 포럼 또는 DBM 디스코드 서버를 방문하시거나 MysticalOS에게 직접 연락을 취해주세요."
-DBM_CORE_NEED_LOGS					= "DBM은 이 보스의 Transcriptor (http://www.wowace.com/addons/transcriptor/) 로그가 있어야 최고의 모드를 만들 수 있습니다. 저희를 돕고 싶다면 이 보스의 Transcriptor 로그를 DBM 포럼이나 디스코드에 올려주세요."
 DBM_HOW_TO_USE_MOD					= "DBM을 사용해 주셔서 감사합니다. 대화창에서 /dbm help를 입력하면 사용 가능한 명령어 목록을 볼 수 있습니다. 설정을 하시려면 /dbm을 입력하세요. 보스 알림 설정을 기호에 맞게 변경하려면 해당 던전을 직접 선택해서 로딩해야 합니다. DBM이 당신의 현재 전문화에 맞는 기본값을 설정하겠지만 일부 옵션은 직접 조정을 할 필요도 있습니다."
 DBM_SILENT_REMINDER					= "알림: DBM이 아직도 조용함 모드입니다."
-
-DBM_FORUMS_MESSAGE					= "버그를 발견했거나 타이머가 맞지 않나요? 경보, 타이머, 특수 기능이 더 추가됐으면 하는 보스 모드가 있나요?\nDBM 포럼이나 DBM 디스코드 서버에 오셔서 피드백을 보내주세요."
-DBM_FORUMS_COPY_URL_DIALOG			= "토론장과 사용자 지원 포럼을 방문해 보세요"
-DBM_FORUMS_COPY_URL_DIALOG_NEWS		= "새로운 기능과 작동 방식을 알고 싶으시다면 저희 포럼을 방문해 주세요"
 
 DBM_CORE_LOAD_MOD_ERROR				= "%s 보스 모드 로딩중 오류 발생: %s"
 DBM_CORE_LOAD_MOD_SUCCESS			= "'%s' 모드가 로딩됐습니다. 사용자 지정 경고 효과음을 설정하거나 개인적으로 메모를 적어놓고 싶다면 /dbm을 입력하세요."
@@ -18,8 +12,6 @@ DBM_CORE_BAD_LOAD					= "DBM이 전투로 인해 현재 인스턴스의 모드�
 DBM_CORE_LOAD_MOD_VER_MISMATCH		= "DBM-Core가 로딩 조건과 맞지 않아 %s|1을;를; 로딩하지 못했습니다. 최신 버전을 설치하세요"
 DBM_CORE_LOAD_MOD_DISABLED			= "%s|1이;가; 설치는 돼있지만 켜져있질 않습니다. 직접 켜기 전까진 모드가 로딩되지 않습니다."
 DBM_CORE_LOAD_MOD_DISABLED_PLURAL	= "%s|1이;가; 설치는 돼있지만 켜져있질 않습니다. 직접 켜기 전까진 모드들이 로딩되지 않습니다."
-
-DBM_CORE_WHATS_NEW					= "대화창 Taint 문제로 인해 몇가지 대화창과 링크 Hook 기능이 삭제되었으며 이로 인해 일부 기능들이 삭제되거나 변경되었습니다 (사실 저는 UI Taint를 재현할 수 없었습니다. 따라서 이러한 변경 사항은 일단 그냥 시도만 해보는 것입니다)"
 
 --Post Patch 7.1
 DBM_CORE_NO_RANGE					= "거리 레이더를 인스턴스 던전에서 사용할 수 없습니다. 예전의 텍스트 방식 거리창으로 대체됩니다."
@@ -254,6 +246,8 @@ DBM_CORE_UNKNOWN					= "알 수 없음"--UNKNOWN
 DBM_CORE_LEFT						= "왼쪽"
 DBM_CORE_RIGHT						= "오른쪽"
 DBM_CORE_BACK						= "뒤쪽"--BACK
+DBM_CORE_TOP						= "위쪽"
+DBM_CORE_BOTTOM						= "아래쪽"
 DBM_CORE_MIDDLE						= "가운데"
 DBM_CORE_FRONT						= "앞쪽"
 DBM_CORE_EAST						= "동쪽"
@@ -269,6 +263,8 @@ DBM_ADDS							= "쫄"--Such as "Move to Ally"
 DBM_CORE_ROOM_EDGE					= "구석"
 DBM_CORE_FAR_AWAY					= "먼 곳"
 DBM_CORE_SAFE						= "안전함"
+DBM_CORE_SHIELD						= "보호막"
+DBM_INCOMING						= "%s 등장"
 --Common Locals end
 
 DBM_CORE_BREAK_USAGE				= "쉬는 시간은 60분을 초과할 수 없습니다. 쉬는 시간은 초단위가 아니라 분단위로 입력해야 합니다."
@@ -356,7 +352,7 @@ DBM_CORE_AUTO_SPEC_WARN_TEXTS.switch		= "%s - 대상 바꾸세요"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.switchcount	= "%s - 대상 바꾸세요 (%%s)"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.gtfo		= "%%s 깔림 - 피하세요"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.Adds		= "쫄 등장 - 대상 바꾸세요"
-DBM_CORE_AUTO_SPEC_WARN_TEXTS.Addscustom	= "쫄 등장 - %s"
+DBM_CORE_AUTO_SPEC_WARN_TEXTS.Addscustom	= "쫄 등장 - %%s"
 
 -- Auto-generated Special Warning Localizations
 DBM_CORE_AUTO_SPEC_WARN_OPTIONS.spell			= "$spell:%s 특수 경고 보기"
@@ -400,10 +396,10 @@ DBM_CORE_AUTO_TIMER_TEXTS.castsource		= "%s: %%s"
 DBM_CORE_AUTO_TIMER_TEXTS.active		= "%s 종료"--Buff/Debuff/event on boss
 DBM_CORE_AUTO_TIMER_TEXTS.fades			= "%s 사라짐"--Buff/Debuff on players
 DBM_CORE_AUTO_TIMER_TEXTS.ai				= "%s AI 예상"
-DBM_CORE_AUTO_TIMER_TEXTS.cd				= "%s 가능"
-DBM_CORE_AUTO_TIMER_TEXTS.cdcount		= "%s 가능 (%%d)"
-DBM_CORE_AUTO_TIMER_TEXTS.cdsource		= "%s 가능: >%%s<"
-DBM_CORE_AUTO_TIMER_TEXTS.cdspecial		= "특수 능력 가능"
+DBM_CORE_AUTO_TIMER_TEXTS.cd				= "%s 쿨타임"
+DBM_CORE_AUTO_TIMER_TEXTS.cdcount		= "%s 쿨타임 (%%s)"
+DBM_CORE_AUTO_TIMER_TEXTS.cdsource		= "%s 쿨타임: >%%s<"
+DBM_CORE_AUTO_TIMER_TEXTS.cdspecial		= "특수 능력 쿨타임"
 DBM_CORE_AUTO_TIMER_TEXTS.next			= "다음 %s"
 DBM_CORE_AUTO_TIMER_TEXTS.nextcount		= "다음 %s (%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.nextsource		= "다음 %s: %%s"
@@ -411,7 +407,7 @@ DBM_CORE_AUTO_TIMER_TEXTS.nextspecial		= "다음 특수 능력"
 DBM_CORE_AUTO_TIMER_TEXTS.achievement		= "%s"
 DBM_CORE_AUTO_TIMER_TEXTS.stage			= "다음 단계"
 DBM_CORE_AUTO_TIMER_TEXTS.adds			= "다음 쫄 등장"
-DBM_CORE_AUTO_TIMER_TEXTS.addscustom		= "쫄 등장 (%s)"
+DBM_CORE_AUTO_TIMER_TEXTS.addscustom		= "쫄 등장 (%%s)"
 
 DBM_CORE_AUTO_TIMER_OPTIONS.target		= "$spell:%s 디버프 타이머 바 보기"
 DBM_CORE_AUTO_TIMER_OPTIONS.cast		= "$spell:%s 시전 타이머 바 보기"

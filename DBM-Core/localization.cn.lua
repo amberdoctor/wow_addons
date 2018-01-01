@@ -2,18 +2,12 @@
 -- Diablohu(diablohudream@gmail.com)
 -- yleaf(yaroot@gmail.com)
 -- Mini Dragon(projecteurs@gmail.com)
--- Last update: 2017/11/01
+-- Last update: 2017/12/22 X-mas
 
 if GetLocale() ~= "zhCN" then return end
 
-DBM_CORE_NEED_LOCALS				= "如果你会编程并且英语不错，请来帮助我们完善DBM中文翻译。你可以访问DBM论坛，或是在DBM Discord中联系MysticalOS。"
-DBM_CORE_NEED_LOGS					= "DBM需要战斗记录器 (http://www.wowace.com/addons/transcriptor/) 的日志来使得技能判断更准确。如果你想帮忙，请用 transcriptor 记录并上传日志文件到我们的论坛或Discord。"
 DBM_HOW_TO_USE_MOD					= "欢迎使用DBM。在聊天框输入 /dbm help 以获取可用命令的帮助。输入 /dbm 可打开设置窗口，并对各个Boss模块进行设置，也可以浏览首领击杀记录。DBM 会自动按你的专精做出相应配置，但是你可以进行微调。"
 DBM_SILENT_REMINDER					= "提示：DBM 正处于安静模式。"
-
-DBM_FORUMS_MESSAGE					= "发现BUG或错误的计时条?你希望要让某些模组有新的警告，计时器或是特别功能?\n请前往DBM论坛或到DBM Discord频道给些反馈。"
-DBM_FORUMS_COPY_URL_DIALOG			= "拜访我们的讨论与支持论坛"
-DBM_FORUMS_COPY_URL_DIALOG_NEWS		= "想知道更多关于新功能的信息请拜访我们的论坛"
 
 DBM_CORE_LOAD_MOD_ERROR				= "读取%s模块时发生错误：%s"
 DBM_CORE_LOAD_MOD_SUCCESS			= "'%s' 模块已加载。在聊天框输入 /dbm 可设置自定义语音或注记等选项。"
@@ -24,8 +18,6 @@ DBM_CORE_BAD_LOAD					= "DBM检测到由于你在战斗过程中载入模块，�
 DBM_CORE_LOAD_MOD_VER_MISMATCH		= "%s 模块无法被载入。 DBM核心版本过旧。请升级DBM。"
 DBM_CORE_LOAD_MOD_DISABLED			= "%s 模块已安装但被禁用。该模块不会被载入除非启用它。"
 DBM_CORE_LOAD_MOD_DISABLED_PLURAL	= "%s 模块已安装但被禁用。这些模块不会被载入除非启用它们。"
-
-DBM_CORE_WHATS_NEW					= "一些窗口中的链接被移除了防止bug。"
 
 --Post Patch 7.1
 DBM_CORE_NO_RANGE					= "距离雷达在副本中无法使用，该功能会使用文本代替"
@@ -363,7 +355,7 @@ DBM_CORE_AUTO_SPEC_WARN_TEXTS.switch			= "%s - 转换目标"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.switchcount		= "%s - 转换目标 (%%s)"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.gtfo				= "注意%%s - 快躲开"
 DBM_CORE_AUTO_SPEC_WARN_TEXTS.Adds				= "小怪出现 - 转换目标"
-DBM_CORE_AUTO_SPEC_WARN_TEXTS.Addscustom		= "小怪出现 - %s"
+DBM_CORE_AUTO_SPEC_WARN_TEXTS.Addscustom		= "小怪出现 - %%s"
 
 -- Auto-generated Special Warning Localizations
 DBM_CORE_AUTO_SPEC_WARN_OPTIONS.spell			= "特殊警报：$spell:%s"
@@ -407,7 +399,7 @@ DBM_CORE_AUTO_TIMER_TEXTS.active				= "%s结束"--Buff/Debuff/event on boss
 DBM_CORE_AUTO_TIMER_TEXTS.fades					= "%s消失"--Buff/Debuff on players
 DBM_CORE_AUTO_TIMER_TEXTS.ai					= "%s人工智能计时冷却"
 DBM_CORE_AUTO_TIMER_TEXTS.cd					= "%s冷却"
-DBM_CORE_AUTO_TIMER_TEXTS.cdcount				= "%s冷却（%%d）"
+DBM_CORE_AUTO_TIMER_TEXTS.cdcount				= "%s冷却（%%s）"
 DBM_CORE_AUTO_TIMER_TEXTS.cdsource				= "%s冷却: >%%s<"
 DBM_CORE_AUTO_TIMER_TEXTS.cdspecial				= "特殊技能冷却"
 DBM_CORE_AUTO_TIMER_TEXTS.next 					= "下一次%s"
@@ -417,7 +409,7 @@ DBM_CORE_AUTO_TIMER_TEXTS.nextspecial			= "下一次特殊技能"
 DBM_CORE_AUTO_TIMER_TEXTS.achievement 			= "%s"
 DBM_CORE_AUTO_TIMER_TEXTS.stage					= "下一阶段"
 DBM_CORE_AUTO_TIMER_TEXTS.adds					= "下一波小怪"
-DBM_CORE_AUTO_TIMER_TEXTS.addscustom			= "小怪 (%s)"
+DBM_CORE_AUTO_TIMER_TEXTS.addscustom			= "小怪 (%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.roleplay				= GUILD_INTEREST_RP
 
 DBM_CORE_AUTO_TIMER_OPTIONS.target				= "计时条：$spell:%s减益效果持续时间"
@@ -463,7 +455,7 @@ DBM_CORE_AUTO_YELL_OPTION_TEXT.position		= "当你受到$spell:%s影响时大喊
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.shortyell  = "%s"
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.yell		= UnitName("player") .. " 中了%s"
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.count		= UnitName("player") .. " 中了%s (%%d)"
-DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.fade		= "%s 于%%d秒后消失"
+DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.fade		= "%s 剩%%d秒"
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.shortfade	= "%%d秒"
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.iconfade	= "{rt%%2$d}%%1$d秒" --应该对的吧。
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT.position	= UnitName("player").." ({rt%%3$d})中了%1$s (%%1$s - {rt%%2$d})" --리동윤

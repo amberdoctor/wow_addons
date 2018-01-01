@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1873, "DBM-TombofSargeras", nil, 875)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 16817 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 16987 $"):sub(12, -3))
 mod:SetCreatureID(116939)--Maiden of Valor 120437
 mod:SetEncounterID(2038)
 mod:SetZone()
@@ -58,7 +58,7 @@ local specWarnDesolateOther			= mod:NewSpecialWarningTaunt(236494, nil, nil, nil
 ----Maiden of Valor
 local specWarnCorruptedMatrix		= mod:NewSpecialWarningMoveTo(233556, "Tank", nil, nil, 1, 7)
 local specWarnCleansingProtocol		= mod:NewSpecialWarningSwitch(233856, "-Healer", nil, nil, 3, 2)
-local specWarnTaintedEssence		= mod:NewSpecialWarningStack(240728, nil, 4, nil, nil, 1, 6)
+local specWarnTaintedEssence		= mod:NewSpecialWarningStack(240728, nil, 6, nil, nil, 1, 6)
 local yellTaintedEssence			= mod:NewShortFadesYell(240728)
 --Stage Two: An Avatar Awakened
 local specWarnDarkMark				= mod:NewSpecialWarningYouPos(239739, nil, nil, nil, 1, 2)
@@ -76,7 +76,7 @@ local timerUnboundChaosCD			= mod:NewCDCountTimer(35, 234059, nil, nil, nil, 3)-
 local timerShadowyBladesCD			= mod:NewCDTimer(30, 236571, nil, nil, nil, 3)--30-46
 local timerDesolateCD				= mod:NewCDTimer(11.4, 236494, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
 ----Maiden of Valor
-mod:AddTimerLine(EJ_GetSectionInfo(14713))
+mod:AddTimerLine(DBM:EJ_GetSectionInfo(14713))
 local timerCorruptedMatrixCD		= mod:NewNextTimer(40, 233556, nil, nil, nil, 5)
 local timerCorruptedMatrix			= mod:NewCastTimer(10, 233556, nil, nil, nil, 5)
 --Stage Two: An Avatar Awakened
@@ -423,7 +423,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif spellId == 240728 then
 		if args:IsPlayer() then
 			local amount = args.amount or 1
-			if amount >= 4 then
+			if amount >= 6 then
 				specWarnTaintedEssence:Show(amount)
 				voiceTaintedEssence:Play("stackhigh")
 				yellTaintedEssence:Yell(amount)
