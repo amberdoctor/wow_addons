@@ -53,7 +53,8 @@ L:SetMiscLocalization({
 	Purifiers 	=	"Purifier",
 	Bats 		=	"Bats",
 	EonarHealth	= 	"Eonar Health",
-	EonarPower	= 	"Eonar Power"
+	EonarPower	= 	"Eonar Power",
+	NextLoc		=	"Next:"
 })
 
 ---------------------------
@@ -94,12 +95,20 @@ L= DBM:GetModLocalization(1983)
 ---------------------------
 L= DBM:GetModLocalization(1986)
 
+L:SetOptionLocalization({
+	SetLighting				= "Automatically turn lighting setting to low when coven is engaged and restore on combat end (Not supported in mac client since mac client doesn't support low lighting)"
+})
+
 L:SetTimerLocalization({
 	timerBossIncoming		= DBM_INCOMING
 })
 
 L:SetOptionLocalization({
-	timerBossIncoming		= "Show timer for next boss swap"
+	timerBossIncoming	= "Show timer for next boss swap",
+	TauntBehavior		= "Set taunt behavior for tank swaps",
+	TwoMythicThreeNon	= "Swap at 2 stacks on mythic, 3 stacks on other difficulties",--Default
+	TwoAlways			= "Always swap at 2 stacks regardless of difficulty",
+	ThreeAlways			= "Always swap at 3 stacks regardless of difficulty"
 })
 
 ---------------------------
@@ -110,13 +119,19 @@ L= DBM:GetModLocalization(1984)
 L:SetMiscLocalization({
 	Foe			=	"Foe",
 	Rend		=	"Rend",
-	Tempest 	=	"Tempest"
+	Tempest 	=	"Tempest",
+	Current		=	"Current:"
 })
 
 ---------------------------
 -- Argus the Unmaker --
 ---------------------------
 L= DBM:GetModLocalization(2031)
+
+L:SetMiscLocalization({
+	SeaText =		"{rt6} Haste/Vers",
+	SkyText =		"{rt5} Crit/Mast"
+})
 
 -------------
 --  Trash  --

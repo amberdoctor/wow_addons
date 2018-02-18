@@ -16,7 +16,7 @@ You can use the following command to accomplish this:
 - CrucibleWeight_v18
 - DBM-Archaeology-r28-alpha
 - DBM-Challenges-r94
-- DBM-Core-7.3.15
+- DBM-Core-7.3.21
 - DBM-PvP-r68
 - DBM-SpellTimers-v4-r111
 - DBM-TimelessIsle-r37-alpha

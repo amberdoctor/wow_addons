@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1980, "DBM-Party-Legion", 13, 945)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 16737 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17146 $"):sub(12, -3))
 mod:SetCreatureID(124872)
 mod:SetEncounterID(2066)
 mod:SetZone()
@@ -19,11 +19,10 @@ mod:RegisterEventsInCombat(
 --TODO, see if swoop/screech target can be identified
 --Void Hunter
 local warnUmbralFlanking				= mod:NewTargetAnnounce(247245, 3)
---local warnRavagingDarkness				= mod:NewSpellAnnounce(245802, 3)
+local warnVoidTrap						= mod:NewSpellAnnounce(246026, 3, nil, nil, nil, nil, nil, 2)
 --local warnDreadScreech					= mod:NewCastAnnounce(248831, 2)
 
 --local specWarnHuntersRush				= mod:NewSpecialWarningDefensive(247145, "Tank", nil, nil, 1, 2)
-local specWarnVoidTrap					= mod:NewSpecialWarningDodge(246026, nil, nil, nil, 2, 2)
 local specWarnOverloadTrap				= mod:NewSpecialWarningDodge(247206, nil, nil, nil, 2, 2)
 local specWarnUmbralFlanking			= mod:NewSpecialWarningMoveAway(247245, nil, nil, nil, 1, 2)
 local yellUmbralFlanking				= mod:NewYell(247245)
@@ -37,13 +36,6 @@ local timerUmbralFlankingCD				= mod:NewCDTimer(35.2, 247245, nil, nil, nil, 3)
 local timerScreechCD					= mod:NewCDTimer(15.4, 248831, nil, nil, nil, 3, nil, DBM_CORE_HEROIC_ICON)
 
 --local countdownBreath					= mod:NewCountdown(22, 227233)
-
---local voiceHuntersRush					= mod:NewVoice(247145)--defensive
-local voiceVoidTrap						= mod:NewVoice(246026)--watchstep
-local voiceOverloadTrap					= mod:NewVoice(247206)--watchstep
-local voiceUmbralFlanking				= mod:NewVoice(247245)--scatter
-local voiceRavagingDarkness				= mod:NewVoice(245802)--watchstep
-local voiceDreadScreech					= mod:NewVoice(248831, "HasInterrupt")--kickcast
 
 function mod:OnCombatStart(delay)
 	timerRavagingDarknessCD:Start(5.5-delay)
@@ -60,11 +52,11 @@ function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
 	if spellId == 245802 then
 		specWarnRavagingDarkness:Show()
-		voiceRavagingDarkness:Play("watchstep")
+		specWarnRavagingDarkness:Play("watchstep")
 		timerRavagingDarknessCD:Start()
 	elseif spellId == 248831 then
 		specWarnDreadScreech:Show(args.sourceName)
-		voiceDreadScreech:Play("kickcast")
+		specWarnDreadScreech:Play("kickcast")
 		timerScreechCD:Start()
 	end
 end
@@ -82,12 +74,12 @@ function mod:SPELL_AURA_APPLIED(args)
 		warnUmbralFlanking:CombinedShow(0.3, args.destName)
 		if args:IsPlayer() then
 			specWarnUmbralFlanking:Show()
-			voiceUmbralFlanking:Play("scatter")
+			specWarnUmbralFlanking:Play("scatter")
 			yellUmbralFlanking:Yell()
 		end
 --	elseif spellId == 247145 then
 --		specWarnHuntersRush:Show()
---		voiceHuntersRush:Play("defensive")
+--		specWarnHuntersRush:Play("defensive")
 	end
 end
 
@@ -108,12 +100,12 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 	if spellId == 247175 then--Void Trap
-		specWarnVoidTrap:Show()
-		voiceVoidTrap:Play("watchstep")
+		warnVoidTrap:Show()
+		warnVoidTrap:Play("watchstep")
 		timerVoidTrapCD:Start()
 	elseif spellId == 247206 then--Overload Trap
 		specWarnOverloadTrap:Show()
-		voiceOverloadTrap:Play("watchstep")
+		specWarnOverloadTrap:Play("watchstep")
 		timerOverloadTrapCD:Start()
 	end
 end
