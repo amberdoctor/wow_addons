@@ -7,6 +7,7 @@ You can use the following command to accomplish this:
 `$ git config --local core.autocrlf false`
 
 ## Addons
+- AethysRotation-7.3.2.03
 - Archy-7.3.0.2
 - AskMrRobot-54
 - BloodTrader-v2.2
