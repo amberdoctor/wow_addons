@@ -1,0 +1,396 @@
+lightweight tag c580b2400d294ea02b5522c82b7cea3675946309 7.3.2.03
+Author:	Aethys256 <aethys256@users.noreply.github.com>
+Date:	Sat Feb 10 19:28:39 2018 +0100
+
+commit c580b2400d294ea02b5522c82b7cea3675946309
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sat Feb 10 19:28:39 2018 +0100
+
+    [TOC] Minor bump
+
+commit d97dc7eea44042cfa82cc696ac9133451c3faa3a
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Fri Feb 9 18:11:00 2018 +0100
+
+    [Arcane] Skip Mark of Aluneth when casting it
+
+commit e9b81cc5a0c4878eb58d5266d759b0ccbc99e79a
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Fri Feb 9 17:58:42 2018 +0100
+
+    [All] Add Overrides.lua
+
+commit b81bf575a07e73baf5467a853299ef6962b495a1
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Fri Feb 9 10:50:35 2018 +0100
+
+    [Readme] fix Vengeance color
+
+commit d63f086283bcb32626ae73033d27937dc44432eb
+Author: Glynnyx <glynny_battle.net@hotmail.co.uk>
+Date:   Thu Feb 8 22:19:54 2018 +0000
+
+    [README] Updated to state max level support only
+
+commit 19a13478374f5bb0ea046669863627c74e4d4ba0
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Sun Feb 4 18:09:39 2018 +0100
+
+    [Subtlety] Fix error
+
+commit ec9f1b6b48aee1476c812015b36b07c1ff026def
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Sat Feb 3 14:40:33 2018 +0100
+
+    [Subtlety] Update APL
+
+commit 859a6d8857ba051c9cfb434cad8e990d9d51b55b
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Fri Feb 2 19:12:14 2018 +0100
+
+    [Survival] Remove debug prints
+
+commit a5f79ebc5255d1c215056df5bbb6e7df79102e30
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Mon Jan 29 00:46:40 2018 -0500
+
+    [Assassination] Update APL for Exsanguinate Changes
+
+commit e979fece2dadb4b4869b3db5464c37286b5f7d2a
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Sun Jan 28 17:59:07 2018 -0500
+
+    [Assassination] Update APL to Latest
+
+commit cc0e89a19d8ed1280a6f74b3dfdd49cc0cbf7807
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sat Jan 27 03:39:15 2018 +0100
+
+    [Commons] Fix bug with AoE toggle
+
+commit c6123e5b1389ae0fbbcc8e24cf6f5879e97f85a4
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Thu Jan 25 18:31:11 2018 +0100
+
+    [Brewmaster] Fix niuzao
+
+commit 86cc267bde9b84e36f34776c96b8c6306472857a
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Thu Jan 25 18:30:59 2018 +0100
+
+    [Vengeance] Should be ok now
+
+commit ba996e0e45ada7092f49a031ad88e9fabfca22c1
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Wed Jan 24 13:45:07 2018 +0100
+
+    [Paladin] Add GUI for Settings
+
+commit 3543728beb07c332fb4202b3094410dd0ddf63ce
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Wed Jan 24 13:19:28 2018 +0100
+
+    [Retribution] Increase rotation tolerance with OffGCD Crusade
+
+commit 0e3ff97f65a48fe902884d76c14a90f15befc3d4
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Tue Jan 23 17:21:05 2018 +0100
+
+    [Subtlety] Add SSW Refunds for Garothi and Kingaroth
+
+commit 299f600f079d055f0c63a6affaa26d6f0e135f59
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Tue Jan 23 11:29:16 2018 +0100
+
+    [readme] color...
+
+commit a021fa1f7fb64cbdc1de72671f49527773933212
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Tue Jan 23 11:28:29 2018 +0100
+
+    [Readme] put mages rotation to OK
+
+commit 657774aa85ae0fa67e3e1d4f268689e13aa5c3a1
+Author: Glynny <glynny_battle.net@hotmail.co.uk>
+Date:   Tue Jan 23 09:49:54 2018 +0000
+
+    [ReadMe] Shameless Update
+
+commit 327e627c5c0778712cb001779d4b7723ccb5e4bf
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Tue Jan 23 09:48:46 2018 +0100
+
+    [Affliction] Phantom singularity as offgcd option
+
+commit f89f58e89da7fdc0e62a4b913f385292c8115e16
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Mon Jan 22 23:15:49 2018 -0500
+
+    [Assassination] Update APL and Display Adjustments
+    
+    * Update new Kingsbane logic
+    * Use "normal" rotation logic instead of a specific OOC block since Assassination has no special OOC logic
+    * Don't show cycle target suggestions on the nameplate of your currently selected target
+
+commit b5585fc0472682d7e5272e950dffb3715a4fbd51
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Mon Jan 22 23:09:47 2018 +0100
+
+    [Main] Fix bug with Masque Support
+
+commit 73de8ebb13d8156e436f96ad5ffe22b9cde1f77e
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Mon Jan 22 00:01:13 2018 -0500
+
+    Update Retribution.lua
+
+commit 93db30060997b2cf5ed2c5082b6bad2c84d9f41b
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sat Jan 20 16:46:27 2018 +0100
+
+    [Vengeance] Fix for Soul Cleave cost range (up to 50 Pain)
+
+commit 5ecbb7be62a9da7214eac134f2fb3bcd545c2ee6
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sat Jan 20 16:30:57 2018 +0100
+
+    [Vengeance] Make it ok with current meta build
+
+commit 74edbfa5ddff57516816aabcc681be2b7d533ffb
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sat Jan 20 15:15:16 2018 +0100
+
+    [Vengeance] Make it less broken
+
+commit 0667f932e4ef107816b8009cff6caefd7875d6ff
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sat Jan 20 13:36:43 2018 +0100
+
+    [Brewmaster] Implements purify things & settings
+
+commit c3ab5939d013d4b1bbeb99df1e410dbdfc8c1d51
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Fri Jan 19 12:30:25 2018 +0100
+
+    [Arcane] Fix lua error
+
+commit c3ab5939d013d4b1bbeb99df1e410dbdfc8c1d51
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Fri Jan 19 12:30:25 2018 +0100
+
+    [Arcane] Fix lua error
+
+commit bf1e4853cd9f93ba277bdf911a65eadb5750186c
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Thu Jan 18 13:58:15 2018 +0100
+
+    [Assassination] Update APL
+
+commit a4f54b50e08f22865ccbdf55f1c28d56e654d3bc
+Author: Krich <pagarizabal2@gmail.com>
+Date:   Wed Jan 17 21:46:56 2018 +0100
+
+    [Frost DK] Updated apl
+
+commit 06ae99ade2567a094ededac4a770b023fd839312
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Wed Jan 17 11:54:02 2018 -0500
+
+    Update BoK Base cost for low level characters
+    
+    Adjust LowestReady Time
+
+commit 64dc073efbc60a92a499225590a389c85b1ae468
+Author: Krich <pagarizabal2@gmail.com>
+Date:   Tue Jan 16 20:17:39 2018 +0100
+
+    [Frost DK] Display a Pool/Wait Icon instead of nothing when pooling resources. Moved OOR rotation to cover BoS Oblit APLs
+
+commit 27aa7a8bfa40b4aa0f961d21ffd2531d792d0d82
+Author: Krich <pagarizabal2@gmail.com>
+Date:   Fri Jan 12 20:20:31 2018 +0100
+
+    [Frost DK] Added Basic OOR Rotation
+    
+    now the module will suggest the following when oor
+    FS when enough rp
+    HB when runes >= 3
+    Pool icon to get into melee range asap
+
+commit b32bb9e7e4185f310059ace3d27ed5d0462dda00
+Author: Thomas Neumann <thomas.neumann@1und1.de>
+Date:   Fri Jan 12 15:22:50 2018 +0100
+
+    [Frost] Added missing OffGCD panel option for ArcaneTorrent
+
+commit 7b50d34c8166e106f7881d6f7c498a68b6c16874
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Thu Jan 11 15:13:39 2018 -0500
+
+    [Assassination] Change SuggestCycleDoT TTD Check to Parameter
+
+commit 010bb49db309cd3f779d4b0722c25d459ce86b17
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Thu Jan 11 13:59:53 2018 -0500
+
+    [Assassination] Extend Ranged DoT Cycle Target Support
+    
+    * Extend the ranged cycle target support added for the AoE action list to all DoT cycle targets, this will allow suggesting to Rupture/Garrote targets within FoK range instead of just melee range if enabled
+    * Add checkbox setting to disable ranged cycle target DoT suggestions if desired
+    * Add cycling to one Garrote line that did not have it previously
+
+commit 1dde610df497ac36df5f6a792245690e5d11e942
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Thu Jan 11 13:02:22 2018 -0500
+
+    [Assassination] Update AoE Thresholds, Fix Typo
+    
+    * Bring over APL tweaks to AoE target thresholds and Envenom maintain removal
+    * Fix typo with Kingsbane/Nightstalker conditional
+
+commit f36db38d7bae9c0d59299bda28a3e34ebdc9d578
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Thu Jan 11 10:40:15 2018 -0500
+
+    Minor WW adjustments
+
+commit 76647227437ff3a9ec443efaf351c628b663bba5
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Thu Jan 11 14:53:36 2018 +0100
+
+    [Subtlety] Implement TimeToSht
+
+commit d0b1d1872eda577f4effc447109f4ace6d731f8c
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Thu Jan 11 13:10:15 2018 +0100
+
+    [Assassination] Update with latest APL change
+
+commit eb5f133609a23a107d18031a8ccd17ea54b59e22
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Thu Jan 11 08:51:13 2018 +0100
+
+    [Fire] More fixes
+
+commit 6cde97d6a0741629bbc3c867048eb6dcb5ce2364
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Wed Jan 10 23:47:27 2018 +0100
+
+    [Fury] Add Pummel interrupt
+
+commit 9505c8d0356ecfbd3843e94b81ea6fb441c5ac8c
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Tue Jan 9 23:24:48 2018 +0100
+
+    [README] Brewmaster OK
+
+commit 7ebc840118b0d9d3ba5077027e068cdfc1fe4821
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Mon Jan 8 10:46:14 2018 +0100
+
+    [Balance] Add a dot in mvt if nothing else is available
+
+commit 37aede1b2b4f0943e921242f9503f43971607e71
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Mon Jan 8 10:44:18 2018 +0100
+
+    [Balance] rip moonfire spam in mvt too
+
+commit 58718146ee5c2f829ab4beb37d01549bea34598a
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Mon Jan 8 10:43:15 2018 +0100
+
+    [Balance] rip moonfire spam
+
+commit 66d6344f7098b1ab0b1728fba5f28231f8ba4fab
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Mon Jan 8 07:29:45 2018 +0100
+
+    [Affliction] Fix Fear
+
+commit e0e39ab822129b14ad0b92754817d9fa9d5cf893
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 18:50:48 2018 +0100
+
+    [Brewmaster] Sync APL changes
+
+commit e19e3b33bfdd2d3559d45ed75b86617dd279d33c
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 15:59:13 2018 +0100
+
+    [Brewmaster] Fix Ironskin Brew maintain
+
+commit 554e24addc0ba0bef29c123dfaad42a98da15fce
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 12:53:51 2018 +0100
+
+    [Brewmaster] Range stuff & various fixes
+
+commit 387e6278ab4cd33826c91324735653ce40f004e7
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 11:39:07 2018 +0100
+
+    [ReadMe] Rotations & Contributors update
+
+commit 0f8d41ac0de039c32f179f93a2e4f04a2da5656a
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 11:33:00 2018 +0100
+
+    [Brewmaster] Typo
+
+commit e6386340d8d312031d59bb07f86d6ac9ee38f9ec
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 11:31:24 2018 +0100
+
+    [Brewmaster] Import some stuff from ARParser
+
+commit 1ade57ea62776a5322f4432cf48dc6225fc728b1
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 11:07:13 2018 +0100
+
+    [Brewmaster] Rework
+
+commit 0d7c6d9a0e1a7caa26d6b767eb250789c025c2c0
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 11:06:54 2018 +0100
+
+    [Protection Pal] Implements encounter tank stuff
+
+commit dd9575f247b26efa154e5b3c2e545db9e2cdf402
+Author: Aethys256 <aethys256@users.noreply.github.com>
+Date:   Sun Jan 7 11:06:35 2018 +0100
+
+    [Guardian] Better maul usage & implements encounter tank stuff
+
+commit a6b3f8aef994b548ad77b0b19c76cd39ae7807b0
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Sat Jan 6 17:47:06 2018 -0500
+
+    Fix Cap from screwing rotation
+
+commit 65a8d62f1c09a1c3e59e4ae3caabe014346c81be
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Sat Jan 6 17:03:34 2018 -0500
+
+    LUA bug
+
+commit 84bf53925ed083f0e2a26ef93140b3accc72a183
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Sat Jan 6 15:57:50 2018 -0500
+
+    Minor bug fixes
+
+commit d002987856caeaeb1a6bf492e02a10bbb749e4d8
+Author: Timothy Seltman <Hinalover@users.noreply.github.com>
+Date:   Sat Jan 6 15:12:34 2018 -0500
+
+    Update Windwalker.lua
+    
+    Update with the latest APL changes
+
+commit dd29457a6a2cef03c7e1f5506a42af0d2cd5571d
+Author: fuu <requiredbm@live.at>
+Date:   Wed Jan 3 16:31:33 2018 +0100
+
+    Smal update to shd
+

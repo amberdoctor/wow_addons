@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Brawlers", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 15745 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17204 $"):sub(12, -3))
 --mod:SetCreatureID(60491)
 --mod:SetModelID(41448)
 mod:SetZone(DBM_DISABLE_ZONE_DETECTION)
@@ -25,7 +25,6 @@ local berserkTimer			= mod:NewBerserkTimer(120)--all fights have a 2 min enrage 
 mod:AddBoolOption("SpectatorMode", true)
 mod:AddBoolOption("SpeakOutQueue", true)
 mod:AddBoolOption("NormalizeVolume", true, "misc")
-mod:RemoveOption("HealthFrame")
 
 local playerIsFighting = false
 local currentFighter = nil
@@ -34,6 +33,7 @@ local currentZoneID = select(8, GetInstanceInfo())
 local modsStopped = false
 local eventsRegistered = false
 local lastRank = 0
+local QueuedBuff = DBM:GetSpellInfo(132639)
 
 local function setDialog(self, set)
 	if not self.Options.NormalizeVolume then return end
@@ -163,6 +163,7 @@ end
 function mod:ZONE_CHANGED_NEW_AREA()
 	currentZoneID = select(8, GetInstanceInfo())
 	if currentZoneID == 369 or currentZoneID == 1043 then
+		QueuedBuff = DBM:GetSpellInfo(132639)
 		playerIsFighting = false
 		currentFighter = nil
 		currentRank = 0
@@ -263,7 +264,6 @@ function mod:OnSync(msg)
 end
 
 do
-	local QueuedBuff = GetSpellInfo(132639)
 	function mod:UNIT_AURA(uId)
 		local currentQueueRank = select(17, UnitBuff("player", QueuedBuff))
 		if currentQueueRank and currentQueueRank ~= lastRank then

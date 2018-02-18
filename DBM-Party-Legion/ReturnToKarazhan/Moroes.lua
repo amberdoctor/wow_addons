@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1837, "DBM-Party-Legion", 11, 860)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 16800 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17174 $"):sub(12, -3))
 mod:SetCreatureID(114312)
 mod:SetEncounterID(1961)
 mod:SetZone()
@@ -52,25 +52,21 @@ local timerWillBreakerCD			= mod:NewAITimer(40, 227672, nil, "Tank", nil, 5)
 
 --local countdownFocusedGazeCD		= mod:NewCountdown(40, 198006)
 
---Moroes
-local voiceCoatCheck				= mod:NewVoice(227832)--defensive/dispelnow
---Lord Crispin Ference
-local voiceWillBreaker				= mod:NewVoice(227672, "Tank")--shockwave
-
 --mod:AddSetIconOption("SetIconOnCharge", 198006, true)
 mod:AddInfoFrameOption(227909, true)
 
+local ccList = {
+	[1] = DBM:GetSpellInfo(227909),--Trap included with fight
+	[2] = DBM:GetSpellInfo(6770),--Rogue Sap
+	[3] = DBM:GetSpellInfo(9484),--Priest Shackle
+	[4] = DBM:GetSpellInfo(20066),--Paladin Repentance
+	[5] = DBM:GetSpellInfo(118),--Mage Polymorph
+	[6] = DBM:GetSpellInfo(51514),--Shaman Hex
+	[7] = DBM:GetSpellInfo(3355),--Hunter Freezing Trap
+}
+
 local updateInfoFrame
 do
-	local ccList = {
-		[1] = GetSpellInfo(227909),--Trap included with fight
-		[2] = GetSpellInfo(6770),--Rogue Sap
-		[3] = GetSpellInfo(9484),--Priest Shackle
-		[4] = GetSpellInfo(20066),--Paladin Repentance
-		[5] = GetSpellInfo(118),--Mage Polymorph
-		[6] = GetSpellInfo(51514),--Shaman Hex
-		[7] = GetSpellInfo(3355),--Hunter Freezing Trap
-	}
 	local lines = {}
 	local UnitDebuff, floor = UnitDebuff, math.floor
 	updateInfoFrame = function()
@@ -94,6 +90,15 @@ do
 end
 
 function mod:OnCombatStart(delay)
+	ccList = {
+		[1] = DBM:GetSpellInfo(227909),--Trap included with fight
+		[2] = DBM:GetSpellInfo(6770),--Rogue Sap
+		[3] = DBM:GetSpellInfo(9484),--Priest Shackle
+		[4] = DBM:GetSpellInfo(20066),--Paladin Repentance
+		[5] = DBM:GetSpellInfo(118),--Mage Polymorph
+		[6] = DBM:GetSpellInfo(51514),--Shaman Hex
+		[7] = DBM:GetSpellInfo(3355),--Hunter Freezing Trap
+	}
 	timerVanishCD:Start(8.2-delay)
 	timerCoatCheckCD:Start(33-delay)
 	if self.Options.InfoFrame then
@@ -112,7 +117,7 @@ function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
 	if spellId == 227672 then
 		specWarnWillBreaker:Show()
-		voiceWillBreaker:Play("shockwave")
+		specWarnWillBreaker:Play("shockwave")
 		timerWillBreakerCD:Start()
 	elseif spellId == 227578 then
 		warnHealingStream:Show()
@@ -141,26 +146,17 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerCoatCheckCD:Start()
 		if args:IsPlayer() then
 			specWarnCoatCheck:Show()
-			voiceCoatCheck:Play("defensive")
+			specWarnCoatCheck:Play("defensive")
 		else
 			specWarnCoatCheckHealer:Show(args.destName)
 			if self.Options.SpecWarn227832dispel then
-				voiceCoatCheck:Play("dispelnow")
+				specWarnCoatCheckHealer:Play("dispelnow")
 			end
 		end
 	elseif spellId == 227616 then
 		warnEmpoweredArms:Show(args.destName)
 	end
 end
-
---[[
-function mod:SPELL_AURA_REMOVED(args)
-	local spellId = args.spellId
-	if spellId == 198006 then
-
-	end
-end
---]]
 
 function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
@@ -178,20 +174,3 @@ function mod:UNIT_DIED(args)
 		timerWillBreakerCD:Stop()
 	end
 end
-
---[[
-function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
-	if spellId == 205611 and destGUID == UnitGUID("player") and self:AntiSpam(2, 1) then
---		specWarnMiasma:Show()
---		voiceMiasma:Play("runaway")
-	end
-end
-mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
-
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
-	if spellId == 206341 then
-	
-	end
-end
---]]

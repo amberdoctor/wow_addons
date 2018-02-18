@@ -7,6 +7,7 @@ You can use the following command to accomplish this:
 `$ git config --local core.autocrlf false`
 
 ## Addons
+- AethysRotation-7.3.2.03
 - Archy-7.3.0.2
 - AskMrRobot-54
 - BloodTrader-v2.2
@@ -15,7 +16,7 @@ You can use the following command to accomplish this:
 - CrucibleWeight_v18
 - DBM-Archaeology-r28-alpha
 - DBM-Challenges-r94
-- DBM-Core-7.3.15
+- DBM-Core-7.3.21
 - DBM-PvP-r68
 - DBM-SpellTimers-v4-r111
 - DBM-TimelessIsle-r37-alpha
