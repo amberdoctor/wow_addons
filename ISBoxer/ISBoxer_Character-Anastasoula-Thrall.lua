@@ -57,6 +57,8 @@ function isboxer.Character_LoadBinds()
 
 		isboxer.SetMacro("JambaStrobeOff","ALT-CTRL-SHIFT-F12","/jamba-follow strobeoff all\n",nil,nil,nil,1);
 
+		isboxer.SetMacro("","ALT-SHIFT-Z","/cast Crimson Water Strider\n",nil,nil,nil,1);
+
 		isboxer.ClearMembers();
 		isboxer.AddMember("Philomela-Thrall");
 		isboxer.AddMember("Anastasoula-Thrall");
