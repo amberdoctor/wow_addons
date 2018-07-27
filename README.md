@@ -11,12 +11,12 @@ You can use the following command to accomplish this:
 - Archy-7.3.0.2
 - AskMrRobot-54
 - BloodTrader-v2.2
-- CanIMogIt-7.3.2v1.1
-- Coordinates_1_23
+- CanIMogIt-78.0.0v1.9
+- Coordinates_v2.03
 - CrucibleWeight_v18
 - DBM-Archaeology-r28-alpha
 - DBM-Challenges-r94
-- DBM-Core-7.3.21
+- DBM-Core-8.0.1
 - DBM-PvP-r68
 - DBM-SpellTimers-v4-r111
 - DBM-TimelessIsle-r37-alpha

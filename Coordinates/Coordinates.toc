@@ -1,10 +1,11 @@
-## Interface: 70300
+## Interface: 80000
+## X-Min-Interface: 80000
 ## Title: Coordinates
-
-## Version: 1.23
-## Author: Szandos
+## Version: 2.03
+## Author: TomCat (Bladefist US)
 ## Notes: Adds coordinates to the minimap and the world map
 ## SavedVariables: CoordinatesDB
+## LoadOnDemand: 0
+## DefaultState: enabled
 
 Coordinates.lua
-

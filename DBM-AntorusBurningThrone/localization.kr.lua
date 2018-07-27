@@ -95,13 +95,22 @@ L:SetOptionLocalization({
 	TwoMythicThreeNon	= "신화에선 2중첩, 그 외 난이도에선 3중첩",--Default
 	TwoAlways			= "난이도 관계없이 2중첩",
 	ThreeAlways			= "난이도 관계없이 3중첩",
-	SetLighting				= "쉬바라 전투가 시작되면 조명 품질 설정이 자동으로 낮음으로 바뀌고 전투가 끝나면 원래 설정으로 복구 (맥용 클라이언트에선 조명 품질 낮음 설정을 할 수 없으므로 지원하지 않음)"
+	SetLighting				= "쉬바라 전투가 시작되면 조명 품질 설정이 자동으로 낮음으로 바뀌고 전투가 끝나면 원래 설정으로 복구 (맥용 클라이언트에선 조명 품질을 낮음으로 설정할 수 없으므로 지원하지 않음)",
+	InterruptBehavior	= "공대원 차단 방식 설정 (공대장 권한 필요)",
+	Three				= "3인 로테이션 ",--Default
+	Four				= "4인 로테이션 ",
+	Five				= "5인 로테이션 ",
+	IgnoreFirstKick		= "이 옵션을 켜면 맨 처음 차단은 로테이션에서 제외됩니다 (공대장 권한 필요)"
 })
 
 ---------------------------
 -- Aggramar --
 ---------------------------
 L= DBM:GetModLocalization(1984)
+
+L:SetOptionLocalization({
+	ignoreThreeTank	= "3탱 이상 구성일 땐 분쇄/적 해체 도발 특수 경고를 표시하지 않습니다. (이런 구성에선 DBM이 정확한 탱킹 로테이션을 감지할 수 없음) 탱커가 죽어서 2명으로 줄어들면 꺼졌던 도발 알림이 다시 작동합니다"
+})
 
 L:SetMiscLocalization({
 	Foe			=	"적 해체",
@@ -115,9 +124,17 @@ L:SetMiscLocalization({
 ---------------------------
 L= DBM:GetModLocalization(2031)
 
+L:SetTimerLocalization({
+	timerSargSentenceCD	= "선고 쿨타임 (%s)"
+})
+
 L:SetMiscLocalization({
-	SeaText =		"{rt6} 가속/유연",
-	SkyText =		"{rt5} 치명/특화"
+	SeaText		=	"{rt6} 가속/유연",
+	SkyText		=	"{rt5} 치명/특화",
+	Blight		=	"역병",
+	Burst		=   	"분출",
+	Sentence	=	"선고",
+	Bomb		=	"폭탄"
 })
 
 -------------

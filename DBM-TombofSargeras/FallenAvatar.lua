@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1873, "DBM-TombofSargeras", nil, 875)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17112 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17623 $"):sub(12, -3))
 mod:SetCreatureID(116939)--Maiden of Valor 120437
 mod:SetEncounterID(2038)
 mod:SetZone()
@@ -130,7 +130,7 @@ local function warnDarkMarkTargets(self, spellName)
 		local name = darkMarkTargets[i]
 		if name == playerName then
 			yellDarkMark:Yell(icon, spellName, icon)
-			local _, _, _, _, _, _, expires = UnitDebuff("player", spellName)
+			local _, _, _, _, _, expires = DBM:UnitDebuff("player", spellName)
 			if expires then
 				local remaining = expires-GetTime()
 				yellDarkMarkFades:Countdown(remaining, nil, icon)
@@ -142,7 +142,7 @@ local function warnDarkMarkTargets(self, spellName)
 			self:SetIcon(name, icon)
 		end
 	end
-	if not UnitDebuff("player", spellName) then
+	if not DBM:UnitDebuff("player", spellName) then
 		specWarnDarkMarkOther:Show(DBM_ALLY)
 		specWarnDarkMarkOther:Play("gathershare")
 	end
@@ -170,7 +170,7 @@ do
 		table.wipe(sortedLines)
 		--Maiden shield amount i active first
 		if mod.vb.shieldActive then
-			local absorbAmount = select(17, UnitBuff("boss2", shieldName)) or select(17, UnitDebuff("boss2", shieldName))
+			local absorbAmount = select(16, DBM:UnitBuff("boss2", shieldName)) or select(16, DBM:UnitDebuff("boss2", shieldName))
 			if absorbAmount then
 				local percent = absorbAmount / mod.vb.shieldActive * 100
 				addLine(shieldName, math.floor(percent))
@@ -214,8 +214,6 @@ do
 end
 
 function mod:OnCombatStart(delay)
-	beamName = DBM:GetSpellInfo(238244)
-	touch, rupture, unbound, shadowy, shieldName = DBM:GetSpellInfo(239207), DBM:GetSpellInfo(239132), DBM:GetSpellInfo(234059), DBM:GetSpellInfo(236571), DBM:GetSpellInfo(241008)
 	table.wipe(darkMarkTargets)
 	self.vb.phase = 1
 	self.vb.bladesIcon = 1
@@ -304,7 +302,7 @@ function mod:SPELL_CAST_START(args)
 		specWarnCleansingProtocol:Show()
 		specWarnCleansingProtocol:Play("targetchange")
 		countdownCleansingProtocol:Start()
-	elseif spellId == 233556 and self:AntiSpam(2, 2) and self.vb.phase == 1 then
+	elseif spellId == 233556 and self:AntiSpam(2, 2) and self.vb.phase == 1 and not self:IsLFR() then
 		specWarnCorruptedMatrix:Show(beamName)
 		specWarnCorruptedMatrix:Play("bosstobeam")
 		if self:IsMythic() then
@@ -391,7 +389,7 @@ function mod:SPELL_AURA_APPLIED(args)
 				specWarnDesolateYou:Show(amount)
 				specWarnDesolateYou:Play("stackhigh")
 			else
-				local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
+				local _, _, _, _, _, expireTime = DBM:UnitDebuff("player", args.spellName)
 				local remaining
 				if expireTime then
 					remaining = expireTime-GetTime()
@@ -487,8 +485,8 @@ function mod:CHAT_MSG_MONSTER_YELL(msg, npc, _, _, target)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 234057 then
 		self.vb.chaosCount = self.vb.chaosCount + 1
 		specWarnUnboundChaos:Show()

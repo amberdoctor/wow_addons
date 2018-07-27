@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1985, "DBM-AntorusBurningThrone", nil, 946)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17145 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17623 $"):sub(12, -3))
 mod:SetCreatureID(122104)
 mod:SetEncounterID(2064)
 mod:DisableESCombatDetection()--Remove if blizz fixes clicking portals causing this event to fire (even though boss isn't engaged)
@@ -16,7 +16,7 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 243983 244709 245504 244607 244915 246805 244689 244000",
-	"SPELL_CAST_SUCCESS 245050 244073 244112 244136 244138 244146 244145 244598 244016",
+	"SPELL_CAST_SUCCESS 245050 244598 244016",
 	"SPELL_AURA_APPLIED 244016 244383 244613 244949 244849 245050 245118",
 	"SPELL_AURA_APPLIED_DOSE 244016",
 	"SPELL_AURA_REFRESH 244016",
@@ -24,7 +24,7 @@ mod:RegisterEventsInCombat(
 --	"SPELL_PERIODIC_DAMAGE",
 --	"SPELL_PERIODIC_MISSED",
 	"UNIT_DIED",
-	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2 boss3 boss4 boss5"
+	"UNIT_SPELLCAST_SUCCEEDED boss1 player"
 )
 
 local Nexus = DBM:EJ_GetSectionInfo(15799)
@@ -44,15 +44,15 @@ local Nathreza = DBM:EJ_GetSectionInfo(15802)
 --Platform: Nexus
 local warnRealityTear					= mod:NewStackAnnounce(244016, 2, nil, "Tank")
 --Platform: Xoroth
-local warnXorothPortal					= mod:NewSpellAnnounce(244318, 2, nil, nil, nil, nil, nil, 2)
+local warnXorothPortal					= mod:NewSpellAnnounce(244318, 2, nil, nil, nil, nil, nil, 7)
 local warnAegisofFlames					= mod:NewTargetAnnounce(244383, 3, nil, nil, nil, nil, nil, nil, true)
 local warnAegisofFlamesEnded			= mod:NewEndAnnounce(244383, 1)
 local warnEverburningFlames				= mod:NewTargetAnnounce(244613, 2, nil, false)
 --Platform: Rancora
-local warnRancoraPortal					= mod:NewSpellAnnounce(246082, 2, nil, nil, nil, nil, nil, 2)
+local warnRancoraPortal					= mod:NewSpellAnnounce(246082, 2, nil, nil, nil, nil, nil, 7)
 local warnCausticSlime					= mod:NewTargetAnnounce(244849, 2, nil, false)
 --Platform: Nathreza
-local warnNathrezaPortal				= mod:NewSpellAnnounce(246157, 2, nil, nil, nil, nil, nil, 2)
+local warnNathrezaPortal				= mod:NewSpellAnnounce(246157, 2, nil, nil, nil, nil, nil, 7)
 local warnDelusions						= mod:NewTargetAnnounce(245050, 2, nil, "Healer")
 local warnCloyingShadows				= mod:NewTargetAnnounce(245118, 2, nil, false)
 local warnHungeringGloom				= mod:NewTargetAnnounce(245075, 2, nil, false)
@@ -61,7 +61,7 @@ local warnHungeringGloom				= mod:NewTargetAnnounce(245075, 2, nil, false)
 local specWarnRealityTear				= mod:NewSpecialWarningStack(244016, nil, 2, nil, nil, 1, 6)
 local specWarnRealityTearOther			= mod:NewSpecialWarningTaunt(244016, nil, nil, nil, 1, 2)
 local specWarnTransportPortal			= mod:NewSpecialWarningSwitch(244677, "-Healer", nil, 2, 1, 2)
-local specWarnCollapsingWorld			= mod:NewSpecialWarningSpell(243983, nil, nil, nil, 2, 2)
+local specWarnCollapsingWorld			= mod:NewSpecialWarningCount(243983, nil, nil, nil, 2, 2)
 local specWarnFelstormBarrage			= mod:NewSpecialWarningDodge(244000, nil, nil, nil, 2, 2)
 local specWarnFieryDetonation			= mod:NewSpecialWarningInterrupt(244709, "HasInterrupt", nil, 2, 1, 2)
 local specWarnHowlingShadows			= mod:NewSpecialWarningInterrupt(245504, "HasInterrupt", nil, nil, 1, 2)
@@ -117,25 +117,23 @@ mod:AddBoolOption("ShowAllPlatforms", false)
 
 mod.vb.shieldsActive = false
 mod.vb.felBarrageCast = 0
+mod.vb.worldCount = 0
 mod.vb.firstPortal = false
 local playerPlatform = 1--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
 local mindFog, aegisFlames, felMiasma = DBM:GetSpellInfo(245099), DBM:GetSpellInfo(244383), DBM:GetSpellInfo(244826)
-local everBurningFlames, causticSlime, CloyingShadows, hungeringGloom = DBM:GetSpellInfo(244613), DBM:GetSpellInfo(244849), DBM:GetSpellInfo(245118), DBM:GetSpellInfo(245075)
-local nexusPlatform, xorothPlatform, rancoraPlatform, nathrezaPlatform = {}, {}, {}, {}
 
 local updateRangeFrame
 do
-	local UnitDebuff = UnitDebuff
 	local function debuffFilter(uId)
-		if UnitDebuff(uId, everBurningFlames) or UnitDebuff(uId, hungeringGloom) or UnitDebuff(uId, causticSlime) then
+		if DBM:UnitDebuff(uId, 244613, 245075, 244849) then
 			return true
 		end
 	end
 	updateRangeFrame = function(self)
 		if not self.Options.RangeFrame then return end
-		if UnitDebuff("player", causticSlime) then
+		if DBM:UnitDebuff("player", 244849) then
 			DBM.RangeCheck:Show(10)
-		elseif UnitDebuff("player", everBurningFlames) or UnitDebuff("player", CloyingShadows) or UnitDebuff("player", hungeringGloom) then
+		elseif DBM:UnitDebuff("player", 244613, 245118, 245075) then
 			DBM.RangeCheck:Show(8)
 		else
 			DBM.RangeCheck:Show(10, debuffFilter)
@@ -173,26 +171,17 @@ local function updateAllTimers(self, ICD)
 end
 
 function mod:OnCombatStart(delay)
-	mindFog, aegisFlames, felMiasma = DBM:GetSpellInfo(245099), DBM:GetSpellInfo(244383), DBM:GetSpellInfo(244826)
-	everBurningFlames, causticSlime, CloyingShadows, hungeringGloom = DBM:GetSpellInfo(244613), DBM:GetSpellInfo(244849), DBM:GetSpellInfo(245118), DBM:GetSpellInfo(245075)
 	self.vb.shieldsActive = false
 	self.vb.firstPortal = false
 	self.vb.felBarrageCast = 0
+	self.vb.worldCount = 0
 	playerPlatform = 1--Nexus
-	table.wipe(nexusPlatform)
-	table.wipe(xorothPlatform)
-	table.wipe(rancoraPlatform)
-	table.wipe(nathrezaPlatform)
 	timerRealityTearCD:Start(6.2-delay)
 	countdownRealityTear:Start(6.2-delay)
 	timerCollapsingWorldCD:Start(10.5-delay)--Still variable, 10.5-18
 	countdownCollapsingWorld:Start(10.5-delay)
 	timerFelstormBarrageCD:Start(25.2-delay)
 	countdownFelstormBarrage:Start(25.2-delay)
-	for uId in DBM:GetGroupMembers() do
-		local name = DBM:GetUnitFullName(uId)
-		nexusPlatform[#nexusPlatform+1] = name
-	end
 end
 
 function mod:OnCombatEnd()
@@ -204,6 +193,7 @@ end
 function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
 	if spellId == 243983 then
+		self.vb.worldCount = self.vb.worldCount + 1
 		if self:IsEasy() then
 			timerCollapsingWorldCD:Start(37.7)--37, but offen delayed by ICD
 			countdownCollapsingWorld:Start(37.8)
@@ -215,17 +205,17 @@ function mod:SPELL_CAST_START(args)
 			countdownCollapsingWorld:Start(31.9)
 		end
 		if self.Options.ShowAllPlatforms or playerPlatform == 1 then--Actually on nexus platform
-			specWarnCollapsingWorld:Show()
+			specWarnCollapsingWorld:Show(self.vb.worldCount)
 			specWarnCollapsingWorld:Play("watchstep")
 		end
 		updateAllTimers(self, 9.7)
-	elseif spellId == 244709 and self:CheckInterruptFilter(args.sourceGUID) then
+	elseif spellId == 244709 and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 		specWarnFieryDetonation:Show(args.sourceName)
 		specWarnFieryDetonation:Play("kickcast")
-	elseif spellId == 245504 and self:CheckInterruptFilter(args.sourceGUID) then
+	elseif spellId == 245504 and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 		specWarnHowlingShadows:Show(args.sourceName)
 		specWarnHowlingShadows:Play("kickcast")
-	elseif spellId == 244607 and self:CheckInterruptFilter(args.sourceGUID) then
+	elseif spellId == 244607 and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 		specWarnFlamesofXoroth:Show(args.sourceName)
 		specWarnFlamesofXoroth:Play("kickcast")
 		timerFlamesofXorothCD:Start()
@@ -271,42 +261,6 @@ function mod:SPELL_CAST_SUCCESS(args)
 	local spellId = args.spellId
 	if spellId == 245050 then--Delusions
 		timerDelusionsCD:Start()
-	elseif spellId == 244073 then--Gateway: Xoroth (Entering)
-		xorothPlatform[#xorothPlatform+1] = args.sourceName
-		tDeleteItem(nexusPlatform, args.sourceName)
-		if args:IsPlayerSource() then
-			playerPlatform = 2--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
-		end
-	elseif spellId == 244112 then--Gateway: Xoroth (Leaving)
-		nexusPlatform[#nexusPlatform+1] = args.sourceName
-		tDeleteItem(xorothPlatform, args.sourceName)
-		if args:IsPlayerSource() then
-			playerPlatform = 1--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
-		end
-	elseif spellId == 244136 then--Gateway: Rancora (Entering)
-		rancoraPlatform[#rancoraPlatform+1] = args.sourceName
-		tDeleteItem(nexusPlatform, args.sourceName)
-		if args:IsPlayerSource() then
-			playerPlatform = 3--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
-		end
-	elseif spellId == 244138 then--Gateway: Rancora (Leaving)
-		nexusPlatform[#nexusPlatform+1] = args.sourceName
-		tDeleteItem(rancoraPlatform, args.sourceName)
-		if args:IsPlayerSource() then
-			playerPlatform = 1--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
-		end
-	elseif spellId == 244146 then--Gateway: Nathreza (Entering)
-		nathrezaPlatform[#nathrezaPlatform+1] = args.sourceName
-		tDeleteItem(nexusPlatform, args.sourceName)
-		if args:IsPlayerSource() then
-			playerPlatform = 4--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
-		end
-	elseif spellId == 244145 then--Gateway: Nathreza (Leaving)
-		nexusPlatform[#nexusPlatform+1] = args.sourceName
-		tDeleteItem(nathrezaPlatform, args.sourceName)
-		if args:IsPlayerSource() then
-			playerPlatform = 1--1 Nexus, 2 Xoroth, 3 Rancora, 4 Nathreza
-		end
 	elseif spellId == 244598 and self:AntiSpam(5, 1) then--Supernova
 		if self.Options.ShowAllPlatforms or playerPlatform == 2 then--Actually on Xoroth platform
 			specWarnSupernova:Show()
@@ -329,7 +283,7 @@ function mod:SPELL_AURA_APPLIED(args)
 					specWarnRealityTear:Show(amount)
 					specWarnRealityTear:Play("stackhigh")
 				else--Taunt as soon as stacks are clear, regardless of stack count.
-					local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
+					local _, _, _, _, _, expireTime = DBM:UnitDebuff("player", spellId)
 					local remaining
 					if expireTime then
 						remaining = expireTime-GetTime()
@@ -454,7 +408,7 @@ function mod:UNIT_DIED(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
 	if spellId == 257939 then
 		self.vb.firstPortal = true
 		warnXorothPortal:Show()
@@ -465,5 +419,13 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 	elseif spellId == 257942 then
 		warnNathrezaPortal:Show()
 		warnNathrezaPortal:Play("newportal")
+	elseif spellId == 244455 then--Platform: Xoroth
+		playerPlatform = 2
+	elseif spellId == 244512 then--Platform: Rancora
+		playerPlatform = 3
+	elseif spellId == 244513 then--Platform: Nathreza
+		playerPlatform = 4
+	elseif spellId == 244450 then--Platform: Nexus
+		playerPlatform = 1
 	end
 end

@@ -100,10 +100,6 @@ L= DBM:GetModLocalization(1983)
 ------------------------
 L= DBM:GetModLocalization(1986)
 
-L:SetOptionLocalization({
-	SetLighting				= "Bajar automáticamente la calidad de iluminación a bajo al iniciar el combate (se restaurará a su configuración anterior al terminar el combate; no funciona en Mac)"
-})
-
 L:SetTimerLocalization({
 	timerBossIncoming		= DBM_INCOMING
 })
@@ -113,13 +109,23 @@ L:SetOptionLocalization({
 	TauntBehavior		= "Patrón de avisos para el cambio de tanque",
 	TwoMythicThreeNon	= "Cambiar a dos acumulaciones en mítico, tres en otras dificultades",--Default
 	TwoAlways			= "Cambiar a dos acumulaciones en todas las dificultades",
-	ThreeAlways			= "Cambiar a tres acumulaciones en todas las dificultades"
+	ThreeAlways			= "Cambiar a tres acumulaciones en todas las dificultades",
+	SetLighting			= "Bajar automáticamente la calidad de iluminación a bajo al iniciar el combate (se restaurará a su configuración anterior al terminar el combate; no funciona en Mac)",
+	InterruptBehavior	= "Patrón de interrupcionesS (requiere ser líder de banda)",
+	Three				= "Rotación de tres jugadores",--Default
+	Four				= "Rotación de cuatro jugadores",
+	Five				= "Rotación de cinco jugadores",
+	IgnoreFirstKick		= "Excluir la primera interrupción de la rotación (requiere ser líder de banda)"
 })
 
 --------------
 -- Aggramar --
 --------------
 L= DBM:GetModLocalization(1984)
+
+L:SetOptionLocalization({
+	ignoreThreeTank	= "Deshabilitar avisos especiales de provocar para Domaenemigos y Desgarro de llamas cuando haya tres o más tanques en el grupo de banda (DBM no puede determinar una rotación exacta con esa composición). Si muere uno de los tanques, los avisos se rehabilitan automáticamente."
+})
 
 L:SetMiscLocalization({
 	Foe			=	"Doma",
@@ -133,9 +139,21 @@ L:SetMiscLocalization({
 --------------------------
 L= DBM:GetModLocalization(2031)
 
+L:SetTimerLocalization({
+	timerSargSentenceCD	= "Sentencia TdR (%s)"
+})
+
+L:SetOptionLocalization({
+	timerSargSentenceCD		=	DBM_CORE_AUTO_TIMER_OPTIONS["cdcount"]:format(257966)
+})
+
 L:SetMiscLocalization({
-	SeaText =		"{rt6} Celeridad/Versatilidad",
-	SkyText =		"{rt5} Crítico/Maestría"
+	SeaText		=	"{rt6} Celeridad/Versatilidad",
+	SkyText		=	"{rt5} Crítico/Maestría",
+	Blight		=	"Añublo",
+	Burst		=	"Ráfaga",
+	Sentence	=	"Sentencia",
+	Bomb		=	"Bomba"
 })
 
 ----------------------

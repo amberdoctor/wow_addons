@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(2004, "DBM-AntorusBurningThrone", nil, 946)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17206 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17623 $"):sub(12, -3))
 mod:SetCreatureID(122578)
 mod:SetEncounterID(2088)
 mod:SetZone()
@@ -22,7 +22,6 @@ mod:RegisterEventsInCombat(
 --	"SPELL_PERIODIC_DAMAGE",
 --	"SPELL_PERIODIC_MISSED",
 	"UNIT_DIED",
---	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"RAID_BOSS_WHISPER",
 	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2 boss3 boss4 boss5"
 )
@@ -69,14 +68,14 @@ local yellDemolishFades					= mod:NewIconFadesYell(246692)
 mod:AddTimerLine(BOSS)
 local timerForgingStrikeCD				= mod:NewCDTimer(14.3, 244312, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
 local timerReverberatingStrikeCD		= mod:NewCDCountTimer(28, 254926, nil, nil, nil, 3)
-local timerDiabolicBombCD				= mod:NewCDTimer(20.3, 246779, nil, nil, nil, 3)
-local timerRuinerCD						= mod:NewCDCountTimer(29.1, 246840, nil, nil, nil, 3)
+local timerDiabolicBombCD				= mod:NewCDTimer(20, 246779, nil, nil, nil, 3)
+local timerRuinerCD						= mod:NewCDCountTimer(28.8, 246840, nil, nil, nil, 3)
 --local timerShatteringStrikeCD			= mod:NewCDTimer(30, 248375, nil, nil, nil, 2)
 local timerApocProtocolCD				= mod:NewCDCountTimer(77, 246516, nil, nil, nil, 6)
 --Stage: Construction
 mod:AddTimerLine(DBM_ADDS)
 local timerInitializing					= mod:NewCastTimer(30, 246504, nil, nil, nil, 6)
-local timerDecimationCD					= mod:NewCDTimer(15.1, 246687, nil, nil, nil, 3)
+local timerDecimationCD					= mod:NewCDTimer(10.9, 246687, nil, nil, nil, 3)
 local timerAnnihilationCD				= mod:NewCDTimer(15.4, 245807, nil, nil, nil, 3)
 local timerDemolishCD					= mod:NewCDTimer(15.8, 246692, nil, nil, nil, 3)
 
@@ -118,17 +117,16 @@ function mod:ReverberatingTarget(targetname, uId)
 	end
 end
 
-local function warnDemolishTargets(self, spellName)
+local function warnDemolishTargets(self, spellId)
 --	table.sort(DemolishTargets)
 	warnDemolish:Show(table.concat(DemolishTargets, "<, >"))
-	--if self:IsLFR() then return end
 	for i = 1, #DemolishTargets do
 		--local icon = i == 1 and 6 or i == 2 and 4 or i == 3 and 3--Because I'm sure bigwigs will do something funky with icons
 		local icon = i
 		local name = DemolishTargets[i]
 		if name == playerName then
 			yellDemolish:Yell(icon, icon, icon)
-			local _, _, _, _, _, _, expires = UnitDebuff("player", spellName)
+			local _, _, _, _, _, expires = DBM:UnitDebuff("player", spellId)
 			local remaining = expires-GetTime()
 			yellDemolishFades:Countdown(remaining, nil, icon)
 		end
@@ -136,7 +134,7 @@ local function warnDemolishTargets(self, spellName)
 			self:SetIcon(name, icon)
 		end
 	end
-	if not UnitDebuff("player", spellName) and not self:IsTank() then
+	if not DBM:UnitDebuff("player", spellId) and not self:IsTank() then
 		specWarnDemolishOther:Show(DBM_ALLY)
 		specWarnDemolishOther:Play("gathershare")
 	end
@@ -176,7 +174,6 @@ function mod:TestFunction(time)
 end
 
 function mod:OnCombatStart(delay)
-	demolishDebuff = DBM:GetSpellInfo(246692)
 	self.vb.ruinerCast = 0
 	self.vb.forgingStrikeCast = 0
 	self.vb.reverbStrikeCast = 0
@@ -198,10 +195,6 @@ function mod:OnCombatStart(delay)
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(5)
 	end
---[[	if self.Options.InfoFrame then
-		DBM.InfoFrame:SetHeader(OVERVIEW)
-		DBM.InfoFrame:Show(8, "function", updateInfoFrame, false, false, true)
-	end--]]
 end
 
 function mod:OnCombatEnd()
@@ -217,29 +210,18 @@ function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
 	if spellId == 244312 or spellId == 257978 or spellId == 254919 then
 		self.vb.forgingStrikeCast = self.vb.forgingStrikeCast + 1
-		local tanking, status = UnitDetailedThreatSituation("player", "boss1")
-		if tanking or (status == 3) then--Player is current target
+		if self:IsTanking("player", "boss1", nil, true) then
 			specWarnForgingStrike:Show()
 			specWarnForgingStrike:Play("defensive")
 		end
 		--1.5, 27.6, 30.1
-		if self:IsLFR() then
-			timerForgingStrikeCD:Start(8.5, self.vb.forgingStrikeCast+1)
-		else
-			timerForgingStrikeCD:Start(14.6, self.vb.forgingStrikeCast+1)
-			countdownForgingStrike:Start(14.6)
-		end
+		timerForgingStrikeCD:Start(14.6, self.vb.forgingStrikeCast+1)
+		countdownForgingStrike:Start(14.6)
 	elseif spellId == 254926 or spellId == 257997 then
 		self:BossTargetScanner(args.sourceGUID, "ReverberatingTarget", 0.1, 9)
 		if self:AntiSpam(5, 3) then--Sometimes stutter casts
 			self.vb.reverbStrikeCast = self.vb.reverbStrikeCast + 1
-			local cooldown = 28
-			if self:IsLFR() then
-				cooldown = 26
-			else
-				cooldown = 28--28-30
-			end
-			timerReverberatingStrikeCD:Start(cooldown, self.vb.reverbStrikeCast+1)--More work needed
+			timerReverberatingStrikeCD:Start(28, self.vb.reverbStrikeCast+1)--More work needed
 		end
 	elseif spellId == 245807 then
 		specWarnAnnihilation:Show()
@@ -248,7 +230,7 @@ function mod:SPELL_CAST_START(args)
 		table.wipe(DemolishTargets)
 	elseif spellId == 246833 then--Ruiner
 		self.vb.ruinerCast = self.vb.ruinerCast + 1
-		timerForgingStrikeCD:Stop()
+		timerForgingStrikeCD:Cancel()
 		countdownForgingStrike:Cancel()
 		specWarnRuiner:Show()
 		specWarnRuiner:Play("farfromline")
@@ -302,10 +284,10 @@ end
 
 function mod:SPELL_AURA_APPLIED(args)
 	local spellId = args.spellId
-	if spellId == 254919 then--Always swap after each cast
+	if spellId == 254919 or spellId == 257978 then--Always swap after each cast
 		local uId = DBM:GetRaidUnitId(args.destName)
 		if uId and self:IsTanking(uId) and not args:IsPlayer() then
-			local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
+			local _, _, _, _, _, expireTime = DBM:UnitDebuff("player", spellId)
 			local remaining
 			if expireTime then
 				remaining = expireTime-GetTime()
@@ -315,28 +297,12 @@ function mod:SPELL_AURA_APPLIED(args)
 				specWarnForgingStrikeOther:Play("changemt")
 			end
 		end
-	elseif spellId == 257978 then--LFR special edition, swap at 2 stacks
-		local uId = DBM:GetRaidUnitId(args.destName)
-		if uId and self:IsTanking(uId) then
-			local amount = args.amount or 1
-			if amount >= 2 and not args:IsPlayer() then
-				local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
-				local remaining
-				if expireTime then
-					remaining = expireTime-GetTime()
-				end
-				if not UnitIsDeadOrGhost("player") and (not remaining or remaining and remaining < 8.5) then
-					specWarnForgingStrikeOther:Show(args.destName)
-					specWarnForgingStrikeOther:Play("tauntboss")
-				end
-			end
-		end
 	elseif spellId == 246687 or spellId == 249680 then
 		warnDecimation:CombinedShow(0.3, args.destName)
 		if args:IsPlayer() then
 			specWarnDecimation:Show()
 			specWarnDecimation:Play("runout")
-			local _, _, _, _, _, _, expires = UnitDebuff("player", args.spellName)
+			local _, _, _, _, _, expires = DBM:UnitDebuff("player", spellId)
 			if expires then
 				local remaining = expires-GetTime()
 				yellDecimation:Countdown(remaining)
@@ -350,7 +316,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		--if #DemolishTargets == 3 then--(uncomment when upper camp known)
 			--warnDemolishTargets(self, args.spellName)
 		--else
-			self:Schedule(0.8, warnDemolishTargets, self, args.spellName)--At least 0.8, maybe bigger needed if warning still splits
+			self:Schedule(0.8, warnDemolishTargets, self, spellId)--At least 0.8, maybe bigger needed if warning still splits
 		--end
 		if args:IsPlayer() then
 			specWarnDemolish:Show()
@@ -437,7 +403,7 @@ function mod:UNIT_DIED(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
 	if spellId == 248319 then--Consume Energy 100% (reaver fully charged and activated)
 		--Info Frame usage situation?
 	elseif spellId == 246686 then--Decimation (ignore 246691 I'm pretty sure)

@@ -1,4 +1,4 @@
-if GetLocale() ~= "ptBR" then return end
+﻿if GetLocale() ~= "ptBR" then return end
 
 if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
 
@@ -215,7 +215,6 @@ L.Panel_SpamFilter			= "Filtros Global e de Spam"
 L.Area_SpamFilter			= "Opções do filtro Global"
 L.DontShowFarWarnings		= "Não exibir anúncios/temporizadores para eventos que estão longe"
 L.StripServerName			= "Tira com nome do reino em avisos e temporizadores"
-L.BlockVersionUpdateNotice	= "Desabilitar popup de notificação de atualização (Não recomendado)"
 
 
 L.Area_SpecFilter			= "Opções de especialização"
@@ -266,15 +265,6 @@ L.AutoAcceptFriendInvite	= "Aceitar convites de amigos automaticamente"
 L.AutoAcceptGuildInvite		= "Aceitar convites de membros da guilda automaticamente"
 L.Area_Advanced				= "Opções avançadas"
 L.FakeBW					= "Fingir ser BigWigs em checagens de versão ao invés de ser DBM ( útil para guildas que forçam o uso de BigWigs )"
-
-L.PizzaTimer_Headline 		= 'Criar um "Cronógrafo para Pizza"'
-L.PizzaTimer_Title			= 'Nome (e.g. "Pizza!")'
-L.PizzaTimer_Hours 			= "Horas"
-L.PizzaTimer_Mins 			= "Min"
-L.PizzaTimer_Secs 			= "Seg"
-L.PizzaTimer_ButtonStart 	= "Iniciar cronógrafo"
-L.PizzaTimer_BroadCast		= "Transmitir para raid"
-
 
 L.Panel_Profile				= "Perfil"
 L.Area_CreateProfile		= "Criação de perfil"

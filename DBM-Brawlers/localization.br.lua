@@ -1,4 +1,4 @@
---Last update by GlitterStorm @ Azralon on Feb,22th,2015
+﻿--Last update by GlitterStorm @ Azralon on Feb,22th,2015
 if GetLocale() ~= "ptBR" then return end
 
 local L
@@ -13,13 +13,13 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	warnQueuePosition	= "Você é %d na fila",
+	warnQueuePosition2	= "Você é %d na fila",
 	specWarnYourNext	= "Você é o próximo!",
 	specWarnYourTurn	= "É a sua vez!"
 })
 
 L:SetOptionLocalization({
-	warnQueuePosition	= "Anuncia a sua posição atual na fila toda vez que ouver mudança",
+	warnQueuePosition2	= "Anuncia a sua posição atual na fila toda vez que ouver mudança",
 	specWarnYourNext	= "Exibe aviso especial quando você for o próximo",
 	specWarnYourTurn	= "Exibe aviso especial quando for a sua vez",
 	SpectatorMode		= "Exibe avisos/temporizadores quando estiver assistindo lutas<br/>(Pessoal 'Aviso especial' mensagens não serão exibidas aos espectadores)",

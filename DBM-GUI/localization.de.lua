@@ -7,7 +7,7 @@ L.MainFrame = "Deadly Boss Mods"
 L.TranslationByPrefix		= "Übersetzt von "
 L.TranslationBy 			= "Ebmor@EU-Malorne"
 L.Website					= "Besuche uns auf Discord: |cFF73C2FBhttps://discord.gg/deadlybossmods|r. Folge auf Twitter: @deadlybossmods oder @MysticalOS"
-L.WebsiteButton				= "Foren"
+L.WebsiteButton				= "Webseite"
 
 L.OTabBosses	= "Bosse"
 L.OTabOptions	= GAMEOPTIONS_MENU
@@ -88,6 +88,7 @@ L.Warn_FontShadow			= "Schatten"
 L.Warn_FontSize				= "Schriftgröße: %d"
 L.Warn_Duration				= "Warnungsdauer: %0.1fs"
 L.None						= "normal"
+L.Random					= "Zufall"
 L.Outline					= "mit Umriss"
 L.ThickOutline				= "mit dickem Umriss"
 L.MonochromeOutline			= "ohne Glättung, mit Umriss"
@@ -210,12 +211,34 @@ L.SWFDefaultOnly			= "Spezialwarnungen eingestellt auf den Standardsound (spielt
 L.SWFAll					= "Spezialwarnungen eingestellt auf irgendeinen Sound"
 L.SpecWarn_AlwaysVoice		= "Spiele immer alle gesprochenen Warnungen (ignoriert Boss-spezifische Einstellung, nützlich für Schlachtzugsleiter)"
 
+L.Area_GetVEM				= "Hole VEM Sprachpack"
+--L.VEMDownload
+L.Area_BrowseOtherVP		= "Suche andere Sprachpacks auf Curse"
+--L.BrowseOtherVPs
+L.Area_BrowseOtherCT		= "Suche Countdownpacks auf Curse"
+--L.BrowseOtherCTs
+
+-- Tab: Event Sounds
+L.Panel_EventSounds			= "Ereignisklänge"
+L.Area_SoundSelection		= "Soundauswahl (scrollbar per Mausrad)"
+L.EventVictorySound			= "Sound gespielt nach Sieg im Kampf"
+L.EventWipeSound			= "Sound gespielt nach Niederlage im Kampf"
+L.EventEngageSound			= "Sound gespielt bei Kampfbeginn"
+L.EventDungeonMusic			= "Musik gepielt innerhalb Dungeons/SZs"
+L.EventEngageMusic			= "Musik gepielt während Kämpfen"
+L.Area_EventSoundsExtras	= "Einstellungen für Ereignisklänge"
+L.EventMusicCombined		= "Alle Musikauswahlmöglichkeiten für Dungeons und Kämpfe zulassen (Änderungen dieser Einstellung werden erst nach \"/reload\" sichtbar.)"
+L.Area_EventSoundsFilters	= "Filter für Ereignisklänge"
+L.EventFilterDungMythicMusic= "Spiele keine Dungeonmusik auf Schwierigkeitsgrad Mythisch/Mythisch+"
+L.EventFilterMythicMusic	= "Spiele keine Kampfmusik auf Schwierigkeitsgrad Mythisch/Mythisch+"
 
 -- Tab: Global Filter
 L.Panel_SpamFilter			= "Deaktivierung von DBM-Funktionen"
 L.Area_SpamFilter_Outgoing	= "Globale Deaktivierungs- und Filtereinstellungen für DBM"
-L.SpamBlockNoShowAnnounce	= "Zeige keine Mitteilungen und spiele keine Warnungssounds"
+L.SpamBlockNoShowAnnounce	= "Zeige keinen Text und spiele keine Sounds für JEGLICHE allgemeine Meldungen"
+L.SpamBlockNoShowTgtAnnounce= "Zeige keinen Text und spiele keine Sounds für allgemeine ZIEL-Meldungen (wird durch obigen Filter überschrieben)"
 L.SpamBlockNoSpecWarn		= "Zeige keine Spezialwarnungen und spiele keine Spezialwarnungssounds"
+L.SpamBlockNoSpecWarnText	= "Zeige keinen Spezialwarnungstext, aber erlaube dennoch Sprachpacks (wird durch obigen Filter überschrieben)"
 L.SpamBlockNoShowTimers		= "Zeige keine Mod-Timer (Boss Mod/Herausforderungsmodus/Gruppensuche/Wiedererscheinen)"
 L.SpamBlockNoShowUTimers	= "Zeige keine von anderen gesendeten Timer (benutzerdefiniert/Pull/Pause)"
 L.SpamBlockNoSetIcon		= "Setze keine Zeichen auf Ziele"
@@ -236,11 +259,13 @@ L.SpamBlockNoRangeRestore	= "Setze das Abstandsfenster nicht auf den vorherigen 
 L.Area_SpamFilter			= "Spam-Filter"
 L.DontShowFarWarnings		= "Zeige keine Mitteilungen/Timer für weit entfernte Ereignisse"
 L.StripServerName			= "Entferne den Realmnamen der Spieler in Warnungen und Timern"
-L.BlockVersionUpdateNotice	= "Zeige häufigere Meldungen zur Aktualisierung einer veralteten DBM-Version im Chatfenster statt als Pop-up"
 
 L.Area_SpecFilter			= "Filtereinstellungen für Rollen"
 L.FilterTankSpec			= "Unterdrücke Warnungen für Tanks, falls deine aktuelle Spezialisierung keine \"Schutz\"-Spezialisierung ist (Hinweis: Diese Filterung sollte normalerweise nicht deaktiviert werden, da alle individuellen \"Spott\"-Warnungen nun standardmäßig aktiviert sind.)"
-L.FilterInterrupts			= "Unterdrücke Warnungen für unterbrechbare Zauber, falls diese nicht von deinem aktuellen Ziel oder Fokusziel gewirkt werden (Hinweis: Diese Einstellung hat keine Wirkung auf Zauber, deren Unterbrechung als kritisch eingestuft wird und die wahrscheinlich tödlich für den Schlachtzug sind, falls sie nicht unterbrochen werden.)"
+L.FilterInterruptsHeader	= "Unterdrücke Warnungen für unterbrechbare Zauber basierend auf Verhaltenseinstellung"
+L.FilterInterrupts			= "nicht von akt. Ziel/Fokusziel gewirkt (immer)"
+L.FilterInterrupts2			= "nicht von akt. Ziel/Fokusziel gewirkt (immer) oder Unterbrechungen auf CD (nur Boss)"
+L.FilterInterrupts3			= "nicht von akt. Ziel/Fokusziel gewirkt (immer) oder Unterbrech. auf CD (Boss & Trash)"
 L.FilterInterruptNoteName	= "Unterdrücke Warnungen für unterbrechbare Zauber (mit Zählung), falls die Warnung nicht deinen Namen in der nutzerdefinierten Notiz enthält"
 L.FilterDispels				= "Unterdrücke Warnungen für reinigbare Zauber, falls deine Reinigungen noch abklingen"
 L.FilterSelfHud				= "Filtere dich selbst in HudMap (ausgenommen Abstands-basierte Hud-Funktionen)"
@@ -302,14 +327,6 @@ L.Area_Advanced				= "Erweiterte Einstellungen"
 L.FakeBW					= "Bei Versionsprüfungen als \"BigWigs\" ausgeben, statt als DBM (nützlich für Gilden, die die Nutzung von \"BigWigs\" erzwingen)"
 L.AITimer					= "Erzeuge automatisch Timer für unbekannte Kämpfe mit der in DBM eingebauten Timer-KI (nützlich beim erstmaligen Pullen eines Test-Bosses, etwa auf Beta- oder PTR-Servern) Hinweis: Dies funktioniert nicht richtig bei mehreren Gegnern mit derselben Fähigkeit."
 L.AutoCorrectTimer			= "Korrigiere automatisch zu lange Timer (nützlich für Gilden, die Kämpfe im topaktuellen \"End-Content\" bestreiten, für die noch keine aktualisierten Boss Mods verfügbar sind) Hinweis: Diese Einstellung kann auch einige Timer verschlechtern, falls bei Phasenwechseln, deren Behandlung in DBM bislang noch nicht geeignet programmiert wurde, Timerrücksetzungen stattfinden."
-
-L.PizzaTimer_Headline 		= 'Erstelle einen "Pizza-Timer"'
-L.PizzaTimer_Title			= 'Name (z.B. "Pizza!")'
-L.PizzaTimer_Hours 			= "Stunden"
-L.PizzaTimer_Mins 			= "Min"
-L.PizzaTimer_Secs 			= "Sek"
-L.PizzaTimer_ButtonStart 	= "Starte Timer"
-L.PizzaTimer_BroadCast		= "Anderen Schlachtzugspielern anzeigen"
 
 L.Panel_Profile				= "Profile"
 L.Area_CreateProfile		= "Profilerzeugung für DBM Core Einstellungen"

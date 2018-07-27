@@ -1,3 +1,103 @@
+8.0.0v1.9 Release - 2018/07/15
+
+Patch 8.0.
+
+* [#38](https://gitlab.com/toreltwiddler/CanIMogIt/issues/38) LiteBag support added by LiteBag author Xodiv.
+* Updated TOC.
+
+*****
+
+7.3.5v1.8 Release - 2018/07/09
+
+Items with Class Restrictions are now properly considered for if you know the appearance or not based on the class you are on.
+
+Bug fixes & Improvements
+
+* Added "/cimi count" which reports the total number of known appearances across all characters.
+* [#185](https://gitlab.com/toreltwiddler/CanIMogIt/issues/185) Fixed issue with class restrictions not being taken into account.
+* [#168](https://gitlab.com/toreltwiddler/CanIMogIt/issues/168) & [#176](https://gitlab.com/toreltwiddler/CanIMogIt/issues/176) Fixes for database storage of Class Restriction information.
+* [#182](https://gitlab.com/toreltwiddler/CanIMogIt/issues/182) Fixes PairByKeys error when jumping from a very old version of the addon to a new version.
+* [#172](https://gitlab.com/toreltwiddler/CanIMogIt/issues/172) Fixes the tooltip not showing up after multiple chat link clicks.
+
+*****
+
+7.3.5v1.7.2 Release - 2018/05/27
+
+* [#169](https://gitlab.com/toreltwiddler/CanIMogIt/issues/169) Avoid lag when looting by only recalculating the looted item, not all items.
+
+*****
+
+7.3.5v1.7.1 Release - 2018/03/30
+
+* [#174](https://gitlab.com/toreltwiddler/CanIMogIt/issues/174) & [#175](https://gitlab.com/toreltwiddler/CanIMogIt/issues/175) Hopefully prevents memory leak by removing DressUpModel redraw.
+
+*****
+
+7.3.5v1.7 Release - 2018/03/25
+
+Bug fixes
+
+* [#151](https://gitlab.com/toreltwiddler/CanIMogIt/issues/151) Hopefully fixes the DressUpModel giving bad source IDs.
+* [#167](https://gitlab.com/toreltwiddler/CanIMogIt/issues/167) Add trial/boost versions of invisible Salvage Yard items to exception list.
+
+*****
+
+7.3.2v1.6 Release - 2018/01/15
+
+Added Black Market Auction House overlay!
+
+![Black Market Auction House overlay!](https://i.imgur.com/j33ZMKb.png)
+
+* [#152](https://gitlab.com/toreltwiddler/CanIMogIt/issues/152) Added overlay to Black Market Auction House.
+* [#153](https://gitlab.com/toreltwiddler/CanIMogIt/issues/153) Hopefully prevented errors when the cache is reset mid-calculations.
+
+*****
+
+7.3.2v1.5 Release - 2017/12/27
+
+Bug fix: Fix nil cache errors and compounding lag.
+
+* [#144](https://gitlab.com/toreltwiddler/CanIMogIt/issues/144) & [#145](https://gitlab.com/toreltwiddler/CanIMogIt/issues/145) Changed order of cache.lua and code.lua in TOC to prevent missing cache issue.
+* [#146](https://gitlab.com/toreltwiddler/CanIMogIt/issues/146) Fix compounding lag caused from getting source ID from DressUpModel frame.
+* [#150](https://gitlab.com/toreltwiddler/CanIMogIt/issues/150) Changed the debug tooltip to not reset the cache.
+
+*****
+
+7.3.2v1.4 Release - 2017/12/16
+
+Bug fix: Overlay and tooltip should now always update after learning an item.  If it does not please let us know!
+
+* [#133](https://gitlab.com/toreltwiddler/CanIMogIt/issues/133) Changed how caching is stored, from itemLink to sourceID to hopefully properly remove items from the cache.
+
+*****
+
+7.3.2v1.3 Release - 2017/11/29
+
+Bug fix: Set appearance list now properly updates.
+
+* [142](https://gitlab.com/toreltwiddler/CanIMogIt/issues/142) Fixed set list ratio text not updating when learning appearance.
+
+*****
+
+7.3.2v1.2 Release - 2017/11/27
+
+Bug fixes
+
+* [#14](https://gitlab.com/toreltwiddler/CanIMogIt/issues/14) Duplicate tooltips should no longer happen (ElvUI, TipTac, Guild Rewards window, etc.)
+* [#105](https://gitlab.com/toreltwiddler/CanIMogIt/issues/105) Deadeye Monocle marked as Cannot be learned.
+* [#133](https://gitlab.com/toreltwiddler/CanIMogIt/issues/133) Slight delay added to tooltip/icon update to try to prevent it missing the event and not updating at all.
+* [#134](https://gitlab.com/toreltwiddler/CanIMogIt/issues/134) Patterns that craft an item now properly show tooltips.  (Only the pattern shows the tooltip, not the item listed on it.)
+* [#138](https://gitlab.com/toreltwiddler/CanIMogIt/issues/138) Set count now updates when learning/unlearning an item.
+* [#139](https://gitlab.com/toreltwiddler/CanIMogIt/issues/139) Hopefully fixed the bad sourceID issue which was causing Cannot Learn messages on unexpected items.
+
+Improvments
+
+* [#132](https://gitlab.com/toreltwiddler/CanIMogIt/issues/132) Tooltip and overlay added to Mythic Keystones.
+* Added tooltips to crafting reagents in crafting windows.
+* Rework of tooltip generation to be more consistent across the game.
+
+*****
+
 7.3.2v1.1 Release - 2017/11/19
 
 Bug fix: Resolved the lag when learning or unlearning an appearance.

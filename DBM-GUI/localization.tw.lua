@@ -1,4 +1,4 @@
-if GetLocale() ~= "zhTW" then return end
+﻿if GetLocale() ~= "zhTW" then return end
 if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
 local L = DBM_GUI_Translations
 
@@ -88,6 +88,7 @@ L.Warn_FontShadow			= "陰影"
 L.Warn_FontSize				= "字型大小:%d"
 L.Warn_Duration				= "警告持續時間:%0.1f秒"
 L.None						= "無"
+L.Random					= "隨機"
 L.Outline					= "輪廓"
 L.ThickOutline				= "厚輪廓"
 L.MonochromeOutline			= "黑白輪廓"
@@ -217,6 +218,20 @@ L.BrowseOtherVPs			= "|cFF73C2FBhttps://wow.curseforge.com/search?search=dbm+voi
 L.Area_BrowseOtherCT		= "在Curse上瀏覽倒數包"
 L.BrowseOtherCTs			= "|cFF73C2FBhttps://wow.curseforge.com/search?search=dbm+count+pack|r"
 
+-- Tab: Event Sounds
+L.Panel_EventSounds			= "事件音效"
+L.Area_SoundSelection		= "音效選項(使用滑鼠滾輪滾動)"
+L.EventVictorySound			= "設置戰鬥勝利時的音效"
+L.EventWipeSound			= "設置戰鬥滅團時的音效"
+L.EventEngageSound			= "設置戰鬥開戰時的音效"
+L.EventDungeonMusic			= "在地城/團隊內設置撥放的音樂"
+L.EventEngageMusic			= "設置戰鬥中的音樂"
+L.Area_EventSoundsExtras	= "事件音效選項"
+L.EventMusicCombined		= "允許在地城和戰鬥選擇的所有音效選項(此選項需要UI重載去反映改變)"
+L.Area_EventSoundsFilters	= "事件音效過濾條件"
+L.EventFilterDungMythicMusic= "不要在傳奇/傳奇+的難度中播放地城音樂"
+L.EventFilterMythicMusic	= "不要在傳奇/傳奇+的難度中播放戰鬥音樂"
+
 
 -- Tab: Global Filter
 L.Panel_SpamFilter			= "DBM全局禁用及過濾"
@@ -224,6 +239,7 @@ L.Area_SpamFilter_Outgoing	= "DBM全局禁用及過濾選項"
 L.SpamBlockNoShowAnnounce	= "不顯示任何提示文字或播放警告音效"
 L.SpamBlockNoShowTgtAnnounce= "不顯示目標的提示文字或播放警告音效 (上列選項會覆蓋此選項)"
 L.SpamBlockNoSpecWarn		= "不顯示特別警告或播放特別警告音效"
+L.SpamBlockNoSpecWarnText	= "不要顯示特別警告文字，但依舊使用語音包 (上列選項會覆蓋此選項)"
 L.SpamBlockNoShowTimers		= "不顯示計時器"
 L.SpamBlockNoShowUTimers	= "不顯示玩家送出的計時器(自訂/拉怪/休息)"
 L.SpamBlockNoSetIcon		= "不設置標記在目標上"
@@ -244,11 +260,13 @@ L.SpamBlockNoRangeRestore	= "不因模組預設值還原距離框架的狀態"
 L.Area_SpamFilter			= "垃圾過濾選項"
 L.DontShowFarWarnings		= "不發送距離過遠的事件提示/計時器"
 L.StripServerName			= "隱藏警告和計時器的玩家伺服器名稱"
-L.BlockVersionUpdateNotice	= "在聊天頻道顯示較高頻率的過期通知而非彈出視窗。"
 
 L.Area_SpecFilter			= "專精過濾選項"
 L.FilterTankSpec			= "非坦克專精時過濾掉坦克專精的特定警告 (註:不建議玩家關閉此選項因大多數的坦克嘲諷警告都是預設開啟。)"
-L.FilterInterrupts			= "過濾可中斷技能的警告如果施法者不是你的目標或專注目標。(註：此選項不套用於可能會導致滅團的必須中斷技能)"
+L.FilterInterruptsHeader	= "為過濾可中斷技能警告設置行為組態。"
+L.FilterInterrupts			= "如果施放者不在目前的目標/專注(總是過濾)。"
+L.FilterInterrupts2			= "如果施放者不在目前的目標/專注(總是過濾) 或中斷技在冷卻時 (只有首領過濾)"
+L.FilterInterrupts3			= "如果施放者不在目前的目標/專注(總是過濾) 或中斷技在冷卻時 (首領跟小兵都過濾)"
 L.FilterInterruptNoteName	= "過濾可中斷技能的警告(與次數)，如果自訂註記警告沒有包含你的名字"
 L.FilterDispels				= "過濾可驅散技能如果你的驅散技正在冷卻中"
 L.FilterSelfHud				= "從HudMap過濾你自己(排除Hud的距離功能)"
@@ -310,14 +328,6 @@ L.Area_Advanced				= "進階選項"
 L.FakeBW					= "假裝使用BigWigs版本檢查而不是用DBM版本(適合用在工會強制使用BigWigs時)"
 L.AITimer					= "DBM為沒遇見過的戰鬥使用內建的AI計時器自動產生計時器(在初期的Beta或PTR的首領測試非常有幫助)。 註: 此功能不會在多目標使用相同技能生效。"
 L.AutoCorrectTimer			= "自動校正時間過長的計時器(適合在公會正在進行全新副本而首領模組還沒被更新至可靠的程度). 註: 這選項可能會使某些計時器錯亂，如首領重制計時器或階段轉換而DBM編碼還不能夠去處理。"
-
-L.PizzaTimer_Headline		= '建立一個計時條'
-L.PizzaTimer_Title			= '名稱（如“Pizza計時器”）'
-L.PizzaTimer_Hours 			= "時"
-L.PizzaTimer_Mins 			= "分"
-L.PizzaTimer_Secs 			= "秒"
-L.PizzaTimer_ButtonStart 	= "開始計時"
-L.PizzaTimer_BroadCast		= "向團隊廣播"
 
 L.Panel_Profile				= "配置檔"
 L.Area_CreateProfile        = "建立核心選項配置檔"

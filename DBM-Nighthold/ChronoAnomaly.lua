@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1725, "DBM-Nighthold", nil, 786)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17126 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17623 $"):sub(12, -3))
 mod:SetCreatureID(104415)--104731 (Depleted Time Particle). 104676 (Waning Time Particle). 104491 (Accelerated Time particle). 104492 (Slow Time Particle)
 mod:SetEncounterID(1865)
 mod:SetZone()
@@ -37,8 +37,7 @@ local specWarnPowerOverwhelming		= mod:NewSpecialWarningSpell(211927, nil, nil, 
 local specWarnTimeBomb				= mod:NewSpecialWarningMoveAway(206617, nil, nil, 2, 3, 2)--When close to expiring, not right away
 local yellTimeBomb					= mod:NewFadesYell(206617)
 local specWarnWarp					= mod:NewSpecialWarningInterrupt(207228, "HasInterrupt", nil, nil, 1, 2)
-local specWarnBigAdd				= mod:NewSpecialWarningSwitch(206700, "-Healer", nil, nil, 1, 2)--Switch to waning time particle when section info known
-local specWarnSmallAdd				= mod:NewSpecialWarningSwitch(206699, "Tank", nil, nil, 1, 2)
+local specWarnBigAdd				= mod:NewSpecialWarningSwitch("ej13022", "-Healer", nil, nil, 1, 2)--Switch to waning time particle when section info known
 
 local timerTemporalOrbsCD			= mod:NewNextCountTimer(30, 219815, nil, nil, nil, 2)
 local timerPowerOverwhelmingCD		= mod:NewNextCountTimer(60, 211927, nil, nil, nil, 4, nil, DBM_CORE_INTERRUPT_ICON)
@@ -66,7 +65,7 @@ mod.vb.timeBombDebuffCount = 0
 local timeBombDebuff = DBM:GetSpellInfo(206617)
 local timeRelease = DBM:GetSpellInfo(206610)
 local function updateTimeBomb(self)
-	local _, _, _, _, _, _, expires = UnitDebuff("player", timeBombDebuff)
+	local _, _, _, _, _, expires = UnitDebuff("player", timeBombDebuff)
 	if expires then
 		specWarnTimeBomb:Cancel()
 		specWarnTimeBomb:CancelVoice()
@@ -85,7 +84,6 @@ local function updateTimeBomb(self)
 end
 
 function mod:OnCombatStart(delay)
-	timeBombDebuff = DBM:GetSpellInfo(206617)
 	self.vb.currentPhase = 2
 	self.vb.interruptCount = 0
 	self.vb.normCount = 0
@@ -93,7 +91,6 @@ function mod:OnCombatStart(delay)
 	self.vb.slowCount = 0
 	self.vb.timeBombDebuffCount = 0
 	if self.Options.InfoFrame and self.Options.InfoFrameBehavior == "TimeRelease" then
-		timeRelease = DBM:GetSpellInfo(206610)
 		DBM.InfoFrame:SetHeader(timeRelease)
 		DBM.InfoFrame:Show(10, "playerabsorb", timeRelease)
 	end
@@ -114,7 +111,7 @@ function mod:SPELL_CAST_START(args)
 		timerChronoPartCD:Stop()--Will be used immediately when this ends.
 		specWarnPowerOverwhelming:Show()
 		specWarnPowerOverwhelming:Play("aesoon")
-	elseif spellId == 207228 and self:CheckInterruptFilter(args.sourceGUID) then
+	elseif spellId == 207228 and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 		specWarnWarp:Show(args.sourceName)
 		specWarnWarp:Play("kickcast")
 	end
@@ -189,8 +186,8 @@ local function delayedOrbs(self, time, count)
 	timerTemporalOrbsCD:Start(time, count)
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 207012 then--Speed: Normal
 		self.vb.currentPhase = 2
 		self.vb.interruptCount = 0
@@ -460,9 +457,6 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 		updateTimeBomb(self)
 		self:Schedule(2, updateTimeBomb, self)
 		self:Schedule(5, updateTimeBomb, self)
-	elseif spellId == 206699 then--Summon Haste Add (Small Adds)
-		specWarnSmallAdd:Show()
-		specWarnSmallAdd:Play("mobsoon")
 	elseif spellId == 206700 then--Summon Slow Add (Big Adds)
 		specWarnBigAdd:Show()
 		specWarnBigAdd:Play("bigmobsoon")
@@ -482,8 +476,8 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 	end
 end
 
-function mod:UNIT_SPELLCAST_CHANNEL_STOP(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_CHANNEL_STOP(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 211927 then--Power Overwhelming
 		self.vb.interruptCount = self.vb.interruptCount + 1
 		if self.vb.currentPhase == 1 then--slow

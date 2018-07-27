@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1897, "DBM-TombofSargeras", nil, 875)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17189 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17603 $"):sub(12, -3))
 mod:SetCreatureID(118289)
 mod:SetEncounterID(2052)
 mod:SetZone()
@@ -83,7 +83,6 @@ mod.vb.shieldActive = false
 local AegynnsWard, felDebuff, lightDebuff, shieldname, unstableSoul = DBM:GetSpellInfo(236420), DBM:GetSpellInfo(235240), DBM:GetSpellInfo(235213), DBM:GetSpellInfo(235028), DBM:GetSpellInfo(235117)
 
 function mod:OnCombatStart(delay)
-	AegynnsWard, felDebuff, lightDebuff, shieldname, unstableSoul = DBM:GetSpellInfo(236420), DBM:GetSpellInfo(235240), DBM:GetSpellInfo(235213), DBM:GetSpellInfo(235028), DBM:GetSpellInfo(235117)
 	self.vb.shieldActive = false
 	self.vb.unstableSoulCount = 0
 	self.vb.hammerCount = 2
@@ -127,7 +126,7 @@ function mod:SPELL_CAST_START(args)
 			timerFelHammerCD:Start(18, self.vb.hammerCount+1)--20 on Mythic, 18 on LFR?
 			countdownFelHammer:Start(18)
 		end
-		if UnitDebuff("player", lightDebuff) then
+		if DBM:UnitDebuff("player", lightDebuff) then
 			specWarnLightHammer:Play("helpsoak")
 		else
 			specWarnLightHammer:Play("shockwave")
@@ -139,7 +138,7 @@ function mod:SPELL_CAST_START(args)
 			timerLightHammerCD:Start(18, 3)
 			countdownLightHammer:Start(18)
 		end
-		if UnitDebuff("player", felDebuff) then
+		if DBM:UnitDebuff("player", felDebuff) then
 			specWarnFelhammer:Play("helpsoak")
 		else
 			specWarnFelhammer:Play("shockwave")
@@ -291,7 +290,8 @@ function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
 end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 239153 then
 		self.vb.spontFragmentationCount = self.vb.spontFragmentationCount + 1
 		specWarnSpontFrag:Show(self.vb.spontFragmentationCount)

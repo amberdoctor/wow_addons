@@ -1,4 +1,4 @@
-if GetLocale() ~= "deDE" then return end
+﻿if GetLocale() ~= "deDE" then return end
 local L
 
 ---------------------------
@@ -61,6 +61,10 @@ L:SetMiscLocalization({
 -- Kil'jaeden --
 ---------------------------
 L= DBM:GetModLocalization(1898)
+
+L:SetWarningLocalization({
+	warnSingularitySoon		= "Rückstoß in %ds"
+})
 
 L:SetMiscLocalization({
 	Obelisklasers	= "Obeliskenlaser"

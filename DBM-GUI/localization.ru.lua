@@ -1,4 +1,4 @@
-if GetLocale() ~= "ruRU" then return end
+﻿if GetLocale() ~= "ruRU" then return end
 
 if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
 local L = DBM_GUI_Translations
@@ -231,7 +231,6 @@ L.SpamBlockNoRangeRestore	= "Не восстанавливать окно про
 L.Area_SpamFilter			= "Параметры спам-фильтра"
 L.DontShowFarWarnings		= "Не отображать предупреждения/таймеры для событий, которые далеко"
 L.StripServerName			= "Удалять имя сервера в предупреждениях и таймерах"
-L.BlockVersionUpdateNotice	= "Отключить уведомление о доступном обновлении (не рекомендуется)"
 
 L.Area_SpecFilter			= "Параметры фильтра по роли"
 L.FilterTankSpec			= "Фильтровать предупреждения для роли танка когда не в специализации танка"
@@ -298,14 +297,6 @@ L.Area_Advanced				= "Дополнительные настройки"
 L.FakeBW					= "Притворяться BigWigs вместо DBM при приверке версий (Полезно для гильдий которые заставляют использовать BigWigs)"
 L.AITimer					= "Automatically generate timers for never before seen fights using DBM's built in timer AI (Useful for pulling a test boss for the very first time such as beta or PTR). Note: This won't work properly for multiple adds with same ability."
 L.AutoCorrectTimer			= "Automatically correct timers that are too long (Useful for guilds pulling cutting edge content that boss mods aren't updated for yet). Note: This option may also make some timers worse if boss resets timers on phase changes that DBM isn't coded to handle properly yet."
-
-L.PizzaTimer_Headline 		= 'Создать "Pizza Timer"'
-L.PizzaTimer_Title			= 'Название (например, "Pizza!")'
-L.PizzaTimer_Hours 			= "час."
-L.PizzaTimer_Mins 			= "мин."
-L.PizzaTimer_Secs 			= "сек."
-L.PizzaTimer_ButtonStart 	= "Начать отсчет"
-L.PizzaTimer_BroadCast		= "Транслировать рейду"
 
 L.Panel_Profile				= "Профили"
 L.Area_CreateProfile		= "Создание профиля настроек DBM Core"
