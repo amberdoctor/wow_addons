@@ -7,7 +7,7 @@ L.MainFrame = "Deadly Boss Mods"
 L.TranslationByPrefix		= "Translated by "
 L.TranslationBy 			= nil -- your name here, localizers!
 L.Website					= "Visit us on discord at |cFF73C2FBhttps://discord.gg/deadlybossmods|r. Follow on twitter @deadlybossmods or @MysticalOS"
-L.WebsiteButton				= "Discord"
+L.WebsiteButton				= "Website"
 
 L.OTabBosses	= "Bosses"
 L.OTabOptions	= GAMEOPTIONS_MENU
@@ -21,7 +21,6 @@ L.TabCategory_CATA	 		= EXPANSION_NAME3
 L.TabCategory_WOTLK 		= EXPANSION_NAME2
 L.TabCategory_BC 			= EXPANSION_NAME1
 L.TabCategory_CLASSIC		= EXPANSION_NAME0
-L.TabCategory_PVP 			= PVP
 L.TabCategory_OTHER    		= "Other Boss Mods"
 
 L.BossModLoaded 			= "%s statistics"
@@ -97,6 +96,7 @@ L.Warn_FontShadow			= "Shadow"
 L.Warn_FontSize				= "Font size: %d"
 L.Warn_Duration				= "Warning duration: %0.1f sec"
 L.None						= "None"
+L.Random					= "Random"
 L.Outline					= "Outline"
 L.ThickOutline				= "Thick outline"
 L.MonochromeOutline			= "Monochrome outline"
@@ -226,12 +226,27 @@ L.BrowseOtherVPs			= "|cFF73C2FBhttps://wow.curseforge.com/search?search=dbm+voi
 L.Area_BrowseOtherCT		= "Browse countdown packs on curse"
 L.BrowseOtherCTs			= "|cFF73C2FBhttps://wow.curseforge.com/search?search=dbm+count+pack|r"
 
+-- Tab: Event Sounds
+L.Panel_EventSounds			= "Event Sounds"
+L.Area_SoundSelection		= "Sound Selections (scroll selection menus with mouse wheel)"
+L.EventVictorySound			= "Set sound played for encounter victory"
+L.EventWipeSound			= "Set sound played for encounter wipe"
+L.EventEngageSound			= "Set sound played for encounter engage"
+L.EventDungeonMusic			= "Set music played inside dungeons/raids"
+L.EventEngageMusic			= "Set music played during encounters"
+L.Area_EventSoundsExtras	= "Event Sound Options"
+L.EventMusicCombined		= "Allow all music choices in dungeon and encounter selections (changing this option requires UIReload to reflect changes)"
+L.Area_EventSoundsFilters	= "Event Sound Filter Conditions"
+L.EventFilterDungMythicMusic= "Do not play dungeon music on Mythic/Mythic+ difficulty"
+L.EventFilterMythicMusic	= "Do not play encounter music on Mythic/Mythic+ difficulty"
+
 -- Tab: Global Filter
 L.Panel_SpamFilter			= "DBM Global Disables & Filters"
 L.Area_SpamFilter_Outgoing	= "DBM Global Disable & Filter Options"
 L.SpamBlockNoShowAnnounce	= "Do not show text or play sound for ANY general announces"
 L.SpamBlockNoShowTgtAnnounce= "Do not show text or play sound for TARGET general announces (above filter overrides this one)"
 L.SpamBlockNoSpecWarn		= "Do not show special warnings or play special warning sounds"
+L.SpamBlockNoSpecWarnText	= "Do not show special warning text, but still allow voice packs (above filter overrides this one)"
 L.SpamBlockNoShowTimers		= "Do not show mod timers (Boss Mod/CM/LFG/Respawn)"
 L.SpamBlockNoShowUTimers	= "Do not show user sent timers (Custom/Pull/Break)"
 L.SpamBlockNoSetIcon		= "Do not set icons on targets"
@@ -252,11 +267,13 @@ L.SpamBlockNoRangeRestore	= "Do not restore range frame to previous state when m
 L.Area_SpamFilter			= "Spam Filter Options"
 L.DontShowFarWarnings		= "Do not show announces/timers for events that are far away"
 L.StripServerName			= "Strip realm name in warnings and timers"
-L.BlockVersionUpdateNotice	= "Show more frequent 'out of date' notifications in chat frame instead of a popup."
 
 L.Area_SpecFilter			= "Role Filter Options"
 L.FilterTankSpec			= "Filter warnings designated for Tank role when not tank spec. (Note: Disabling this is not recommended for most users as 'taunt' warnings are now all on by default.)"
-L.FilterInterrupts			= "Filter warnings for interruptable spells if caster is not your current target or focus target. (Note: does not apply to spells deemed critical to interrupt that will likely result in raid wipes if missed)"
+L.FilterInterruptsHeader	= "Filter warnings for interruptable spells based on behavior preference."
+L.FilterInterrupts			= "If caster is not current target/focus (Always)."
+L.FilterInterrupts2			= "if caster is not current target/focus (Always) or interrupt on CD (Boss Only)"
+L.FilterInterrupts3			= "if caster is not current target/focus (Always) or interrupt on CD (Boss & Trash)"
 L.FilterInterruptNoteName	= "Filter warnings for interruptable spells (with count) if warning does not contain your name in the custom note"
 L.FilterDispels				= "Filter warnings for dispelable spells if your dispel is on cooldown"
 L.FilterSelfHud				= "Filter yourself from HudMap (Excludes range based Hud functions)"
@@ -318,14 +335,6 @@ L.Area_Advanced				= "Advanced Options"
 L.FakeBW					= "Pretend to be BigWigs in version checks instead of DBM (Useful for guilds that force using BigWigs)"
 L.AITimer					= "Automatically generate timers for never before seen fights using DBM's built in timer AI (Useful for pulling a test boss for the very first time such as beta or PTR). Note: This won't work properly for multiple adds with same ability."
 L.AutoCorrectTimer			= "Automatically correct timers that are too long (Useful for guilds pulling cutting edge content that boss mods aren't updated for yet). Note: This option may also make some timers worse if boss resets timers on phase changes that DBM isn't coded to handle properly yet."
-
-L.PizzaTimer_Headline 		= 'Create a "Pizza Timer"'
-L.PizzaTimer_Title			= 'Name (e.g. "Pizza!")'
-L.PizzaTimer_Hours 			= "Hours"
-L.PizzaTimer_Mins 			= "Min"
-L.PizzaTimer_Secs 			= "Sec"
-L.PizzaTimer_ButtonStart 	= "Start timer"
-L.PizzaTimer_BroadCast		= "Broadcast to raid"
 
 L.Panel_Profile				= "Profiles"
 L.Area_CreateProfile		= "Profile Creation for DBM Core Options"

@@ -1,4 +1,4 @@
-if GetLocale() ~= "frFR" then return end
+﻿if GetLocale() ~= "frFR" then return end
 if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
 local L = DBM_GUI_Translations
 
@@ -223,7 +223,6 @@ L.SpamBlockNoRangeRestore	= "Ne pas restaurer le radar de portée quand les addo
 L.Area_SpamFilter			= "Options des filtres de spam"
 L.DontShowFarWarnings		= "Ne pas afficher les annonces/timers pour les événements distants"
 L.StripServerName			= "Ne pas afficher le royaume sur les alertes et les timers"
-L.BlockVersionUpdateNotice	= "Désactiver le popup de notification de mise à jour"
 
 L.Area_SpecFilter			= "Options du filtre de Spécialisation"
 L.FilterTankSpec			= "Filtrer les alertes réservées aux tanks si vous n'êtes pas en spé tank. (Note: Désactivé n'est pas recommandé car les alertes de taunt sont activés en permanence par défaut.)"
@@ -290,14 +289,6 @@ L.Area_Advanced				= "Options Avancées"
 L.FakeBW					= "Prétendre être BigWigs lors des vérifications de versions au lieu de DBM (Utile pour les guildes qui forcent l'utilisation de BigWigs)"
 L.AITimer					= "Utiliser un générateur automatique de timers pour des nouveaux combats utilisant l'IA intégrée de DBM (Utile pout engager les boss jamais vus sur la beta). Note: ceci ne fonctionnera pas correctement s'il y a plusieurs adds avec la même abilité"
 L.AutoCorrectTimer			= "Corriger automatiquement les timers trop longs (Utile pour les guildes sur le contenu haut niveau pour lequel les bossmods ne sont pas encore mis à jour)"
-
-L.PizzaTimer_Headline 		= 'Création d\'un "délai pizza"'
-L.PizzaTimer_Title			= 'Nom (par ex. : "Pizza !")'
-L.PizzaTimer_Hours 			= "Hrs"
-L.PizzaTimer_Mins 			= "Min"
-L.PizzaTimer_Secs 			= "Sec"
-L.PizzaTimer_ButtonStart 	= "Lancer le délai"
-L.PizzaTimer_BroadCast		= "Diffuser au raid"
 
 L.Panel_Profile				= "Profils"
 L.Area_CreateProfile		= "Création de Profil"

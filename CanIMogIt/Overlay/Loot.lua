@@ -96,8 +96,7 @@ local function ChatMessageLootEvent(event, message, _, _, _, target)
     end
 
     -- Remove the cache for this item
-    CanIMogIt.cache:SetItemTextValue(link, nil)
-    CanIMogIt.frame:ItemOverlayEvents("BAG_UPDATE")
+    CanIMogIt.cache:RemoveItem(link)
 
 end
 

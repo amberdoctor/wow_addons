@@ -1,5 +1,6 @@
 -- Coordinates
--- By Szandos
+-- Updated for 8.x by TomCat
+-- Previous versions by Szandos
 
 --Variables
 local Coordinates_UpdateInterval = 0.2
@@ -84,42 +85,48 @@ end
 
 function Coordinates_UpdateCoordinates()
 	--MinimapCoordinates
+	local mapID
+	local position
 	if (CoordinatesDB["minimap"] and Minimap:IsVisible()) then
-		local px, py = GetPlayerMapPosition("player")
-		if (px and px ~= 0 and py ~= 0 ) then
-			MinimapZoneText:SetText( format("(%d:%d) ",px*100.0,py*100.0) .. GetMinimapZoneText() );
+		mapID = C_Map.GetBestMapForUnit("player")
+		if (mapID) then
+			position = C_Map.GetPlayerMapPosition(mapID,"player")
+			if (position and position.x ~= 0 and position.y ~= 0 ) then
+				MinimapZoneText:SetText( format("(%d:%d) ",position.x*100.0,position.y*100.0) .. GetMinimapZoneText() );
+			end
 		end
 	end
-
 	--WorldMapCoordinates
  	if (CoordinatesDB["worldmap"] and WorldMapFrame:IsVisible()) then
- 		-- Get the cursor's coordinates
- 		local cursorX, cursorY = GetCursorPosition()
-		
+		-- Get the cursor's coordinates
+		local cursorX, cursorY = GetCursorPosition()
+
 		-- Calculate cursor position
- 		local scale = WorldMapDetailFrame:GetEffectiveScale()
- 		cursorX = cursorX / scale
- 		cursorY = cursorY / scale
- 		local width = WorldMapDetailFrame:GetWidth()
- 		local height = WorldMapDetailFrame:GetHeight()
-		local left = WorldMapDetailFrame:GetLeft()
-		local top = WorldMapDetailFrame:GetTop()
+		local scale = WorldMapFrame:GetCanvas():GetEffectiveScale()
+		cursorX = cursorX / scale
+		cursorY = cursorY / scale
+		local width = WorldMapFrame:GetCanvas():GetWidth()
+		local height = WorldMapFrame:GetCanvas():GetHeight()
+		local left = WorldMapFrame:GetCanvas():GetLeft()
+		local top = WorldMapFrame:GetCanvas():GetTop()
 		cursorX = (cursorX - left) / width * 100
 		cursorY = (top - cursorY) / height * 100
- 		local worldmapCoordsText = "Cursor(X,Y): "..format("%.1f , %.1f |", cursorX, cursorY)
-		
+		local worldmapCoordsText = "Cursor(X,Y): "..format("%.1f , %.1f |", cursorX, cursorY)
 		-- Player position
-		local px, py = GetPlayerMapPosition("player")
- 		if (px == nil or px == 0 and py == 0 ) then
- 			worldmapCoordsText = worldmapCoordsText.." Player(X,Y): n/a"
- 		else
- 			worldmapCoordsText = worldmapCoordsText.." Player(X,Y): "..format("%.1f , %.1f", px * 100, py * 100)
- 		end
-		
+		if (not mapID) then
+			mapID = C_Map.GetBestMapForUnit("player")
+		end
+		if (mapID) then
+			position = C_Map.GetPlayerMapPosition(mapID,"player")
+		end
+		if (position and position.x ~= 0 and position.y ~= 0 ) then
+			worldmapCoordsText = worldmapCoordsText.." Player(X,Y): "..format("%.1f , %.1f", position.x * 100, position.y * 100)
+		else
+			worldmapCoordsText = worldmapCoordsText.." Player(X,Y): n/a"
+		end
 		-- Add text to world map
 		WorldMapFrame.BorderFrame.TitleText:SetText(worldmapCoordsText)
-	end
-	if ((not CoordinatesDB["worldmap"]) and WorldMapFrame:IsVisible()) then
+	elseif (WorldMapFrame:IsVisible()) then
 		WorldMapFrame.BorderFrame.TitleText:SetText(MAP_AND_QUEST_LOG)
 	end
 end

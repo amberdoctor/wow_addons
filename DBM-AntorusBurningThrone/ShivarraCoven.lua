@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1986, "DBM-AntorusBurningThrone", nil, 946)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17210 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17626 $"):sub(12, -3))
 mod:SetCreatureID(122468, 122467, 122469)--122468 Noura, 122467 Asara, 122469 Diima, 125436 Thu'raya (mythic only)
 mod:SetEncounterID(2073)
 mod:SetZone()
@@ -52,8 +52,8 @@ local warnFlashFreeze					= mod:NewStackAnnounce(245518, 2, nil, "Tank")
 local warnCosmicGlare					= mod:NewTargetAnnounce(250757, 3)
 
 --General
-local specWarnGTFO						= mod:NewSpecialWarningGTFO(238028, nil, nil, nil, 1, 2)
-local specWarnActivated					= mod:NewSpecialWarningSwitchCount(118212, "Tank", nil, nil, 1, 2)
+local specWarnGTFO						= mod:NewSpecialWarningGTFO(245634, nil, nil, nil, 1, 2)
+local specWarnActivated					= mod:NewSpecialWarningSwitchCount(118212, "Tank", nil, 2, 3, 2)
 --Noura, Mother of Flames
 local specWarnFieryStrike				= mod:NewSpecialWarningStack(244899, nil, 2, nil, nil, 1, 6)
 local specWarnFieryStrikeOther			= mod:NewSpecialWarningTaunt(244899, nil, nil, nil, 1, 2)
@@ -119,6 +119,9 @@ mod:AddSetIconOption("SetIconOnCosmicGlare", 250757, true)
 mod:AddInfoFrameOption(245586, true)
 mod:AddNamePlateOption("NPAuraOnVisageofTitan", 249863)
 mod:AddBoolOption("SetLighting", true)
+mod:AddBoolOption("IgnoreFirstKick", false)
+mod:AddMiscLine(DBM_CORE_OPTION_CATEGORY_DROPDOWNS)
+mod:AddDropdownOption("InterruptBehavior", {"Three", "Four", "Five"}, "Three", "misc")
 mod:AddDropdownOption("TauntBehavior", {"TwoMythicThreeNon", "TwoAlways", "ThreeAlways"}, "TwoMythicThreeNon", "misc")
 
 local titanCount = {}
@@ -129,6 +132,9 @@ mod.vb.fpIcon = 6
 mod.vb.chilledIcon = 1
 mod.vb.glareIcon = 4
 mod.vb.touchCosmosCast = 0
+mod.vb.interruptBehavior = "Three"
+mod.vb.ignoreFirstInterrupt = false
+mod.vb.firstCastHappend = false
 local CVAR1, CVAR2 = nil, nil
 
 function mod:OnCombatStart(delay)
@@ -139,6 +145,9 @@ function mod:OnCombatStart(delay)
 	self.vb.chilledIcon = 1
 	self.vb.glareIcon = 4
 	self.vb.touchCosmosCast = 0
+	self.vb.interruptBehavior = "Three"
+	self.vb.ignoreFirstInterrupt = false
+	self.vb.firstCastHappend = false
 	if self:IsMythic() then
 		self:SetCreatureID(122468, 122467, 122469, 125436)
 	else
@@ -157,10 +166,19 @@ function mod:OnCombatStart(delay)
 	if self.Options.NPAuraOnVisageofTitan then
 		DBM:FireEvent("BossMod_EnableHostileNameplates")
 	end
-	if self.Options.SetLighting and not IsMacClient() then--Mac client doesn't support low (1) setting for lighting (and not InCombatLockdown() needed?)
-		CVAR1, CVAR2 = GetCVarBool("graphicsLightingQuality") or 3, GetCVarBool("raidGraphicsLightingQuality") or 2--Non raid cvar is nil if 3 (default) and raid one is nil if 2 (default)
+	if self.Options.SetLighting then
+		CVAR1, CVAR2 = GetCVar("graphicsLightingQuality") or 3, GetCVar("raidGraphicsLightingQuality") or 2--Non raid cvar is nil if 3 (default) and raid one is nil if 2 (default)
 		SetCVar("graphicsLightingQuality", 1)
 		SetCVar("raidGraphicsLightingQuality", 1)
+	end
+	if UnitIsGroupLeader("player") and not self:IsLFR() then
+		if self.Options.InterruptBehavior == "Three" then
+			self:SendSync("Three", self.Options.IgnoreFirstKick)
+		elseif self.Options.InterruptBehavior == "Four" then
+			self:SendSync("Four", self.Options.IgnoreFirstKick)
+		elseif self.Options.InterruptBehavior == "Five" then
+			self:SendSync("Five", self.Options.IgnoreFirstKick)
+		end
 	end
 end
 
@@ -172,10 +190,20 @@ function mod:OnCombatEnd()
 	if self.Options.NPAuraOnVisageofTitan then
 		DBM.Nameplate:Hide(true, nil, nil, nil, true, true)
 	end
-	if CVAR1 or CVAR2 then
-		CVAR1, CVAR2 = nil, nil
+	--Attempt restore right away
+	if (CVAR1 or CVAR2) and not InCombatLockdown() then
 		SetCVar("graphicsLightingQuality", CVAR1)
 		SetCVar("raidGraphicsLightingQuality", CVAR2)
+		CVAR1, CVAR2 = nil, nil
+	end
+end
+
+--Backup check on leaving combat if OnCombatEnd wasn't successful
+function mod:OnLeavingCombat()
+	if CVAR1 or CVAR2 then
+		SetCVar("graphicsLightingQuality", CVAR1)
+		SetCVar("raidGraphicsLightingQuality", CVAR2)
+		CVAR1, CVAR2 = nil, nil
 	end
 end
 
@@ -205,13 +233,20 @@ function mod:SPELL_CAST_START(args)
 	elseif spellId == 250095 and self:AntiSpam(3, 1) then
 		timerMachinationsofAman:Start()
 	elseif spellId == 250648 then
-		self.vb.touchCosmosCast = self.vb.touchCosmosCast + 1
-		if self.vb.touchCosmosCast == 4 then
-			self.vb.touchCosmosCast = 1
+		if self.vb.firstCastHappend or not self.vb.ignoreFirstInterrupt then
+			self.vb.touchCosmosCast = self.vb.touchCosmosCast + 1
+		end
+		if (self.vb.interruptBehavior == "Three" and self.vb.touchCosmosCast == 4) or (self.vb.interruptBehavior == "Four" and self.vb.touchCosmosCast == 5) or (self.vb.interruptBehavior == "Five" and self.vb.touchCosmosCast == 6) then
+			self.vb.touchCosmosCast = 0
 		end
 		local kickCount = self.vb.touchCosmosCast
 		specWarnTouchoftheCosmos:Show(args.sourceName, kickCount)
-		specWarnTouchoftheCosmos:Play("kick"..kickCount.."r")
+		if kickCount == 0 then
+			specWarnTouchoftheCosmos:Play("kickcast")
+		else
+			specWarnTouchoftheCosmos:Play("kick"..kickCount.."r")
+		end
+		if not self.vb.firstCastHappend then self.vb.firstCastHappend = true end
 	end
 end
 
@@ -260,7 +295,7 @@ function mod:SPELL_AURA_APPLIED(args)
 					specWarnFieryStrike:Show(amount)
 					specWarnFieryStrike:Play("stackhigh")
 				else
-					local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
+					local _, _, _, _, _, expireTime = DBM:UnitDebuff("player", spellId)
 					local remaining
 					if expireTime then
 						remaining = expireTime-GetTime()
@@ -303,7 +338,7 @@ function mod:SPELL_AURA_APPLIED(args)
 					specWarnFlashfreeze:Show(amount)
 					specWarnFlashfreeze:Play("stackhigh")
 				else--Taunt as soon as stacks are clear, regardless of stack count.
-					local _, _, _, _, _, _, expireTime = UnitDebuff("player", args.spellName)
+					local _, _, _, _, _, expireTime = DBM:UnitDebuff("player", spellId)
 					local remaining
 					if expireTime then
 						remaining = expireTime-GetTime()
@@ -328,7 +363,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		if self.Options.InfoFrame and not DBM.InfoFrame:IsShown() then
 			DBM.InfoFrame:SetHeader(args.spellName)
-			DBM.InfoFrame:Show(6, "playerabsorb", args.spellName, select(17, UnitDebuff(args.destName, args.spellName)))
+			DBM.InfoFrame:Show(6, "playerabsorb", args.spellName, select(16, DBM:UnitDebuff(args.destName, args.spellName)))
 		end
 		if self.Options.SetIconOnChilledBlood2 then
 			self:SetIcon(args.destName, self.vb.chilledIcon)
@@ -413,7 +448,7 @@ end
 
 --"<94.13 21:56:15> [UNIT_SPELLCAST_SUCCEEDED] Diima, Mother of Gloom(??) [[boss3:Torment of Khaz'goroth::3-3779-1712-25990-259066-00119F734F:259066]]", -- [1126]
 --"<94.33 21:56:15> [CHAT_MSG_RAID_BOSS_EMOTE] |TInterface\\Icons\\ABILITY_MONK_BREATHOFFIRE:20|tThe Coven prepares to unleash the  |cFFFF0000|Hspell:245671|h[Flames of Khaz'goroth]|h|r!#Diima, Mother of Gloom###
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
 	if spellId == 259068 or spellId == 259066 or spellId == 259069 or spellId == 259070 then
 		local name = UnitName(uId)
 		name = string.split(",", name)--Strip title
@@ -525,4 +560,18 @@ function mod:UNIT_TARGETABLE_CHANGED(uId)
 			timerCosmicGlareCD:Stop()
 		end
 	end
-end	
+end
+
+function mod:OnSync(msg, firstInterrupt)
+	if self:IsLFR() then return end
+	if msg == "Three" then
+		self.vb.interruptBehavior = "Three"
+	elseif msg == "Four" then
+		self.vb.interruptBehavior = "Four"
+	elseif msg == "Five" then
+		self.vb.interruptBehavior = "Five"
+	end	
+	if firstInterrupt then
+		self.vb.ignoreFirstInterrupt = firstInterrupt == "true" and true or false
+	end
+end

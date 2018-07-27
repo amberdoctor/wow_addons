@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1713, "DBM-Nighthold", nil, 786)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17112 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17634 $"):sub(12, -3))
 mod:SetCreatureID(101002)
 mod:SetEncounterID(1842)
 mod:SetZone()
@@ -65,6 +65,7 @@ local mythicOrbTimers = {13, 62, 27, 25, 14.9, 15, 15, 30, 55.1, 38, 30, 12, 18}
 local lolBurningPitchTimers = {38.0, 102.0, 85.0, 90.0}--LFR and Normal
 local heroicBurningPitchTimers = {49.8, 85.0, 90.0, 94}--Verified Dec 7
 local mythicBurningPitchTimers = {45.0, 90, 93.9, 78}
+local minAmount, maxAmount = 2, 4
 mod.vb.burningEmbers = 0
 mod.vb.slamCount = 0
 mod.vb.beamCount = 0
@@ -90,7 +91,15 @@ function DBMUpdateKrosusBeam(wasLeft)
 end
 
 function mod:OnCombatStart(delay)
-	burningPitchDebuff = DBM:GetSpellInfo(215944)
+	if self:IsTrivial(120) or self:IsLFR() then
+		minAmount, maxAmount = 8, 16
+	elseif self:IsNormal() then
+		minAmount, maxAmount = 4, 8
+	elseif self:IsHeroic() then
+		minAmount, maxAmount = 3, 6
+	else--Mythic
+		minAmount, maxAmount = 2, 4
+	end
 	table.wipe(mobGUIDs)
 	self.vb.burningEmbers = 0
 	self.vb.slamCount = 0
@@ -168,7 +177,7 @@ function mod:SPELL_CAST_START(args)
 	elseif spellId == 205420 then
 		self.vb.pitchCount = self.vb.pitchCount+ 1
 		specWarnBurningPitch:Show(self.vb.pitchCount)
-		if UnitDebuff("player", burningPitchDebuff) then
+		if DBM:UnitDebuff("player", burningPitchDebuff) then
 			specWarnBurningPitch:Play("watchstep")
 		else
 			specWarnBurningPitch:Play("helpsoak")
@@ -178,7 +187,7 @@ function mod:SPELL_CAST_START(args)
 		if timers then
 			timerBurningPitchCD:Start(timers, nextCount)
 		end
-	elseif spellId == 209017 and self:CheckInterruptFilter(args.sourceGUID) then
+	elseif spellId == 209017 and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 		specWarnFelBlast:Show(args.sourceName)
 		specWarnFelBlast:Play("kickcast")
 	elseif spellId == 206351 then
@@ -192,7 +201,7 @@ function mod:SPELL_CAST_START(args)
 				self:ScanForMobs(args.sourceGUID, 0, 8, 8, 0.1, 15, "SetIconOnAdds")
 			end
 		end
-		if self:CheckInterruptFilter(args.sourceGUID) then
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
 			specWarnFelBurst:Show(args.sourceName)
 			specWarnFelBurst:Play("kickcast")
 		end
@@ -229,14 +238,14 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self:IsTanking(uId) then
 			local amount = args.amount or 1
 			timerSearingBrand:Start(args.destName)
-			if amount >= 2 then
+			if amount >= minAmount then
 				if args:IsPlayer() then
-					if amount >= 4 then
+					if amount >= maxAmount then
 						specWarnSearingBrand:Show(amount)
 						specWarnSearingBrand:Play("stackhigh")
 					end
 				else
-					if not UnitDebuff("player", args.spellName) and not UnitIsDeadOrGhost("player") then
+					if not DBM:UnitDebuff("player", args.spellName) and not UnitIsDeadOrGhost("player") then
 						specWarnSearingBrandOther:Show(args.destName)
 						specWarnSearingBrandOther:Play("tauntboss")
 					end
@@ -280,8 +289,8 @@ function mod:UNIT_DIED(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 205383 then--Fel Beam (fires for left and right) Does not fire for double beams
 		DBM:Debug("Single Beam", 2)
 	elseif spellId == 215961 then--Double Beam (fires for the double beam sequence where you get both beams back to back. Only fires at start of it not each beam*)

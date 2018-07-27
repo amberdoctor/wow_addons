@@ -3,6 +3,7 @@ isboxer.Character.ActualName = "Philomela";
 isboxer.Character.QualifiedName = "Philomela-Thrall";
 
 function isboxer.Character_LoadBinds()
+
 	if (isboxer.CharacterSet.Name=="one of each") then
 		isboxer.SetMacro("FTLAssist","BACKSPACE","/assist [nomod:alt,mod:lshift,nomod:ctrl]Philomela;[nomod:alt,mod:rshift,nomod:ctrl]Ashimagari;[nomod:alt,nomod:shift,mod:lctrl]Ubuy;[mod:lalt,nomod:shift,nomod:ctrl]Anastasoula;[nomod:alt,mod:lshift,mod:lctrl]Lorakain;[mod:lalt,mod:lshift,nomod:ctrl]Darsaadi;[nomod:alt,mod:rshift,mod:lctrl]Luscinia;[mod:lalt,mod:rshift,nomod:ctrl]Tydeüs\n",1,1,1,1);
 

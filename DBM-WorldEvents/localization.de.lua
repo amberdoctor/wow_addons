@@ -1,4 +1,4 @@
-if GetLocale() ~= "deDE" then return end
+﻿if GetLocale() ~= "deDE" then return end
 local L
 
 ------------
@@ -67,8 +67,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	specWarnBrew		= "Spezialwarnung für $spell:47376",
-	specWarnBrewStun	= "Spezialwarnung für $spell:47340",
-	YellOnBarrel		= "Schreie bei $spell:51413"
+	specWarnBrewStun	= "Spezialwarnung für $spell:47340"
 })
 
 L:SetMiscLocalization({

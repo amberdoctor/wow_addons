@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1861, "DBM-TombofSargeras", nil, 875)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17112 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17603 $"):sub(12, -3))
 mod:SetCreatureID(115767)--116328 Vellius, 115795 Abyss Stalker, 116329/116843 Sarukel
 mod:SetEncounterID(2037)
 mod:SetZone()
@@ -104,7 +104,6 @@ local eventsRegistered = false
 local p3MythicCrashingWave = {30.9, 30.9, 40.6, 35.8, 30.9}--All minus 2 because timer starts at SUCCESS but is for START
 
 function mod:OnCombatStart(delay)
-	thunderingShock, consumingHunger, bufferFish = DBM:GetSpellInfo(230358), DBM:GetSpellInfo(230384), DBM:GetSpellInfo(239375)
 	self.vb.phase = 1
 	self.vb.crashingWaveCount = 0
 	self.vb.hydraShotCount = 0
@@ -169,7 +168,7 @@ function mod:SPELL_CAST_START(args)
 		specWarnCrashingWave:Show()
 		specWarnCrashingWave:Play("chargemove")
 	elseif spellId == 230358 then
-		if UnitDebuff("player", consumingHunger) then
+		if DBM:UnitDebuff("player", consumingHunger) then
 			specWarnConsumingHunger:Show(thunderingShock)
 			specWarnConsumingHunger:Play("movetojelly")
 		else
@@ -178,8 +177,7 @@ function mod:SPELL_CAST_START(args)
 		end
 		timerThunderingShockCD:Start()
 	elseif spellId == 230201 then
-		local tanking, status = UnitDetailedThreatSituation("player", "boss1")
-		if tanking or (status == 3) then
+		if self:IsTanking("player", "boss1", nil, true) then
 			specWarnBurdenofPain:Show()
 			specWarnBurdenofPain:Play("defensive")
 		else
@@ -318,8 +316,8 @@ function mod:SPELL_DAMAGE(sourceGUID, _, _, _, _, _, _, _, spellId)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 230227 and self:AntiSpam(3, 3) then
 		warnFromtheAbyss:Show()
 		timerFromtheAbyssCD:Start()
@@ -338,7 +336,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 		if self:IsMythic() then
 			--Every two sharks
 			specWarnDreadShark:Show()
-			if UnitDebuff("player", bufferFish) then--Has bufferfish
+			if DBM:UnitDebuff("player", bufferFish) then--Has bufferfish
 				specWarnDreadShark:Play("takedamage")
 			else
 				specWarnDreadShark:Play("watchstep")

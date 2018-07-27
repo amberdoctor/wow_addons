@@ -64,14 +64,6 @@ L.Button_RangeRadar			= "Visualizza/Nascondi il radar di Prossimita'"
 L.Button_InfoFrame			= "Visualizza/Nascondi la finestra Informazioni"
 L.Button_TestBars			= "Avvia le Barre di Test"
 
-L.PizzaTimer_Headline 		= 'Crea un "Pizza Timer"'
-L.PizzaTimer_Title			= 'Nome (es. "Pizza!")'
-L.PizzaTimer_Hours 			= "Ore"
-L.PizzaTimer_Mins 			= "Minuti"
-L.PizzaTimer_Secs 			= "Secondi"
-L.PizzaTimer_ButtonStart 	= "Avvia il Timer"
-L.PizzaTimer_BroadCast		= "Invia agli altri il Timer"
-
 -- Tab: Raidwarning
 L.Tab_RaidWarning 			= "Avvisi di Incursione"
 L.RaidWarning_Header		= "Avvisi di Incursione - Avvisi"
@@ -143,7 +135,6 @@ L.SpecWarn_ResetMe			= "Ripristina impostazioni di default"
 L.Panel_SpamFilter				= "Filtri globali e di Spam"
 L.Area_SpamFilter				= "Filtri di Spam - Opzioni"
 L.HideBossEmoteFrame			= "Nascondi la finestra con i messaggi dei boss"
-L.BlockVersionUpdateNotice		= "Disabilita il popup di notifica"
 L.ShowBBOnCombatStart			= "Fai un Check dei Benefici con Big Brother quando inizia un combattimento"
 L.BigBrotherAnnounceToRaid		= "Annuncia i risultati di Big Brother all'incursione"
 

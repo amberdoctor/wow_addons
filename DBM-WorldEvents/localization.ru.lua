@@ -1,4 +1,4 @@
-if GetLocale() ~= "ruRU" then return end
+﻿if GetLocale() ~= "ruRU" then return end
 
 local L
 
@@ -68,8 +68,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	specWarnBrew		= "Спец-предупреждение для $spell:47376",
-	specWarnBrewStun	= "Спец-предупреждение для $spell:47340",
-	YellOnBarrel		= "Кричать, когда на вас $spell:51413"
+	specWarnBrewStun	= "Спец-предупреждение для $spell:47340"
 })
 
 L:SetMiscLocalization({

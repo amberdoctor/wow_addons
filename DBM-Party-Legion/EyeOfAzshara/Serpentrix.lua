@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1479, "DBM-Party-Legion", 3, 716)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17143 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17522 $"):sub(12, -3))
 mod:SetCreatureID(91808)
 mod:SetEncounterID(1813)
 mod:SetZone(1456)
@@ -58,7 +58,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnToxicWound:ScheduleVoice(1.5, "keepmove")
 		end
 	elseif spellId == 191797 and self:AntiSpam(3, 2) then--Violent Winds
-		if not wrathMod then wrathMod = DBM:GetModByName(1492) end
+		if not wrathMod then wrathMod = DBM:GetModByName("1492") end
 		if wrathMod.vb.phase == 2 then return end--Phase 2 against Wrath of Azshara, which means this is happening every 10 seconds
 		warnWinds:Show()
 		if self:IsInCombat() then--Boss engaged it's 30
@@ -71,10 +71,10 @@ end
 
 function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
-	if spellId == 192003 and self:CheckInterruptFilter(args.sourceGUID) then--Blazing Nova
+	if spellId == 192003 and self:CheckInterruptFilter(args.sourceGUID, false, true) then--Blazing Nova
 		specWarnBlazingNova:Show(args.sourceName)
 		specWarnBlazingNova:Play("kickcast")
-	elseif spellId == 192005 and self:CheckInterruptFilter(args.sourceGUID) then
+	elseif spellId == 192005 and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 		specWarnArcaneBlast:Show(args.sourceName)
 		specWarnArcaneBlast:Play("kickcast")
 	elseif spellId == 191848 then

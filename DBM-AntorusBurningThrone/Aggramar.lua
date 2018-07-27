@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1984, "DBM-AntorusBurningThrone", nil, 946)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17195 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17623 $"):sub(12, -3))
 mod:SetCreatureID(121975)
 mod:SetEncounterID(2063)
 mod:SetZone()
@@ -13,16 +13,14 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 244693 245458 245463 245301 255058 255061 255059",
+	"SPELL_CAST_SUCCESS 247079 244033",
 	"SPELL_AURA_APPLIED 245990 245994 244894 244903 247091 254452",
 	"SPELL_AURA_APPLIED_DOSE 245990",
 	"SPELL_AURA_REMOVED 244894 244903 247091 254452",
---	"SPELL_PERIODIC_DAMAGE 247135",
---	"SPELL_PERIODIC_MISSED 247135",
---	"UNIT_DIED",
+	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED boss1"
 )
 
---TODO, if ember energy gains are detectable with ease, use hostile nameplates to show power circle over them all fancy like
 --[[
 (ability.id = 244693 or ability.id = 245458 or ability.id = 245463 or ability.id = 245301 or ability.id = 255058 or ability.id = 255061 or ability.id = 255059) and type = "begincast"
  or ability.id = 244894 and (type = "applybuff" or type = "removebuff")
@@ -45,15 +43,13 @@ local specWarnRavenousBlaze				= mod:NewSpecialWarningMoveAway(254452, nil, nil,
 local yellRavenousBlaze					= mod:NewPosYell(254452, DBM_CORE_AUTO_YELL_CUSTOM_POSITION)
 local specWarnWakeofFlame				= mod:NewSpecialWarningDodge(244693, nil, nil, nil, 2, 2)
 local yellWakeofFlame					= mod:NewYell(244693)
---local specWarnFoeBreaker				= mod:NewSpecialWarningDodge(245458, nil, nil, nil, 3, 2)
 local specWarnFoeBreakerTaunt			= mod:NewSpecialWarningTaunt(245458, nil, nil, nil, 3, 2)
 local specWarnFoeBreakerDefensive		= mod:NewSpecialWarningDefensive(245458, nil, nil, nil, 3, 2)
 local specWarnFlameRend					= mod:NewSpecialWarningCount(245463, nil, nil, nil, 1, 2)
+local specWarnFlameRendTaunt			= mod:NewSpecialWarningTaunt(245463, nil, nil, nil, 1, 2)
 local specWarnSearingTempest			= mod:NewSpecialWarningRun(245301, nil, nil, nil, 4, 2)
 --Stage Two: Champion of Sargeras
 local specWarnFlare						= mod:NewSpecialWarningDodge(245983, "-Melee", nil, 2, 2, 2)
-
---local specWarnGTFO						= mod:NewSpecialWarningGTFO(247135, nil, nil, nil, 1, 2)
 
 --Stage One: Wrath of Aggramar
 local timerTaeshalachTechCD				= mod:NewNextCountTimer(61, 244688, nil, nil, nil, 5, nil, DBM_CORE_TANK_ICON)
@@ -61,7 +57,7 @@ local timerFoeBreakerCD					= mod:NewNextCountTimer(6.1, 245458, nil, nil, nil, 
 local timerFlameRendCD					= mod:NewNextCountTimer(6.1, 245463, nil, nil, nil, 5, nil, DBM_CORE_TANK_ICON)
 local timerTempestCD					= mod:NewNextTimer(6.1, 245301, nil, nil, nil, 2, nil, DBM_CORE_DEADLY_ICON)
 local timerScorchingBlazeCD				= mod:NewCDTimer(6.5, 245994, nil, nil, nil, 3)--6.5-8
-local timerRavenousBlazeCD				= mod:NewCDTimer(23.2, 254452, nil, nil, nil, 3, nil, DBM_CORE_HEROIC_ICON)
+local timerRavenousBlazeCD				= mod:NewCDTimer(22.2, 254452, nil, nil, nil, 3, nil, DBM_CORE_HEROIC_ICON)
 local timerWakeofFlameCD				= mod:NewCDTimer(24.3, 244693, nil, nil, nil, 3)
 --Stage Two: Champion of Sargeras
 local timerFlareCD						= mod:NewCDTimer(15, 245983, nil, "-Melee", 2, 3)
@@ -70,13 +66,15 @@ local berserkTimer						= mod:NewBerserkTimer(600)
 
 --Stages One: Wrath of Aggramar
 local countdownTaeshalachTech			= mod:NewCountdown(61, 244688)
+local countdownFlare					= mod:NewCountdown("Alt15", 245983, "-Tank")
 local countdownWakeofFlame				= mod:NewCountdown("AltTwo24", 244693, "-Tank")
 
 mod:AddSetIconOption("SetIconOnBlaze2", 254452, false)--Both off by default, both conflit with one another
 mod:AddSetIconOption("SetIconOnAdds", 244903, false, true)--Both off by default, both conflit with one another
 mod:AddInfoFrameOption(244688, true)
-mod:AddRangeFrameOption("6")
+mod:AddRangeFrameOption("6", nil, "Ranged")
 mod:AddNamePlateOption("NPAuraOnPresence", 244903)
+mod:AddBoolOption("ignoreThreeTank", true)
 
 mod.vb.phase = 1
 mod.vb.techCount = 0
@@ -88,6 +86,10 @@ mod.vb.techActive = false
 mod.vb.firstCombo = nil
 mod.vb.secondCombo = nil
 mod.vb.comboCount = 0
+--mod.vb.incompleteCombo = false
+local comboDebug = {}
+local comboDebugCounter = 0
+local unitTracked = {}
 
 local comboUsed = {
 	[1] = false,--L.Foe, L.Tempest, L.Rend, L.Foe, L.Rend
@@ -114,32 +116,32 @@ do
 			elseif mod.vb.comboCount == 1 and mod.vb.firstCombo then
 				if mod.vb.firstCombo == "Foe" then--L.Foe, L.Tempest, L.Rend, L.Foe, L.Rend or L.Foe, L.Rend, L.Tempest, L.Foe, L.Rend
 					addLine(L.Current, DBM_CORE_TANK_ICON_SMALL..L.Foe)
-					if comboUsed[1] then--It's L.Foe, L.Rend, L.Tempest, L.Foe, L.Rend (combo 2) for sure
+					--[[if comboUsed[1] then--It's L.Foe, L.Rend, L.Tempest, L.Foe, L.Rend (combo 2) for sure
 						addLine(mod.vb.comboCount+1, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend)
 						addLine(mod.vb.comboCount+2, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 					elseif comboUsed[2] then--It's L.Foe, L.Tempest, L.Rend, L.Foe, L.Rend (Combo 1) for sure
 						addLine(mod.vb.comboCount+1, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
-						addLine(mod.vb.comboCount+2, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend)
-					else--Could be either one
+						addLine(mod.vb.comboCount+2, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend)--]]
+					--else--Could be either one
 						addLine(mod.vb.comboCount+1, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend.."/"..DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 						addLine(mod.vb.comboCount+2, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend.."/"..DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
-					end
+					--end
 					addLine(mod.vb.comboCount+3, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
 				elseif mod.vb.firstCombo == "Rend" then----L.Rend, L.Tempest, L.Foe, L.Foe, L.Rend or L.Rend, L.Foe, L.Foe, L.Tempest, L.Rend
 					addLine(L.Current, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend)
-					if comboUsed[3] then--It's L.Rend, L.Foe, L.Foe, L.Tempest, L.Rend (combo 4) for sure
+					--[[if comboUsed[3] then--It's L.Rend, L.Foe, L.Foe, L.Tempest, L.Rend (combo 4) for sure
 						addLine(mod.vb.comboCount+1, DBM_CORE_TANK_ICON_SMALL..L.Foe)
 						addLine(mod.vb.comboCount+2, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
 						addLine(mod.vb.comboCount+3, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 					elseif comboUsed[4] then--It's L.Rend, L.Tempest, L.Foe, L.Foe, L.Rend (combo 3) for sure
 						addLine(mod.vb.comboCount+1, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 						addLine(mod.vb.comboCount+2, DBM_CORE_TANK_ICON_SMALL..L.Foe)
-						addLine(mod.vb.comboCount+3, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
-					else
+						addLine(mod.vb.comboCount+3, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")--]]
+					--else
 						addLine(mod.vb.comboCount+1, DBM_CORE_TANK_ICON_SMALL..L.Foe.."/"..DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 						addLine(mod.vb.comboCount+2, DBM_CORE_TANK_ICON_SMALL..L.Foe.."/"..DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
 						addLine(mod.vb.comboCount+3, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)/"..DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
-					end
+					--end
 				end
 				addLine(mod.vb.comboCount+4, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend.."(2)")
 			elseif mod.vb.comboCount == 2 and mod.vb.secondCombo then
@@ -148,9 +150,13 @@ do
 					if mod.vb.firstCombo == "Foe" then--L.Foe, L.Tempest, L.Rend, L.Foe, L.Rend
 						addLine(mod.vb.comboCount+1, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend)
 						comboUsed[1] = true
+						comboDebugCounter = comboDebugCounter + 1
+						comboDebug[comboDebugCounter] = L.Foe..", "..L.Tempest..", "..L.Rend..", "..L.Foe..", "..L.Rend
 					elseif mod.vb.firstCombo == "Rend" then--L.Rend, L.Tempest, L.Foe, L.Foe, L.Rend
 						addLine(mod.vb.comboCount+1, DBM_CORE_TANK_ICON_SMALL..L.Foe)
 						comboUsed[3] = true
+						comboDebugCounter = comboDebugCounter + 1
+						comboDebug[comboDebugCounter] = L.Rend..", "..L.Tempest..", "..L.Foe..", "..L.Foe..", "..L.Rend
 					end
 					--Same in both combos
 					addLine(mod.vb.comboCount+2, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
@@ -159,11 +165,15 @@ do
 					addLine(mod.vb.comboCount+1, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
 					addLine(mod.vb.comboCount+2, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 					comboUsed[4] = true
+					comboDebugCounter = comboDebugCounter + 1
+					comboDebug[comboDebugCounter] = L.Rend..", "..L.Foe..", "..L.Foe..", "..L.Tempest..", "..L.Rend
 				elseif mod.vb.secondCombo == "Rend" then--L.Foe, L.Rend, L.Tempest, L.Foe, L.Rend
 					addLine(L.Current, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend)
 					addLine(mod.vb.comboCount+1, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 					addLine(mod.vb.comboCount+2, DBM_CORE_TANK_ICON_SMALL..L.Foe.."(2)")
 					comboUsed[2] = true
+					comboDebugCounter = comboDebugCounter + 1
+					comboDebug[comboDebugCounter] = L.Foe..", "..L.Rend..", "..L.Tempest..", "..L.Foe..", "..L.Rend
 				end
 				--Rend always last
 				addLine(mod.vb.comboCount+3, DBM_CORE_IMPORTANT_ICON_SMALL..L.Rend.."(2)")
@@ -224,7 +234,6 @@ do
 					addLine(mod.vb.comboCount+1, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 				else
 					addLine(L.Current, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
-					--DBM.InfoFrame:Hide()
 				end
 			else
 				if mod.vb.comboCount == 0 then
@@ -249,7 +258,6 @@ do
 					addLine(mod.vb.comboCount+1, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
 				else
 					addLine(L.Current, DBM_CORE_DEADLY_ICON_SMALL..L.Tempest)
-					--DBM.InfoFrame:Hide()
 				end
 			end
 		end
@@ -272,17 +280,21 @@ function mod:OnCombatStart(delay)
 	self.vb.wakeOfFlameCount = 0
 	self.vb.blazeIcon = 1
 	self.vb.techActive = false
+	--self.vb.incompleteCombo = false
+	table.wipe(unitTracked)
 	if self:IsMythic() then
 		comboUsed[1] = false
 		comboUsed[2] = false
 		comboUsed[3] = false
 		comboUsed[4] = false
-		timerRavenousBlazeCD:Start(4.4-delay)
+		timerRavenousBlazeCD:Start(4-delay)
 		timerWakeofFlameCD:Start(10.7-delay)--Health based?
 		countdownWakeofFlame:Start(10.7-delay)
 		timerTaeshalachTechCD:Start(14.3-delay, 1)--Health based?
 		countdownTaeshalachTech:Start(14.3-delay)
 		berserkTimer:Start(540-delay)
+		table.wipe(comboDebug)
+		comboDebugCounter = 0
 	else
 		timerScorchingBlazeCD:Start(4.8-delay)
 		timerWakeofFlameCD:Start(5.1-delay)
@@ -290,12 +302,47 @@ function mod:OnCombatStart(delay)
 		timerTaeshalachTechCD:Start(35-delay, 1)
 		countdownTaeshalachTech:Start(35-delay)
 	end
-	--Everyone should lose spead except tanks which should stay stacked. Maybe melee are safe too?
+	--Everyone should lose spread except tanks which should stay stacked. Maybe melee are safe too?
 	if self.Options.RangeFrame and not self:IsTank() then
 		DBM.RangeCheck:Show(6)
 	end
 	if self.Options.NPAuraOnPresence then
 		DBM:FireEvent("BossMod_EnableHostileNameplates")
+		self:RegisterOnUpdateHandler(function(self)
+			for i = 1, 40 do
+				local UnitID = "nameplate"..i
+				local GUID = UnitGUID(UnitID)
+				local cid = self:GetCIDFromGUID(GUID)
+				if cid == 122532 then
+					local unitPower = UnitPower(UnitID)
+					if not unitTracked[GUID] then unitTracked[GUID] = "None" end
+					if (unitPower < 35) then
+						if unitTracked[GUID] ~= "Green" then
+							unitTracked[GUID] = "Green"
+							DBM.Nameplate:Show(true, GUID, 244912, 463281)
+						end
+					elseif (unitPower < 70) then
+						if unitTracked[GUID] ~= "Yellow" then
+							unitTracked[GUID] = "Yellow"
+							DBM.Nameplate:Hide(true, GUID, 244912, 463281)
+							DBM.Nameplate:Show(true, GUID, 244912, 460954)
+						end
+					elseif (unitPower < 90) then
+						if unitTracked[GUID] ~= "Red" then
+							unitTracked[GUID] = "Red"
+							DBM.Nameplate:Hide(true, GUID, 244912, 460954)
+							DBM.Nameplate:Show(true, GUID, 244912, 463282)
+						end
+					elseif (unitPower < 100) then
+						if unitTracked[GUID] ~= "Critical" then
+							unitTracked[GUID] = "Critical"
+							DBM.Nameplate:Hide(true, GUID, 244912, 463282)
+							DBM.Nameplate:Show(true, GUID, 244912, 1029718)
+						end
+					end
+				end
+			end
+		end, 1)
 	end
 end
 
@@ -308,6 +355,11 @@ function mod:OnCombatEnd()
 	end
 	if self.Options.NPAuraOnPresence then
 		DBM.Nameplate:Hide(true, nil, nil, nil, true, true)
+	end
+	if DBM.Options.DebugMode then
+		for i, v in ipairs(comboDebug) do
+			DBM:AddMsg(v)
+		end
 	end
 end
 
@@ -334,13 +386,15 @@ function mod:SPELL_CAST_START(args)
 		end
 		self.vb.foeCount = self.vb.foeCount + 1
 		if self:IsTank() then
-			local tanking, status = UnitDetailedThreatSituation("player", "boss1")
-			if tanking or (status == 3) then--Player is current target
+			if self:IsTanking("player", "boss1", nil, true) then
 				specWarnFoeBreakerDefensive:Show()
 				specWarnFoeBreakerDefensive:Play("defensive")
-			elseif not UnitDebuff("player", args.spellName) and self.vb.foeCount == 2 then--Second cast and you didn't take first
-				specWarnFoeBreakerTaunt:Show(BOSS)
-				specWarnFoeBreakerTaunt:Play("tauntboss")
+			elseif (self.vb.foeCount == 2) and not DBM:UnitDebuff("player", 245458, 255059) then
+				if self.Options.ignoreThreeTank and self:GetNumAliveTanks() >= 3 then return end
+				if self:AntiSpam(2, 6) then--Second cast and you didn't take first and didn't get a flame rend taunt warning in last 2 seconds
+					specWarnFoeBreakerTaunt:Show(BOSS)
+					specWarnFoeBreakerTaunt:Play("tauntboss")
+				end
 			end
 		end
 		if self.vb.foeCount == 1 and not self:IsMythic() then
@@ -398,6 +452,25 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
+function mod:SPELL_CAST_SUCCESS(args)
+	local spellId = args.spellId
+	if spellId == 247079 or spellId == 244033 then--Special cast Ids that show the primary target of the flame rend, not all the people hit by it
+		if self.Options.ignoreThreeTank and self:GetNumAliveTanks() >= 3 then return end
+		local uId = DBM:GetRaidUnitId(args.destName)
+		if self:IsTanking(uId) then--For good measure, filter non tanks on wipes or LFR trolls
+			if not args:IsPlayer() and (self:IsMythic() and self.vb.rendCount == 2 or not DBM:UnitDebuff("player", 245458, 255059)) then
+				--Will warn if Rend count 2 and mythic, combo has ended and tank that didn't get hit should taunt boss to keep him still
+				--Will warn if Flame did not hit you and you do NOT have foebreaker debuff yet, should taunt to keep boss from moving, you're the next foe soaker in this case.
+				--Will NOT warn if Using 3+ tank strat and 3 tank filter enabled. If using 3+ tank strat, none of the two above can be safely assumed who should taunt boss, so we do nothing
+				if self:AntiSpam(2, 6) then--Antispam to prevent double taunt warnings with foebreaker code that warns you to taunt on cast start if other tank has debuff
+					specWarnFlameRendTaunt:Show(args.destName)
+					specWarnFlameRendTaunt:Play("tauntboss")
+				end
+			end
+		end
+	end
+end
+
 function mod:SPELL_AURA_APPLIED(args)
 	local spellId = args.spellId
 	if spellId == 245990 then
@@ -410,7 +483,7 @@ function mod:SPELL_AURA_APPLIED(args)
 					specWarnTaeshalachReach:Play("stackhigh")
 				else--Taunt as soon as stacks are clear, regardless of stack count.
 					local techTimer = timerTaeshalachTechCD:GetRemaining(self.vb.techCount+1)
-					if not UnitIsDeadOrGhost("player") and not UnitDebuff("player", args.spellName) and (techTimer == 0 or techTimer >= 4) then
+					if not UnitIsDeadOrGhost("player") and not DBM:UnitDebuff("player", args.spellName) and (techTimer == 0 or techTimer >= 4) then
 						specWarnTaeshalachReachOther:Show(args.destName)
 						specWarnTaeshalachReachOther:Play("tauntboss")
 					else
@@ -447,6 +520,11 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		self.vb.blazeIcon = self.vb.blazeIcon + 1
 	elseif spellId == 244894 then--Corrupt Aegis
+		if self.vb.comboCount > 0 and self.vb.comboCount < 5 then
+			--self.vb.incompleteCombo = true
+			comboDebugCounter = comboDebugCounter + 1
+			comboDebug[comboDebugCounter] = "Phase changed aborted a combo before it finished"
+		end
 		warnPhase:Play("phasechange")
 		self.vb.wakeOfFlameCount = 0
 		self.vb.techActive = false
@@ -454,6 +532,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerRavenousBlazeCD:Stop()
 		timerWakeofFlameCD:Stop()
 		timerFlareCD:Stop()
+		countdownFlare:Cancel()
 		countdownWakeofFlame:Cancel()
 		timerTaeshalachTechCD:Stop()
 		countdownTaeshalachTech:Cancel()
@@ -473,8 +552,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.NPAuraOnPresence then
 			DBM.Nameplate:Show(true, args.destGUID, spellId)
 		end
---	elseif spellId == 245923 then--Debuff version of flare
---		warnFlare:CombinedShow(0.3, args.destName)
 	end
 end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
@@ -483,6 +560,8 @@ function mod:SPELL_AURA_REMOVED(args)
 	local spellId = args.spellId
 	if spellId == 244894 then--Corrupt Aegis
 		self.vb.phase = self.vb.phase + 1
+		comboDebugCounter = comboDebugCounter + 1
+		comboDebug[comboDebugCounter] = "Phase: "..self.vb.phase
 		self.vb.wakeOfFlameCount = 0
 		self.vb.comboCount = 0
 		self.vb.firstCombo = nil
@@ -500,10 +579,16 @@ function mod:SPELL_AURA_REMOVED(args)
 		warnPhase:Show(DBM_CORE_AUTO_ANNOUNCE_TEXTS.stage:format(self.vb.phase))
 		if self.vb.phase == 2 then
 			warnPhase:Play("ptwo")
-			timerFlareCD:Start(10)
+			timerFlareCD:Start(self:IsMythic() and 8 or 10)
+			if self:IsMythic() then
+				countdownFlare:Start(8)
+			end
 		elseif self.vb.phase == 3 then
 			warnPhase:Play("pthree")
-			timerFlareCD:Start(10)
+			timerFlareCD:Start(self:IsMythic() and 8 or 10)
+			if self:IsMythic() then
+				countdownFlare:Start(8)
+			end
 		end
 		if self.Options.RangeFrame and not self:IsTank() then
 			DBM.RangeCheck:Show(6)
@@ -522,27 +607,14 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
---[[
-function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
-	if spellId == 247135 and destGUID == UnitGUID("player") and self:AntiSpam(2, 4) then
-		specWarnGTFO:Show()
-		specWarnGTFO:Play("runaway")
-	end
-end
-mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
-
---http://ptr.wowhead.com/npc=121985/flame-of-taeshalach
---http://ptr.wowhead.com/npc=122532/ember-of-taeshalach
---http://ptr.wowhead.com/npc=123531/blazing-ember-of-taeshalach
 function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
-	if cid == 121193 then
-
+	if cid == 122532 then
+		DBM.Nameplate:Hide(true, args.destGUID)
 	end
 end
---]]
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)
 	if spellId == 245993 then--Scorching Blaze
 		timerScorchingBlazeCD:Start()
 	elseif spellId == 254451 then--Ravenous Blaze (mythic replacement for Scorching Blaze)
@@ -560,8 +632,8 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
 		timerRavenousBlazeCD:Stop()
 		timerWakeofFlameCD:Stop()
 		timerFlareCD:Stop()
+		countdownFlare:Cancel()
 		countdownWakeofFlame:Cancel()
-		warnTaeshalachTech:Show(self.vb.techCount)
 		if self:IsMythic() then
 			--Reset combo and tech count if needed
 			if self.vb.techCount == 5 then
@@ -582,16 +654,17 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
 				timerTempestCD:Start(15)
 			end
 		end
+		warnTaeshalachTech:Show(self.vb.techCount)
 		timerTaeshalachTechCD:Start(nil, self.vb.techCount+1)
 		countdownTaeshalachTech:Start()
 		if self.Options.InfoFrame then
-			DBM.InfoFrame:SetHeader(spellName)
+			DBM.InfoFrame:SetHeader(DBM:GetSpellInfo(spellId))
 			DBM.InfoFrame:Show(5, "function", updateInfoFrame, false, false, true)
 		end
 	elseif spellId == 244792 and self.vb.techActive then--Burning Will of Taeshalach (technique ended)
 		self.vb.techActive = false
 		if self:IsMythic() then
-			timerRavenousBlazeCD:Start(4.2)
+			timerRavenousBlazeCD:Start(self.vb.phase == 1 and 4.2 or 21.3)
 		else
 			timerScorchingBlazeCD:Start(4.2)
 		end
@@ -604,9 +677,15 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
 				countdownWakeofFlame:Start(7)
 			end
 		elseif self.vb.phase == 2 then
-			timerFlareCD:Start(8.6)--Might be wrong here
+			timerFlareCD:Start(self:IsMythic() and 6.6 or 8.6)
+			if self:IsMythic() then
+				countdownFlare:Start(6.6)
+			end
 		else--Stage 3
-			timerFlareCD:Start(10)--Might be wrong here
+			timerFlareCD:Start(self:IsMythic() and 8 or 10)
+			if self:IsMythic() then
+				countdownFlare:Start(8)
+			end
 		end
 		if self.Options.InfoFrame then
 			DBM.InfoFrame:Hide()
@@ -616,6 +695,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
 		specWarnFlare:Play("watchstep")
 		if not self:IsMythic() then
 			timerFlareCD:Start()
+			--No countdown on non mythic on purpose
 		end
 	end
 end

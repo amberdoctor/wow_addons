@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1744, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17112 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17623 $"):sub(12, -3))
 mod:SetCreatureID(106087)
 mod:SetEncounterID(1876)
 mod:SetZone()
@@ -57,21 +57,21 @@ local specViolentWinds				= mod:NewSpecialWarningYou(218124, nil, nil, nil, 3, 2
 local yellViolentWinds				= mod:NewYell(218124)
 
 --Spider Form
---mod:AddTimerLine(DBM:GetSpellInfo(210326))
+mod:AddTimerLine(DBM:GetSpellInfo(210326))
 local timerSpiderFormCD				= mod:NewNextTimer(132, 210326, nil, nil, nil, 6)
 local timerFeedingTimeCD			= mod:NewNextCountTimer(50, 212364, nil, nil, nil, 1, nil, DBM_CORE_DAMAGE_ICON)
 local timerNecroticVenomCD			= mod:NewNextCountTimer(21.8, 215443, nil, nil, nil, 3)--This only targets ranged, but melee/tanks need to be sure to also move away from them
---mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
+mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
 local timerNightmareSpawnCD			= mod:NewNextTimer(10, 218630, nil, nil, nil, 1, nil, DBM_CORE_HEROIC_ICON)
 --Roc Form
---mod:AddTimerLine(DBM:GetSpellInfo(210308))
+mod:AddTimerLine(DBM:GetSpellInfo(210308))
 local timerRocFormCD				= mod:NewNextTimer(47, 210308, nil, nil, nil, 6)
 local timerGatheringCloudsCD		= mod:NewNextTimer(15.8, 212707, nil, nil, nil, 2)
 local timerDarkStormCD				= mod:NewNextTimer(26, 210948, nil, nil, nil, 2)
 local timerTwistingShadowsCD		= mod:NewNextCountTimer(21.5, 210864, nil, nil, nil, 3)
 local timerRazorWingCD				= mod:NewNextTimer(32.5, 210547, nil, nil, nil, 3)
 local timerRakingTalonsCD			= mod:NewCDCountTimer(32, 215582, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
---mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
+mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
 local timerViolentWindsCD			= mod:NewNextTimer(40.5, 218124, nil, nil, nil, 5, nil, DBM_CORE_HEROIC_ICON..DBM_CORE_TANK_ICON)
 
 local berserkTimer					= mod:NewBerserkTimer(540)
@@ -102,14 +102,14 @@ local function findDebuff(self, spellName, spellId)
 	local found = 0
 	for uId in DBM:GetGroupMembers() do
 		local name = DBM:GetUnitFullName(uId)
-		if UnitDebuff(uId, spellName) then
+		if DBM:UnitDebuff(uId, spellName) then
 			found = found + 1
 			if spellId == 210864 then
 				warnTwistingShadows:CombinedShow(0.1, self.vb.twistedCast, name)
 				if name == UnitName("player") then
 					specWarnTwistingShadows:Show()
 					specWarnTwistingShadows:Play("runout")
-					local _, _, _, _, _, _, expires = UnitDebuff("Player", spellName)
+					local _, _, _, _, _, expires = DBM:UnitDebuff("Player", spellName)
 					local debuffTime = expires - GetTime()
 					if debuffTime then
 						yellTwistingShadows:Schedule(debuffTime-1, 1)
@@ -122,7 +122,7 @@ local function findDebuff(self, spellName, spellId)
 				if name == UnitName("player") then
 					specWarnNecroticVenom:Show()
 					specWarnNecroticVenom:Play("runout")
-					local _, _, _, _, _, _, expires = UnitDebuff("Player", spellName)
+					local _, _, _, _, _, expires = DBM:UnitDebuff("Player", spellName)
 					local debuffTime = expires - GetTime()
 					if debuffTime then
 						yellNecroticVenom:Schedule(debuffTime - 1, 1)
@@ -139,7 +139,6 @@ local function findDebuff(self, spellName, spellId)
 end
 
 function mod:OnCombatStart(delay)
-	eyeOfStorm = DBM:GetSpellInfo(211127)
 	self.vb.venomCast = 0
 	self.vb.feedingTimeCast = 0
 	timerNecroticVenomCD:Start(12.2-delay, 1)
@@ -170,8 +169,7 @@ function mod:SPELL_CAST_START(args)
 	elseif spellId == 215582 then
 		self.vb.talonsCast = self.vb.talonsCast + 1
 		local targetName, uId, bossuid = self:GetBossTarget(106087, true)
-		local tanking, status = UnitDetailedThreatSituation("player", bossuid)
-		if tanking or (status == 3) then--Player is current target
+		if self:IsTanking("player", bossuid, nil, true) then
 			specWarnRakingTalon:Show()
 			specWarnRakingTalon:Play("defensive")
 		end
@@ -304,8 +302,8 @@ function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
 end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 212364 then--Feeding Time
 		self.vb.feedingTimeCast = self.vb.feedingTimeCast + 1
 		specWarnFeedingTime:Show(self.vb.feedingTimeCast)

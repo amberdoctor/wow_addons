@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1795, "DBM-BrokenIsles", nil, 822)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17077 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17603 $"):sub(12, -3))
 mod:SetCreatureID(99929)
 mod:SetEncounterID(1951)
 mod:SetReCombatTime(20)
@@ -20,9 +20,6 @@ local warnJetsam				= mod:NewTargetAnnounce(220295, 2)
 
 local specWarnGetsam			= mod:NewSpecialWarningDodge(220340, "Tank", nil, nil, 1, 2)
 local specWarnBreakSam			= mod:NewSpecialWarningSpell(223317, "Melee", nil, nil, 1, 2)
-local specWarnJetsam			= mod:NewSpecialWarningMoveAway(220295, nil, nil, nil, 1, 2)
-local yellJetsam				= mod:NewYell(220295)
-local specWarnJetsamNear		= mod:NewSpecialWarningClose(220295, nil, nil, nil, 1, 2)
 
 local timerGetsamCD				= mod:NewCDTimer(53, 220340, nil, nil, nil, 5, nil, DBM_CORE_TANK_ICON)
 local timerYaksamCD				= mod:NewCDTimer(50, 223373, nil, nil, nil, 1)--50-55
@@ -31,16 +28,7 @@ local timerYaksamCD				= mod:NewCDTimer(50, 223373, nil, nil, nil, 1)--50-55
 
 function mod:JetsamTarget(targetname, uId)
 	if not targetname then return end
-	if targetname == UnitName("player") then
-		specWarnJetsam:Show()
-		specWarnJetsam:Play("runout")
-		yellJetsam:Yell()
-	elseif self:CheckNearby(10, targetname) then
-		specWarnJetsamNear:Show(targetname)
-		specWarnJetsamNear:Play("watchstep")
-	else
-		warnJetsam:Show(targetname)
-	end
+	warnJetsam:Show(targetname)
 end
 
 --[[
@@ -69,8 +57,8 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
-	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, bfaSpellId, _, legacySpellId)
+	local spellId = legacySpellId or bfaSpellId
 	if spellId == 220295 and self:AntiSpam(4, 1) then---220277-Summon Jetsam Stalker/220295-Jetsam
 		self:BossTargetScanner(99929, "JetsamTarget", 0.2, 5)
 	end
