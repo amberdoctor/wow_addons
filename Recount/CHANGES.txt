@@ -1,10 +1,9 @@
 ------------------------------------------------------------------------
-r1447 | Resike | 2017-11-10 14:50:11 -0600 (Fri, 10 Nov 2017) | 3 lines
+r1457 | Resike | 2018-07-18 23:12:09 +0000 (Wed, 18 Jul 2018) | 1 line
 Changed paths:
-   M /trunk/GUI_Detail.lua
+   M /trunk/Recount.toc
+   M /trunk/Tracker.lua
 
-- Force an update.
-- Minor changes.
-
+- Updated for 8.0.1.
 ------------------------------------------------------------------------
 

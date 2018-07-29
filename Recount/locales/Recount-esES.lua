@@ -21,12 +21,12 @@ L["Allows the data of a window to be reported"] = "Permite reportar los datos de
 L["Appearance"] = "Apariencia"
 L["Arcane"] = "Arcano"
 L["Arenas"] = "Arenas"
---Translation missing 
--- L["Astral Power Abilities"] = "Astral Power Abilities"
---Translation missing 
--- L["Astral Power Gained"] = "Astral Power Gained"
---Translation missing 
--- L["Astral Power Sources"] = "Astral Power Sources"
+--[[Translation missing --]]
+--[[ L["Astral Power Abilities"] = "Astral Power Abilities"--]] 
+--[[Translation missing --]]
+--[[ L["Astral Power Gained"] = "Astral Power Gained"--]] 
+--[[Translation missing --]]
+--[[ L["Astral Power Sources"] = "Astral Power Sources"--]] 
 L["Attack Name"] = "Nombre del Ataque"
 L["Attack Summary Incoming (Click for Outgoing)"] = "Resumen de ataque entrante (Click para saliente)"
 L["Attack Summary Outgoing (Click for Incoming)"] = "Resumen de ataque saliente (Click para entrante)"
@@ -142,11 +142,11 @@ L["Friendly Fired On"] = "Fuego amigo en"
 L["From"] = "De"
 L["Frost"] = "Escarcha"
 L["Frostfire"] = "Pirofrío"
---Translation missing 
--- L["Fury Abilities"] = "Fury Abilities"
+--[[Translation missing --]]
+--[[ L["Fury Abilities"] = "Fury Abilities"--]] 
 L["Fury Gained"] = "Furia Generada"
---Translation missing 
--- L["Fury Sources"] = "Fury Sources"
+--[[Translation missing --]]
+--[[ L["Fury Sources"] = "Fury Sources"--]] 
 L["Gained"] = "Ganado"
 L["General Window Options"] = "Opciones de la Ventana General"
 L["Glancing"] = "De Refilon"
@@ -318,10 +318,10 @@ L["Runic Power Abilities"] = "Habilidades de poder rúnico"
 L["Runic Power Gained"] = "Poder Runico Ganado"
 L["Runic Power Sources"] = "Fuentes de poder rúnico"
 L["'s Absorbs"] = "absorvió"
---Translation missing 
--- L["'s Astral Power Gained"] = "'s Astral Power Gained"
---Translation missing 
--- L["'s Astral Power Gained From"] = "'s Astral Power Gained From"
+--[[Translation missing --]]
+--[[ L["'s Astral Power Gained"] = "'s Astral Power Gained"--]] 
+--[[Translation missing --]]
+--[[ L["'s Astral Power Gained From"] = "'s Astral Power Gained From"--]] 
 L["'s Dispels"] = "-> disipados"
 L["'s DOT Uptime"] = "-> DOT Arriba"
 L["'s DPS"] = "-> DPS"
@@ -330,35 +330,35 @@ L["'s Effective Healing"] = "-> Curaciones Efectivas"
 L["'s Energy Gained"] = "-> Energia Ganada"
 L["'s Energy Gained From"] = "-> Energia Ganada de"
 L["'s Friendly Fire"] = "-> Fuego Amigo"
---Translation missing 
--- L["'s Fury Gained"] = "'s Fury Gained"
---Translation missing 
--- L["'s Fury Gained From"] = "'s Fury Gained From"
+--[[Translation missing --]]
+--[[ L["'s Fury Gained"] = "'s Fury Gained"--]] 
+--[[Translation missing --]]
+--[[ L["'s Fury Gained From"] = "'s Fury Gained From"--]] 
 L["'s Hostile Attacks"] = "-> Ataques hostiles"
 L["'s HOT Uptime"] = "-> HOT Arriba"
 L["'s HPS"] = "-> HPS"
 L["'s HTPS"] = "-> HTPS"
 L["'s Interrupts"] = "-> Interrumpidos"
---Translation missing 
--- L["'s Maelstorm Gained"] = "'s Maelstorm Gained"
---Translation missing 
--- L["'s Maelstorm Gained From"] = "'s Maelstorm Gained From"
+--[[Translation missing --]]
+--[[ L["'s Maelstorm Gained"] = "'s Maelstorm Gained"--]] 
+--[[Translation missing --]]
+--[[ L["'s Maelstorm Gained From"] = "'s Maelstorm Gained From"--]] 
 L["'s Mana Gained"] = "-> Mana Ganado"
 L["'s Mana Gained From"] = "-> Mana Ganado de"
 L["'s Network Traffic"] = "-> Trafico de Red"
 L["'s Overhealing"] = "-> Overhealing"
---Translation missing 
--- L["'s Pain Gained"] = "'s Pain Gained"
---Translation missing 
--- L["'s Pain Gained From"] = "'s Pain Gained From"
+--[[Translation missing --]]
+--[[ L["'s Pain Gained"] = "'s Pain Gained"--]] 
+--[[Translation missing --]]
+--[[ L["'s Pain Gained From"] = "'s Pain Gained From"--]] 
 L["'s Partial Resists"] = "-> Parcialmente resistidos"
 L["'s Rage Gained"] = "-> Ira Ganada"
 L["'s Rage Gained From"] = "-> Ira Ganada de"
 L["'s Resses"] = "-> Resucitados"
---Translation missing 
--- L["'s Runic Power Gained"] = "'s Runic Power Gained"
---Translation missing 
--- L["'s Runic Power Gained From"] = "'s Runic Power Gained From"
+--[[Translation missing --]]
+--[[ L["'s Runic Power Gained"] = "'s Runic Power Gained"--]] 
+--[[Translation missing --]]
+--[[ L["'s Runic Power Gained From"] = "'s Runic Power Gained From"--]] 
 L["'s Time Spent"] = "-> Tiempo Gastado"
 L["'s Time Spent Attacking"] = "-> Tiempo Gastado Atacando"
 L["'s Time Spent Healing"] = "-> Tiempo Gastado Curando"
@@ -420,8 +420,8 @@ L["Times"] = "Tiempos"
 L["Title"] = "Titulo"
 L["Title Text"] = "Texto de Titulo"
 L["Toggle"] = "Cambiar"
---Translation missing 
--- L["Toggle merge pets"] = "Toggle merge pets"
+--[[Translation missing --]]
+--[[ L["Toggle merge pets"] = "Toggle merge pets"--]] 
 L["Toggle pause of global data collection"] = "Activa/desactiva la pausa de recoleccion de datos global"
 L["Toggles sending synchronization messages"] = "Activa/desactiva el envio de mensajes de sincronizacion"
 L["Toggles the main window"] = "Muestra/oculta la ventana principal"
