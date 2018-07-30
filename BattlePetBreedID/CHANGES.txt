@@ -1,0 +1,7 @@
+changeset:   169:25f115e633ef
+tag:         v1.12.0
+user:        Caleb Atherton <atcaleb@twitch.tv>
+date:        Tue Jul 17 12:51:46 2018 -0400
+summary:     Updated TOC for Patch 8.0.1. Added base stats for all new and changed pets in Patch 8.0.1.
+
+
