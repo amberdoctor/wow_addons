@@ -26,9 +26,9 @@ L= DBM:GetModLocalization(2146)
 L= DBM:GetModLocalization(2169)
 
 L:SetMiscLocalization({
-	CThunDisc	 =	"Disc accessed. C'thun data loading.",
-	YoggDisc	 =	"Disc accessed. Yogg-Saron data loading.",
-	CorruptedDisc =	"Disc accessed. Corrupted data loading."
+	CThunDisc	 =	"원반 접속 완료. 크툰 데이터를 불러옵니다.",
+	YoggDisc	 =	"원반 접속 완료. 요그사론 데이터를 불러옵니다.",
+	CorruptedDisc =	"원반 접속 완료. 오염된 데이터를 불러옵니다."
 })
 
 ---------------------------
@@ -51,11 +51,19 @@ L= DBM:GetModLocalization(2194)
 L= DBM:GetModLocalization(2195)
 
 L:SetTimerLocalization({
-	timerAddIncoming		= DBM_INCOMING
+	timerCallofCrawgCD		= "다음 크로그 (%s)",
+	timerCallofHexerCD 		= "다음 혈사술사 (%s)",
+	timerCallofCrusherCD	= "다음 분쇄자 (%s)",
 })
 
 L:SetOptionLocalization({
 	timerAddIncoming		= "쫄이 공격 가능해지면 타이머 바 보기"
+})
+
+L:SetMiscLocalization({
+	Crusher			=	"분쇄자",
+	Bloodhexer		=	"혈사술사",
+	Crawg			=	"크로그"
 })
 
 ------------------

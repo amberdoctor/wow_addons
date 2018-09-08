@@ -168,6 +168,7 @@ DBM_CORE_UPDATEREMINDER_TESTVERSION		= "WARNUNG: Du benutzt eine Version von Dea
 DBM_CORE_VEM							= "WARNUNG: Du benutzt Deadly Boss Mods zusammen mit Voice Encounter Mods. DBM läuft nicht in dieser Konfiguration und wird deshalb nicht geladen."
 DBM_CORE_3RDPROFILES					= "WARNUNG: DBM-Profiles ist mit dieser Version von DBM nicht kompatibel. Es muss entfernt werden bevor DBM genutzt werden kann um Konflikte zu vermeiden."
 DBM_CORE_DPMCORE						= "WARNUNG: Deadly Pvp Mods (DPM) wird nicht mehr gepflegt und ist mit dieser Version von DBM nicht kompatibel. Es muss entfernt werden bevor DBM genutzt werden kann um Konflikte zu vermeiden."
+DBM_CORE_DBMLDB							= "WARNUNG: DBM-LDB ist nun DBM-Core integriert. Obwohl es keine schädlichen Auswirkungen hat, wird empfohlen 'DBM-LDB' aus dem Addon-Ordner zu entfernen."
 DBM_CORE_UPDATE_REQUIRES_RELAUNCH		= "WARNUNG: Dieses Update von DBM arbeitet erst nach einem vollständigem Neustart des Spielclients korrekt. Das Update enthält neue Dateien oder Änderungen an .toc-Dateien, die nicht mit \"/reload\" geladen werden können. Die Funktionsfähigkeit von DBM kann beeinträchtigt sein und es können Fehler auftreten, bis du den Spielclient neu startest."
 DBM_CORE_OUT_OF_DATE_NAG				= "Deine Version von Deadly Boss Mods ist veraltet. Du solltest eine Aktualisierung für diesen Kampf durchführen, da du sonst wichtige Warnungen oder Timer verpassen könntest oder automatische \"Schreie\" fehlen, die der Rest deines Schlachtzuges von dir erwartet."
 
@@ -179,7 +180,7 @@ DBM_PIZZA_CONFIRM_IGNORE			= "Willst du wirklich DBM-Timer von %s für diese Sit
 DBM_PIZZA_ERROR_USAGE				= "Benutzung: /dbm [broadcast] timer <Sekunden> <Text>. <Sekunden> muss größer als 1 sein."
 
 --DBM_CORE_MINIMAP_TOOLTIP_HEADER
-DBM_CORE_MINIMAP_TOOLTIP_FOOTER		= "Shift+Klick oder Rechtsklick zum Bewegen\nAlt+Shift+Klick zum freien Bewegen"
+DBM_CORE_MINIMAP_TOOLTIP_FOOTER		= "Shift gedrückt halten und Ziehen zum Bewegen"
 
 DBM_CORE_RANGECHECK_HEADER			= "Abstandscheck (%dm)"
 DBM_CORE_RANGECHECK_SETRANGE		= "Abstand einstellen"
@@ -551,3 +552,13 @@ DBM_CORE_DUR_HEADER					= "Deadly Boss Mods - Haltbarkeitergebnisse"
 DBM_CORE_DUR_ENTRY					= "%s: Haltbarkeit [%d Prozent] / Ausrüstung defekt [%s]"
 DBM_CORE_LAG_FOOTER					= "Keine Antwort: %s"
 
+--LDB
+DBM_LDB_TOOLTIP_HELP1	= "Links-Klick, um DBM zu öffnen."
+DBM_LDB_TOOLTIP_HELP2	= "Rechts-Klick, um das Konfigurationsmenü zu öffnen."
+
+DBM_LDB_LOAD_MODS		= "Lade Boss Mod"
+
+DBM_LDB_CAT_OTHER		= "Sonstige Boss Mods"
+
+DBM_LDB_CAT_GENERAL		= "Allgemein"
+DBM_LDB_ENABLE_BOSS_MOD	= "Aktiviere Boss Mod"
