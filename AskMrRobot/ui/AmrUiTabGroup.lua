@@ -10,10 +10,9 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 local Amr = LibStub("AceAddon-3.0"):GetAddon("AskMrRobot")
 
 -- Lua APIs
-local pairs, ipairs, assert, type, wipe = pairs, ipairs, assert, type, wipe
+local pairs, ipairs, assert, type = pairs, ipairs, assert, type
 
 -- WoW APIs
-local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 local _G = _G
 
@@ -225,7 +224,7 @@ Constructor
 -------------------------------------------------------------------------------]]
 local function Constructor()
 	local num = AceGUI:GetNextWidgetNum(Type)
-	local frame = CreateFrame("Frame",nil,UIParent)
+	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetHeight(100)
 	frame:SetWidth(100)
 	frame:SetFrameStrata("FULLSCREEN_DIALOG")

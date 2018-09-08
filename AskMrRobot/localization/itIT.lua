@@ -1,17 +1,3 @@
-﻿--[[-------------------------------------------------------------------------------------------------------------
-Master Localization File (English)
-
-Instructions for Translators:
-1. Copy this entire file into a new file in the same folder, named with your locale, e.g. deDE.lua for German.
-2. At the top, replace "enUS" in the first code line with your locale.
-3. Change all the English strings in your file as appropriate.
-
-Note that a couple of the "strings" are functions that are provided variables.  Feel free to modify these
-functions as necessary to output an appropriately worded statement in your language (but don't change the parameters).  
-If you need assistance with the syntax of any used methods like string.format, please contact Team Robot and we will gladly assist you.
----------------------------------------------------------------------------------------------------------------]]
-
--- replace enUS with your locale
 local L = LibStub("AceLocale-3.0"):NewLocale("AskMrRobot", "itIT", false)
 
 if L then
@@ -85,10 +71,7 @@ L.StatsShort = {
 }
 
 L.InstanceNames = {
-	[1520] = "Emerald Nightmare",
-	[1530] = "Nighthold",
-	[1648] = "Trial of Valor",
-	[1676] = "Tomb of Sargeras"
+	[1861] = "Uldir"
 }
 
 L.DifficultyNames = {
@@ -137,9 +120,7 @@ L.CoverCancel = "Annulla"
 L.MinimapTooltip = 
 [[Clic Sinistro per aprire l'interfaccia di Ask Mr Robot.
 
-Tasto Destro per cambiare spec ed equip collegato.
-
-Ctrl + Clic Sinistro per segnare il wipe.]]
+Tasto Destro per cambiare spec ed equip collegato.]]
 
 L.MainStatusText = function(version, url)
 	return version .. " loaded. Documentazione disponibile su " .. url
@@ -148,7 +129,6 @@ end
 L.TabExportText = "Esporta"
 L.TabGearText = "Equip"
 L.TabLogText = "Combat Logs"
-L.TabTeamText = "Ottimizzatore Raid"
 L.TabOptionsText = "Opzioni"
 
 L.VersionChatTitle = "Versione Addon AMR:"
@@ -161,15 +141,13 @@ Export Tab
 ------------------------------------------------------------------------]]
 L.ExportTitle = "Istruzioni di Esportazione"
 L.ExportHelp1 = "1. Copia il testo qui sotto premendo Ctrl+C (o Cmd+C su un Mac)"
-L.ExportHelp2 = "2. Vai su http://www.askmrrobot.com/wow/player e carica il tuo personaggio"
-L.ExportHelp3 = "3. Premi la scritta verde IMPORT (from addon) subito sopra il nome del tuo personaggio"
-L.ExportHelp4 = "4. Incolla all'interno dell'area di testoe premi il tasto Import!"
+L.ExportHelp2 = "2. Vai su https://www.askmrrobot.com e carica il tuo personaggio"
+L.ExportHelp3 = "3. Paste into the textbox under the AMR ADDON section" -- TODO
 
 L.ExportSplashTitle = "Per Cominciare"
 L.ExportSplashSubtitle = "Questa è la tua prima volta con la nuova versione dell'addon. Esegui queste operazioni per creare il Database del tuo equipaggiamento:"
 L.ExportSplash1 = "1. Attiva Ognuna delle tue spec ed equipaggia gli oggetti migliori che hai"
 L.ExportSplash2 = "2. Apri la tua banca e lasciala aperta almeno per 2 secondi"
-L.ExportSplash3 = "3. Se hai dell'equipaggiamento nella Banca Eterea, Aprila e lasciala aperta per almeno due secondi"
 L.ExportSplashClose = "Continua"
 
 
@@ -288,104 +266,6 @@ L.LogInstructions =
 
 **L'addon di AMR colleziona dati relativi a tutti i giocatori nella tua incursione con l'addon AMR. Gli altri giocatori non devono abilitare la registrazione! Devono solo avere l'addon installato ed abilitato. Questi dati vengono salvati su disco solo se esci da Wow o ricarichi la IU prima di caricarli.
 ]]
-
-
---[[----------------------------------------------------------------------
-Team Optimizer Tab
-------------------------------------------------------------------------]]
-L.TeamTabLeaderText = "Loot Ranker"
-L.TeamTabMemberText = "Membro"
-
-L.TeamSplashHeader = "Come uso di solito l'ottimizzatore di Incursione?"
-L.TeamSplashLeaderLabel = "Sono la persona che usa askmrrobot.com per determinare il miglior utilizzatore per il bottino"
-L.TeamSplashMemberLabel = "Qualcun'altro utilizza l'ottimizzatore per me"
-
-L.TeamMemberText = "Rilassati, tutto è gestito dal master looter."
-L.TeamMemberShowLootLabel = "Looting in progress!"
-L.TeamMemberShowLoot = "Mostra finestra Bottino"
-
-L.TeamButtonVersionText = "Verifica L'addon"
-L.TeamButtonExportRosterText = "Esporta Lista"
-L.TeamButtonExportLootText = "Esporta Bottino"
-L.TeamButtonExportClose = "Chiudi"
-L.TeamButtonImportRankingsText = "Importa Punteggi"
-L.TeamButtonStartLootText = "Inizia Predazione"
-L.TeamButtonResumeLootText = "Continua Predazione"
-
-L.TeamExportVersionLabel = "L'ottimizzatore di Incursione è più accurato e facile da utilizzare se tutti nel tuo gruppo hanno installato l'addon di AskMrRobot."
-L.TeamExportRosterLabel = "Fallo una volta all'inizio del raid per inizializzare l'addon sul web. Se qualcuno entra od esce dal tuo gruppo durante un'incursione, fallo di nuovo e premi 'Import without Reload' sul web per effettuare un aggiornamento rapido dei giocatori che sono cambiati."
-L.TeamExportLootLabel = "Esporta tutti i drop dell'ultimo boss lootato ed inseriscili nella graduatoria sul web.  L'inserimento tiene conto automaticamente dei loot vinti dai boss precedenti o con un tiro bonus!"
-L.TeamExportLootLabel2 = "Richiedere Master Loot"
-L.TeamImportRankingsLabel = "Importa i punteggi da askmrrobot.com così da semplificarti la distribuzione del bottino in gioco."
-L.TeamStartLootLabel = function(numItems)
-	return numItems .. " oggetti sono stati importati."
-end
-
-L.TeamHistoryTitle = "Loot History"
-L.TeamHistoryNoGroup = "Non sei in gruppo o in incursione."
-L.TeamHistoryEmpty = "Nessun loot è ancora stato assegnato."
-
-L.TeamVersionTitle = "Controlla Versione"
-L.TeamVersionNoGroup = "Non sei in gruppo o in incursione."
-L.TeamVersionGood = "Tutti nel tuo gruppo hanno l'addon!"
-L.TeamVersionMissing = "NON INSTALLATO"
-L.TeamVersionOld = "VERSIONE OBSOLETA"
-
-L.TeamExportRosterLoading = "Gathering player data, please wait..."
-
-L.TeamAlertNoGroup = "Non sei in un gruppo!"
-L.TeamAlertNoLoot = "Non è stato lootato niente recentemente nel tuo gruppo o incursione!"
-
-L.TeamExportHelp = "Premi Ctrl+C (o Cmd+C su un Mac) per copiatre il testo seguente."
-L.TeamExportRosterText = "Quindi vai sul Team Optimizer sul sito ed incolla all'interno della roster import box."
-L.TeamExportLootText = "Quindi vai sul Team Optimizer sul sito ed incolla all'interno della loot import box."
--- note to translators: leave "Team Optimizer" in english in the above two texts because our website is not localized yet
-
-L.TeamImportRankingsHeader = "Premi Ctrl+V (Cmd+V su un Mac) per incollare i dati nella textbox."
-
-L.TeamLootOptionNeed = "Need"
-L.TeamLootOptionOff = "Off Spec"
-L.TeamLootOptionGreed = "Greed"
-L.TeamLootOptionPass = "Pass"
-L.TeamLootOptionDisenchant = "Disenchant"
-
-
---[[----------------------------------------------------------------------
-Loot Window
-------------------------------------------------------------------------]]
-L.LootTitle = "Loot!"
-L.LootEmpty = " Non c'è nessun loot da gestire!"
-L.LootHelpItems = "Per ogni drop..."
-L.LootHelpRanks = "Scegli un opzione:"
-L.LootHelpMaster = "Quindi master loota:"
-
-L.LootIneligible = "Non sei eleggibile per questo Loot."
-
-L.LootRankHeaderRank = "Rank"
-L.LootRankHeaderScore = "Percentuale di Upgrade"
-L.LootRankHeaderScoreDisenchant = "Giocatore"
-
--- note to translators: these column headers should be short, abbreviate if necessary, keep to 5 characters max
-L.LootRankHeaderNeed = "Need"
-L.LootRankHeaderOff = "Off"
-L.LootRankHeaderGreed = "Greed"
-L.LootRankHeaderPass = "Pass"
-L.LootRankHeaderRoll = "Roll"
-
-L.LootRankLabelOff = "off spec"
-L.LootRankLabelDisenchant = "disenchanter"
-L.LootRankLabelMasterLooter = "master looter"
-L.LootRankLabelNoAddon = "addon non funzionante"
-
-L.LootMasterRollText = "Roll"
-L.LootMasterDisenchantText = "Disenchant/Sell"
-
-L.LootMasterRollLabel = "/roll automatico per tutti"
-L.LootMasterDisenchantLabel = "Clicca qui se nessuno vuole il loot"
-L.LootMasterGiveLoot = "Dai Loot"
-L.LootMasterGiveDisenchant = "Dai loot per Disenchant/Sell"
-
-L.LootMasterGiveFail = "Questo item o il vincitore non possono esser trovati :("
 
 
 --[[----------------------------------------------------------------------

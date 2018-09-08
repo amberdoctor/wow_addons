@@ -7,17 +7,60 @@ local _activeTab
 
 -- Returns a number indicating how different two items are (0 means the same, higher means more different)
 local function countItemDifferences(item1, item2)
-    if item1 == nil and item2 == nil then return 0 end
-    
-    -- different items (id + bonus ids + suffix, constitutes a different physical drop)
-    if Amr.GetItemUniqueId(item1, true) ~= Amr.GetItemUniqueId(item2, true) then
+	-- both nil, the same
+	if not item1 and not item2 then 
+		return 0 
+	end 
+	
+	-- one nil and other not, or different id, totally different
+	if (not item1 and item2) or (item1 and not item2) or item1.id ~= item2.id then 
+		return 10000 
+	end
+	
+    -- different versions of same item (id + bonus ids + suffix + drop level, constitutes a different physical drop)
+    if Amr.GetItemUniqueId(item1, true, true) ~= Amr.GetItemUniqueId(item2, true, true) then
 		return 1000
     end
     
     -- different upgrade levels of the same item
     if item1.upgradeId ~= item2.upgradeId then
         return 100
-    end
+	end
+	
+	-- different azerite powers
+	local aztDiffs = 0
+	if item1.azerite or item2.azerite then
+		if item1.azerite and not item2.azerite then
+			aztDiffs = #item1.azerite * 10
+		elseif item2.azerite and not item1.azerite then
+			aztDiffs = #item2.azerite * 10
+		else
+			-- count up number in item1 but missing from item2
+			for i = 1, #item1.azerite do
+				local missing = false
+				for j = 1, #item2.azerite do
+					if item2[j] == item1[i] then
+						missing = false
+					end
+				end
+				if missing then
+					aztDiffs = aztDiffs + 10
+				end
+			end
+			-- count up number in item2 but missing from item1
+			for i = 1, #item2.azerite do
+				local missing = false
+				for j = 1, #item1.azerite do
+					if item1[j] == item2[i] then
+						missing = false
+					end
+				end
+				if missing then
+					aztDiffs = aztDiffs + 10
+				end
+			end
+		end
+	end
     
     -- different gems
     local gemDiffs = 0
@@ -33,26 +76,24 @@ local function countItemDifferences(item1, item2)
         enchantDiff = 1
     end
     
-    return gemDiffs + enchantDiff
+    return aztDiffs + gemDiffs + enchantDiff
 end
 
 -- given a table of items (keyed or indexed doesn't matter) find closest match to item, or nil if none are a match
-local function findMatchingItemFromTable(item, list, bestLink, bestItem, bestDiff, bestLoc, usedItems, tableType)
+local function findMatchingItemFromTable(item, list, bestItem, bestDiff, bestLoc, usedItems, tableType)
 	if not list then return nil end
 	
 	local found = false
-	for k,v in pairs(list) do
-		local listItem = Amr.ParseItemLink(v)
+	for k,listItem in pairs(list) do		
 		if listItem then
 			local diff = countItemDifferences(item, listItem)
 			if diff < bestDiff then
 				-- each physical item can only be used once, the usedItems table has items we can't use in this search
 				local key = string.format("%s_%s", tableType, k)
 				if not usedItems[key] then
-					bestLink = v
 					bestItem = listItem
 					bestDiff = diff
-					bestLoc = string.format("%s_%s", tableType, k)
+					bestLoc = key
 					found = true
 				end
 			end
@@ -60,24 +101,25 @@ local function findMatchingItemFromTable(item, list, bestLink, bestItem, bestDif
 		end
 	end
 	
-	return bestLink, bestItem, bestDiff, bestLoc
+	return bestItem, bestDiff, bestLoc
 end
 
--- search the player's equipped gear, bag, bank, and void storage for an item that best matches the specified item
+-- search the player's equipped gear, bag, and bank for an item that best matches the specified item
 function Amr:FindMatchingItem(item, player, usedItems)
 	if not item then return nil end
 
 	local equipped = player.Equipped and player.Equipped[player.ActiveSpec] or nil
-	local bestLink, bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, equipped, nil, nil, 1000, nil, usedItems, "equip")
-	bestLink, bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, player.BagItems, bestLink, bestItem, bestDiff, bestLoc, usedItems, "bag")
-	bestLink, bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, player.BankItems, bestLink, bestItem, bestDiff, bestLoc, usedItems, "bank")
-	bestLink, bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, player.VoidItems, bestLink, bestItem, bestDiff, bestLoc, usedItems, "void")
+	local bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, equipped, nil, 10000, nil, usedItems, "equip")
+	bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, player.BagItems, bestItem, bestDiff, bestLoc, usedItems, "bag")
+	if player.BankItems then
+		bestItem, bestDiff, bestLoc = findMatchingItemFromTable(item, player.BankItems, bestItem, bestDiff, bestLoc, usedItems, "bank")		
+	end	
 
-	if bestDiff >= 1000 then
-		return nil, nil, 1000
+	if bestDiff >= 10000 then
+		return nil, 10000
 	else
 		usedItems[bestLoc] = true
-		return bestLink, bestItem, bestDiff
+		return bestItem, bestDiff
 	end
 end
 
@@ -86,25 +128,64 @@ local function renderEmptyGear(container)
 	local panelBlank = AceGUI:Create("AmrUiPanel")
 	panelBlank:SetLayout("None")
 	panelBlank:SetBackgroundColor(Amr.Colors.Black, 0.4)
+	container:AddChild(panelBlank)
 	panelBlank:SetPoint("TOPLEFT", container.content, "TOPLEFT", 6, 0)
 	panelBlank:SetPoint("BOTTOMRIGHT", container.content, "BOTTOMRIGHT")
-	container:AddChild(panelBlank)
 	
 	local lbl = AceGUI:Create("AmrUiLabel")
+	panelBlank:AddChild(lbl)
 	lbl:SetText(L.GearBlank)
 	lbl:SetWidth(700)
 	lbl:SetJustifyH("MIDDLE")
 	lbl:SetFont(Amr.CreateFont("Italic", 16, Amr.Colors.TextTan))		
 	lbl:SetPoint("BOTTOM", panelBlank.content, "CENTER", 0, 20)
-	panelBlank:AddChild(lbl)
 	
 	local lbl2 = AceGUI:Create("AmrUiLabel")
+	panelBlank:AddChild(lbl2)
 	lbl2:SetText(L.GearBlank2)
 	lbl2:SetWidth(700)
 	lbl2:SetJustifyH("MIDDLE")
 	lbl2:SetFont(Amr.CreateFont("Italic", 16, Amr.Colors.TextTan))		
 	lbl2:SetPoint("TOP", lbl.frame, "CENTER", 0, -20)
-	panelBlank:AddChild(lbl2)
+end
+
+-- helper to create a widget for showing a socket or azerite power
+local function createSocketWidget(panelMods, prevWidget, prevIsSocket, isEquipped)
+
+	-- highlight for socket that doesn't match
+	local socketBorder = AceGUI:Create("AmrUiPanel")
+	panelMods:AddChild(socketBorder)
+	if not prevIsSocket then
+		socketBorder:SetPoint("LEFT", prevWidget.frame, "RIGHT", 30, 0)
+	else
+		socketBorder:SetPoint("LEFT", prevWidget.frame, "RIGHT", 2, 0)
+	end
+	socketBorder:SetLayout("None")
+	socketBorder:SetBackgroundColor(Amr.Colors.Black, isEquipped and 0 or 1)
+	socketBorder:SetWidth(26)
+	socketBorder:SetHeight(26)
+	if isEquipped then
+		socketBorder:SetAlpha(0.3)
+	end					
+
+	local socketBg = AceGUI:Create("AmrUiIcon")
+	socketBorder:AddChild(socketBg)
+	socketBg:SetPoint("TOPLEFT", socketBorder.content, "TOPLEFT", 1, -1)
+	socketBg:SetLayout("None")
+	socketBg:SetBorderWidth(2)
+	socketBg:SetIconBorderColor(Amr.Colors.Green, isEquipped and 0 or 1)
+	socketBg:SetWidth(24)
+	socketBg:SetHeight(24)
+
+	local socketIcon = AceGUI:Create("AmrUiIcon")
+	socketBg:AddChild(socketIcon)
+	socketIcon:SetPoint("CENTER", socketBg.content, "CENTER")
+	socketIcon:SetBorderWidth(1)
+	socketIcon:SetIconBorderColor(Amr.Colors.White)
+	socketIcon:SetWidth(18)
+	socketIcon:SetHeight(18)
+	
+	return socketBorder, socketIcon
 end
 
 local function renderGear(spec, container)
@@ -120,16 +201,16 @@ local function renderGear(spec, container)
 		local panelGear = AceGUI:Create("AmrUiPanel")
 		panelGear:SetLayout("None")
 		panelGear:SetBackgroundColor(Amr.Colors.Black, 0.3)
+		container:AddChild(panelGear)
 		panelGear:SetPoint("TOPLEFT", container.content, "TOPLEFT", 6, 0)
 		panelGear:SetPoint("BOTTOMRIGHT", container.content, "BOTTOMRIGHT", -300, 0)
-		container:AddChild(panelGear)
 		
 		local panelMods = AceGUI:Create("AmrUiPanel")
 		panelMods:SetLayout("None")
-		panelMods:SetPoint("TOPLEFT", panelGear.frame, "TOPRIGHT", 15, 0)
-		panelMods:SetPoint("BOTTOMRIGHT", container.content, "BOTTOMRIGHT")
 		panelMods:SetBackgroundColor(Amr.Colors.Black, 0.3)
 		container:AddChild(panelMods)
+		panelMods:SetPoint("TOPLEFT", panelGear.frame, "TOPRIGHT", 15, 0)
+		panelMods:SetPoint("BOTTOMRIGHT", container.content, "BOTTOMRIGHT")
 		
 		-- spec icon
 		local icon = AceGUI:Create("AmrUiIcon")	
@@ -145,8 +226,8 @@ local function renderGear(spec, container)
 		end
 
 		icon:SetIcon("Interface\\Icons\\" .. Amr.SpecIcons[iconSpec])
-		icon:SetPoint("TOPLEFT", panelGear.content, "TOPLEFT", 10, -10)
 		panelGear:AddChild(icon)
+		icon:SetPoint("TOPLEFT", panelGear.content, "TOPLEFT", 10, -10)
 		
 		local btnEquip = AceGUI:Create("AmrUiButton")
 		btnEquip:SetText(L.GearButtonEquip(L.SpecsShort[player.Specs[spec]]))
@@ -154,12 +235,12 @@ local function renderGear(spec, container)
 		btnEquip:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.White))
 		btnEquip:SetWidth(300)
 		btnEquip:SetHeight(26)
-		btnEquip:SetPoint("LEFT", icon.frame, "RIGHT", 40, 0)
-		btnEquip:SetPoint("RIGHT", panelGear.content, "RIGHT", -40, 0)
 		btnEquip:SetCallback("OnClick", function(widget)
 			Amr:EquipGearSet(spec)			
 		end)
 		panelGear:AddChild(btnEquip)
+		btnEquip:SetPoint("LEFT", icon.frame, "RIGHT", 40, 0)
+		btnEquip:SetPoint("RIGHT", panelGear.content, "RIGHT", -40, 0)
 		
 		-- each physical item can only be used once, this tracks ones we have already used
 		local usedItems = {}
@@ -169,159 +250,140 @@ local function renderGear(spec, container)
 		for slotNum = 1, #Amr.SlotIds do
 			local slotId = Amr.SlotIds[slotNum]
 			
-			local equippedItemLink = equipped and equipped[slotId] or nil
-			local equippedItem = Amr.ParseItemLink(equippedItemLink)
+			local equippedItem = equipped and equipped[slotId] or nil
+			--local equippedItemLink = equipped and equipped.link or nil
 			local optimalItem = gear[slotId]			
 			local optimalItemLink = Amr.CreateItemLink(optimalItem)
 			
 			-- see if item is currently equipped, is false if don't have any item for that slot (e.g. OH for a 2-hander)
 			local isEquipped = false			
-			if equippedItem and optimalItem and Amr.GetItemUniqueId(equippedItem) == Amr.GetItemUniqueId(optimalItem) then
+			if equippedItem and optimalItem and Amr.GetItemUniqueId(equippedItem, false, true) == Amr.GetItemUniqueId(optimalItem, false, true) then
 				isEquipped = true
 			end
+
+			local isAzerite = optimalItem and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(optimalItem.id)
 			
 			-- find the item in the player's inventory that best matches what the optimization wants to use
-			local matchItemLink, matchItem = Amr:FindMatchingItem(optimalItem, player, usedItems)
+			local matchItem = Amr:FindMatchingItem(optimalItem, player, usedItems)
 			
 			-- slot label
 			local lbl = AceGUI:Create("AmrUiLabel")
+			panelGear:AddChild(lbl)
+			lbl:SetPoint("TOPLEFT", prevElem.frame, "BOTTOMLEFT", 0, -12) 
 			lbl:SetText(Amr.SlotDisplayText[slotId])
 			lbl:SetWidth(85)
 			lbl:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.White))		
-			lbl:SetPoint("TOPLEFT", prevElem.frame, "BOTTOMLEFT", 0, -12) 
-			panelGear:AddChild(lbl)
 			prevElem = lbl
 			
 			-- ilvl label
 			local lblIlvl = AceGUI:Create("AmrUiLabel")
+			panelGear:AddChild(lblIlvl)
+			lblIlvl:SetPoint("TOPLEFT", lbl.frame, "TOPRIGHT", 0, 0) 
 			lblIlvl:SetWidth(45)
 			lblIlvl:SetFont(Amr.CreateFont("Italic", 14, Amr.Colors.TextTan))		
-			lblIlvl:SetPoint("TOPLEFT", lbl.frame, "TOPRIGHT", 0, 0) 
-			panelGear:AddChild(lblIlvl)
 			
 			-- equipped label
 			local lblEquipped = AceGUI:Create("AmrUiLabel")
+			panelGear:AddChild(lblEquipped)
+			lblEquipped:SetPoint("TOPLEFT", lblIlvl.frame, "TOPRIGHT", 0, 0) 
 			lblEquipped:SetWidth(20)
 			lblEquipped:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.White))
-			lblEquipped:SetPoint("TOPLEFT", lblIlvl.frame, "TOPRIGHT", 0, 0) 
 			lblEquipped:SetText(isEquipped and "E" or "")
-			panelGear:AddChild(lblEquipped)
 			
 			-- item name/link label
 			local lblItem = AceGUI:Create("AmrUiLabel")
+			panelGear:AddChild(lblItem)
+			lblItem:SetPoint("TOPLEFT", lblEquipped.frame, "TOPRIGHT", 0, 0) 
 			lblItem:SetWordWrap(false)
 			lblItem:SetWidth(345)
 			lblItem:SetFont(Amr.CreateFont(isEquipped and "Regular" or "Bold", isEquipped and 14 or 15, Amr.Colors.White))		
-			lblItem:SetPoint("TOPLEFT", lblEquipped.frame, "TOPRIGHT", 0, 0) 
-			panelGear:AddChild(lblItem)
 			
-			-- fill the name/ilvl labels, which may require asynchronous loading of item information
+			-- fill the name/ilvl labels, which may require asynchronous loading of item information			
 			if optimalItemLink then
-				Amr.GetItemInfo(optimalItemLink, function(obj, name, link, quality, iLevel)					
-					-- set item name, tooltip, and ilvl
-					obj.nameLabel:SetText(link:gsub("%[", ""):gsub("%]", ""))
-					
-					-- not quite right but whatever... close enough
-					if quality == 6 then
-						local tmprel = optimalItem.relicBonusIds
-						optimalItem.relicBonusIds = nil
-						link = Amr.CreateItemLink(optimalItem)
-						optimalItem.relicBonusIds = tmprel
+				local gameItem = Item:CreateFromItemLink(optimalItemLink)
+				if gameItem then
+					local q = gameItem:GetItemQuality()
+					if q == 6 then
+						-- for artifacts, we consider it equipped if the item id alone matches
+						if equippedItem and equippedItem.id == optimalItem.id then
+							isEquipped = true
+						end
+						lblEquipped:SetText(isEquipped and "E" or "")
 					end
-					
-					Amr:SetItemTooltip(obj.nameLabel, link)
-					
-					-- the game's info gives the wrong item level, so we have to scan for it
-					--iLevel = (quality ~= 6 or optimalItem.relicBonusIds) and Amr.GetItemLevel(nil, nil, link) or ""
-					obj.ilvlLabel:SetText(iLevel)			
-					
-				end, { ilvlLabel = lblIlvl, nameLabel = lblItem })
+
+					lblItem:SetFont(Amr.CreateFont(isEquipped and "Regular" or "Bold", isEquipped and 14 or 15, Amr.Colors.Qualities[q] or Amr.Colors.White))
+					lblItem:SetText(gameItem:GetItemName())
+					lblIlvl:SetText(gameItem:GetCurrentItemLevel())
+					Amr:SetItemTooltip(lblItem, gameItem:GetItemLink(), "ANCHOR_TOPRIGHT")
+				end
 			end
 						
 			-- modifications
 			if optimalItem then
-				local itemInfo = Amr.db.char.ExtraItemData[spec][optimalItem.id]
 
-				-- gems
-				if itemInfo and itemInfo.socketColors then
-					local prevSocket = nil
-					for i = 1, #itemInfo.socketColors do
+				-- gems or azerite powers
+				local prevSocket = nil
+
+				if isAzerite then
+					local azt = optimalItem.azerite or {}
+					for i,spellId in ipairs(azt) do
+						if spellId and spellId ~= 0 then
+							local equippedAzt = matchItem and matchItem.azerite or {}
+							local isPowerActive = Amr.Contains(equippedAzt, spellId)
+
+							local socketBorder, socketIcon = createSocketWidget(panelMods, prevSocket or lblItem, prevSocket, isPowerActive)
+							
+							-- set icon and tooltip
+							local _, _, spellIcon = GetSpellInfo(spellId)
+							socketIcon:SetIcon(spellIcon)
+							Amr:SetSpellTooltip(socketIcon, spellId, "ANCHOR_TOPRIGHT")
+							
+							prevSocket = socketBorder
+						end
+					end
+				else
+					for i = 1, #optimalItem.gemIds do
+						-- we rely on the fact that the gear sets coming back from the site will almost always have all sockets filled,
+						-- because it's a pain to get the actual number of sockets on an item from within the game
 						local g = optimalItem.gemIds[i]
-						local isGemEquipped = g ~= 0 and matchItem and matchItem.gemIds and matchItem.gemIds[i] == g
+						if g == 0 then break end
+
+						local isGemEquipped = matchItem and matchItem.gemIds and matchItem.gemIds[i] == g
 						
-						-- highlight for gem that doesn't match
-						local socketBorder = AceGUI:Create("AmrUiPanel")
-						socketBorder:SetLayout("None")
-						socketBorder:SetBackgroundColor(Amr.Colors.Black, isGemEquipped and 0 or 1)
-						socketBorder:SetWidth(26)
-						socketBorder:SetHeight(26)
-						if not prevSocket then
-							socketBorder:SetPoint("LEFT", lblItem.frame, "RIGHT", 30, 0)
-						else
-							socketBorder:SetPoint("LEFT", prevSocket.frame, "RIGHT", 2, 0)
-						end
-						if isGemEquipped then
-							socketBorder:SetAlpha(0.3)
-						end
-						panelMods:AddChild(socketBorder)
-						
-						local socketBg = AceGUI:Create("AmrUiIcon")
-						socketBg:SetLayout("None")
-						socketBg:SetBorderWidth(2)
-						socketBg:SetIconBorderColor(Amr.Colors.Green, isGemEquipped and 0 or 1)
-						socketBg:SetWidth(24)
-						socketBg:SetHeight(24)
-						socketBg:SetPoint("TOPLEFT", socketBorder.content, "TOPLEFT", 1, -1)
-						socketBorder:AddChild(socketBg)
-						
-						local socketIcon = AceGUI:Create("AmrUiIcon")
-						socketIcon:SetBorderWidth(1)
-						socketIcon:SetIconBorderColor(Amr.Colors.White)
-						socketIcon:SetWidth(18)
-						socketIcon:SetHeight(18)
-						socketIcon:SetPoint("CENTER", socketBg.content, "CENTER")
-						socketBg:AddChild(socketIcon)
+						local socketBorder, socketIcon = createSocketWidget(panelMods, prevSocket or lblItem, prevSocket, isGemEquipped)
 						
 						-- get icon for optimized gem
-						if g ~= 0 then
-							local gemInfo = Amr.db.char.ExtraGemData[spec][g]
-							if gemInfo then
-								local gident = gemInfo.id
-								if optimalItem.relicBonusIds then
-									gident = Amr.CreateItemLink({ id = gemInfo.id, enchantId = 0, gemIds = {0,0,0,0}, suffixId = 0, bonusIds = optimalItem.relicBonusIds[i]})
-								end
-								Amr.GetItemInfo(gident, function(obj, name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture)					
-									-- set icon and a tooltip
-									obj:SetIcon(texture)
-									Amr:SetItemTooltip(obj, link)
-								end, socketIcon)
-							end
+						local gameItem = Item:CreateFromItemID(g)
+						if gameItem then
+							socketIcon:SetIcon(gameItem:GetItemIcon())
+							Amr:SetItemTooltip(socketIcon, gameItem:GetItemLink(), "ANCHOR_TOPRIGHT")
 						end
 						
 						prevSocket = socketBorder
 					end
 				end
-				
+
 				-- enchant
 				if optimalItem.enchantId and optimalItem.enchantId ~= 0 then
 					local isEnchantEquipped = matchItem and matchItem.enchantId and matchItem.enchantId == optimalItem.enchantId
-					
+
 					local lblEnchant = AceGUI:Create("AmrUiLabel")
+					panelMods:AddChild(lblEnchant)
+					lblEnchant:SetPoint("TOPLEFT", lblItem.frame, "TOPRIGHT", 130, 0)
 					lblEnchant:SetWordWrap(false)
 					lblEnchant:SetWidth(170)
 					lblEnchant:SetFont(Amr.CreateFont(isEnchantEquipped and "Regular" or "Bold", 14, isEnchantEquipped and Amr.Colors.TextGray or Amr.Colors.White))
-					lblEnchant:SetPoint("TOPLEFT", lblItem.frame, "TOPRIGHT", 130, 0)
 					
-					local enchInfo = Amr.db.char.ExtraEnchantData[spec][optimalItem.enchantId]
+					local enchInfo = Amr.db.char.ExtraEnchantData[optimalItem.enchantId]
 					if enchInfo then
 						lblEnchant:SetText(enchInfo.text)
 						
-						Amr.GetItemInfo(enchInfo.itemId, function(obj, name, link)					
-							Amr:SetItemTooltip(obj, link)
-						end, lblEnchant)						
-						--Amr:SetSpellTooltip(lblEnchant, enchInfo.spellId)
+						local gameItem = Item:CreateFromItemID(enchInfo.itemId)
+						if gameItem then
+							Amr:SetItemTooltip(lblEnchant, gameItem:GetItemLink(), "ANCHOR_TOPRIGHT")
+						end
 					end
-					panelMods:AddChild(lblEnchant)
+					
 				end
 			end
 			
@@ -349,40 +411,40 @@ function Amr:RenderTabGear(container)
 	btnImport:SetFont(Amr.CreateFont("Bold", 16, Amr.Colors.White))
 	btnImport:SetWidth(120)
 	btnImport:SetHeight(26)
-	btnImport:SetPoint("TOPLEFT", container.content, "TOPLEFT", 0, -81)
 	btnImport:SetCallback("OnClick", onImportClick)
 	container:AddChild(btnImport)	
+	btnImport:SetPoint("TOPLEFT", container.content, "TOPLEFT", 0, -81)
 	
 	local lbl = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl)
 	lbl:SetText(L.GearImportNote)
 	lbl:SetWidth(100)
 	lbl:SetFont(Amr.CreateFont("Italic", 12, Amr.Colors.TextTan))
 	lbl:SetJustifyH("MIDDLE")
 	lbl:SetPoint("TOP", btnImport.frame, "BOTTOM", 0, -5)
-	container:AddChild(lbl)
 	
 	local lbl2 = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl2)
 	lbl2:SetText(L.GearTipTitle)
 	lbl2:SetWidth(140)
 	lbl2:SetFont(Amr.CreateFont("Italic", 20, Amr.Colors.Text))
 	lbl2:SetJustifyH("MIDDLE")
 	lbl2:SetPoint("TOP", lbl.frame, "BOTTOM", 0, -50)
-	container:AddChild(lbl2)
 	
 	lbl = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl)
 	lbl:SetText(L.GearTipText)
 	lbl:SetWidth(140)
 	lbl:SetFont(Amr.CreateFont("Italic", 12, Amr.Colors.Text))
 	lbl:SetJustifyH("MIDDLE")
 	lbl:SetPoint("TOP", lbl2.frame, "BOTTOM", 0, -5)
-	container:AddChild(lbl)
 	
 	lbl2 = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl2)
 	lbl2:SetText(L.GearTipCommands)
 	lbl2:SetWidth(130)
 	lbl2:SetFont(Amr.CreateFont("Italic", 12, Amr.Colors.Text))
 	lbl2:SetPoint("TOP", lbl.frame, "BOTTOM", 10, -5)
-	container:AddChild(lbl2)
 	
 	local t =  AceGUI:Create("AmrUiTabGroup")
 	t:SetLayout("None")
@@ -397,9 +459,9 @@ function Amr:RenderTabGear(container)
 	
 	t:SetTabs(tabz)
 	t:SetCallback("OnGroupSelected", onGearTabSelected)
+	container:AddChild(t)	
 	t:SetPoint("TOPLEFT", container.content, "TOPLEFT", 144, -30)
 	t:SetPoint("BOTTOMRIGHT", container.content, "BOTTOMRIGHT")
-	container:AddChild(t)	
 	_gearTabs = t;
 	
 	local btnShop = AceGUI:Create("AmrUiButton")
@@ -408,9 +470,9 @@ function Amr:RenderTabGear(container)
 	btnShop:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.White))
 	btnShop:SetWidth(245)
 	btnShop:SetHeight(26)
-	btnShop:SetPoint("TOPRIGHT", container.content, "TOPRIGHT", -20, -25)
 	btnShop:SetCallback("OnClick", function(widget) Amr:ShowShopWindow() end)
 	container:AddChild(btnShop)
+	btnShop:SetPoint("TOPRIGHT", container.content, "TOPRIGHT", -20, -25)
 	
 	if not _activeTab then
 		_activeTab = tostring(GetSpecialization())
@@ -443,56 +505,13 @@ end
 -- Gear Set Management
 ------------------------------------------------------------------------------------------------
 local _waitingForSpec = 0
-local _waitingForItemLock = nil
-local _pendingEquip = nil
-local _pendingRemove = nil
+local _pendingGearOps = nil
+local _currentGearOp = nil
+local _itemLockAction = nil
+local _gearOpPasses = 0
+local _gearOpWaiting = nil
 
--- scan a bag for the best matching item
-local function scanBagForItem(item, bagId, bestItem, bestDiff, bestLink)
-	local numSlots = GetContainerNumSlots(bagId)
-	for slotId = 1, numSlots do
-		local _, _, _, _, _, _, itemLink = GetContainerItemInfo(bagId, slotId)
-        -- we skip any stackable item, as far as we know, there is no equippable gear that can be stacked
-		if itemLink then
-			local bagItem = Amr.ParseItemLink(itemLink)
-			if bagItem ~= nil then
-				local diff = countItemDifferences(item, bagItem)
-				if diff < bestDiff then
-					bestItem = { bag = bagId, slot = slotId }
-					bestDiff = diff
-					bestLink = itemLink
-				end
-            end
-		end
-	end
-	return bestItem, bestDiff, bestLink
-end
-
-local function onEquipGearSetComplete()
-	if Amr.db.profile.options.disableEm then return end
-	
-	-- create an equipment manager set
-	local specId, specName = GetSpecializationInfo(GetSpecialization())
-	
-	local item = Amr.ParseItemLink(GetInventoryItemLink("player", INVSLOT_MAINHAND))
-	if not item or not Amr.ArtifactIdToSpecNumber[item.id] then
-		item = Amr.ParseItemLink(GetInventoryItemLink("player", INVSLOT_OFFHAND))
-		if item and not Amr.ArtifactIdToSpecNumber[item.id] then
-			item = nil
-		end
-	end
-	if item then
-		Amr.GetItemInfo(item.id, function(customArg, name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture)
-			local setname = "AMR " .. specName
-			local setid = C_EquipmentSet.GetEquipmentSetID(setname)
-			if setid then
-				C_EquipmentSet.SaveEquipmentSet(setid, texture)
-			else
-				C_EquipmentSet.CreateEquipmentSet(setname, texture)
-			end
-		end)
-	end
-end
+local beginEquipGearSet, processCurrentGearOp, nextGearOp
 
 -- find the first empty slot in the player's backpack+bags
 local function findFirstEmptyBagSlot()
@@ -516,30 +535,35 @@ local function findFirstEmptyBagSlot()
 	return nil, nil
 end
 
-local function finishEquipGearSet()
-	if not _pendingEquip then return end
-	
-	_pendingEquip.tries = _pendingEquip.tries + 1
-	if _pendingEquip.tries > 16 then
-		-- too many tries, just give up (shouldn't happen but just to be safe)
-		_pendingEquip = nil
-	else
-		-- start over again, trying any items that could not be equipped in the previous pass (unique constraints)
-		Amr:EquipGearSet(_pendingEquip.spec)
+-- scan a bag for the best matching item
+local function scanBagForItem(item, bagId, bestItem, bestDiff, bestLink)
+	local numSlots = GetContainerNumSlots(bagId)
+	for slotId = 1, numSlots do
+		local _, _, _, _, _, _, itemLink = GetContainerItemInfo(bagId, slotId)
+        -- we skip any stackable item, as far as we know, there is no equippable gear that can be stacked
+		if itemLink then
+			local bagItem = Amr.ParseItemLink(itemLink)
+			if bagItem ~= nil then
+				local diff = countItemDifferences(item, bagItem)
+				if diff < bestDiff then
+					bestItem = { bag = bagId, slot = slotId }
+					bestDiff = diff
+					bestLink = itemLink
+				end
+            end
+		end
 	end
+	return bestItem, bestDiff, bestLink
 end
 
--- equip the next slot in a pending equip
-local function tryEquipNextItem()
-	if not _pendingEquip then return end
-	
-	local item = _pendingEquip.itemsToEquip[_pendingEquip.nextSlot]
-	
+-- find the item in the player's inventory that best matches the current gear op item, favoring stuff already equipped, then in bags, then in bank
+local function findCurrentGearOpItem()
+
+	local item = _currentGearOp.items[_currentGearOp.nextSlot]
+
 	local bestItem = nil
 	local bestLink = nil
-	local bestDiff = 1000
-	
-	-- find the best matching item
+	local bestDiff = 10000
 	
 	-- inventory
 	bestItem, bestDiff, bestLink = scanBagForItem(item, BACKPACK_CONTAINER, bestItem, bestDiff, bestLink)
@@ -547,14 +571,16 @@ local function tryEquipNextItem()
 		bestItem, bestDiff, bestLink = scanBagForItem(item, bagId, bestItem, bestDiff, bestLink)
 	end
 
+	-- with new approach, the item to use should never be equipped, should be in bags at this point
+	--[[
 	-- equipped items, but skip slots we have just equipped (to avoid e.g. just moving 2 of the same item back and forth between mh oh weapon slots)
 	for slotNum = 1, #Amr.SlotIds do
 		local slotId = Amr.SlotIds[slotNum]
-		if not _pendingEquip.doneSlots[slotId] then
+		if _currentGearOp.slotsRemaining[slotId] then
 			local itemLink = GetInventoryItemLink("player", slotId)
 			if itemLink then
 				local invItem = Amr.ParseItemLink(itemLink)
-				if invItem ~= nil then
+				if invItem then
 					local diff = countItemDifferences(item, invItem)
 					if diff < bestDiff then
 						bestItem = { slot = slotId }
@@ -565,266 +591,500 @@ local function tryEquipNextItem()
 			end
 		end
 	end
-	
+	]]
+
 	-- bank
-	bestItem, bestDiff, bestLink = scanBagForItem(item, BANK_CONTAINER, bestItem, bestDiff, bestLink)
-	for bagId = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
-		bestItem, bestDiff, bestLink = scanBagForItem(item, bagId, bestItem, bestDiff, bestLink)
+	if bestDiff > 0 then
+		bestItem, bestDiff, bestLink = scanBagForItem(item, BANK_CONTAINER, bestItem, bestDiff, bestLink)
+		for bagId = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
+			bestItem, bestDiff, bestLink = scanBagForItem(item, bagId, bestItem, bestDiff, bestLink)
+		end
 	end
+
+	return bestItem, bestDiff, bestLink
+end
+
+-- on completion, create an equipment manager set if desired
+local function onEquipGearSetComplete()
+	if Amr.db.profile.options.disableEm then return end
 	
-	ClearCursor()
-	
-	if not bestItem then
-		-- stop if we can't find an item
-		Amr:Print(L.GearEquipErrorNotFound)
-		Amr:Print(L.GearEquipErrorNotFound2)
-		_pendingEquip = nil
-		return
+	-- create an equipment manager set
+
+	-- note: ignore slots and/or saveset need to be called twice
+    -- for some reason, the slot is treated as blank if you try to ignore once on the first load of the equipment manager
+ 
+    -- clear any currently ignored slots
+    --C_EquipmentSet.ClearIgnoredSlotsForSave()
+    --C_EquipmentSet.ClearIgnoredSlotsForSave()
+ 
+    -- ignore shirt and tabard
+    C_EquipmentSet.IgnoreSlotForSave(INVSLOT_BODY) -- shirt
+    C_EquipmentSet.IgnoreSlotForSave(INVSLOT_TABARD)
+    C_EquipmentSet.IgnoreSlotForSave(INVSLOT_BODY) -- shirt
+	C_EquipmentSet.IgnoreSlotForSave(INVSLOT_TABARD)
 		
-	elseif bestItem and bestItem.bag and (bestItem.bag == BANK_CONTAINER or bestItem.bag >= NUM_BAG_SLOTS + 1 and bestItem.bag <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS) then
+	-- for now use icon of the spec
+	local _, specName, _, setIcon = GetSpecializationInfo(GetSpecialization())
+	
+	--[[
+	local item = Amr.ParseItemLink(GetInventoryItemLink("player", INVSLOT_MAINHAND))
+	if not item then
+		item = Amr.ParseItemLink(GetInventoryItemLink("player", INVSLOT_OFFHAND))
+	end
+	if item then
+		local itemObj = Item:CreateFromItemID(item.id)
+		if itemObj then
+			setIcon = itemObj:GetItemIcon()
+		end
+	end
+	]]
+
+	local setname = "AMR " .. specName
+	local setid = C_EquipmentSet.GetEquipmentSetID(setname)
+	if setid then
+		C_EquipmentSet.SaveEquipmentSet(setid, setIcon)
+	else
+		C_EquipmentSet.CreateEquipmentSet(setname, setIcon)
+	end
+end
+
+-- stop any currently in-progress gear swapping operation and clean up
+local function disposeGearOp()
+	_pendingGearOps = nil
+	_currentGearOp = nil
+	_itemLockAction = nil
+	_gearOpPasses = 0
+	_gearOpWaiting = nil
+
+	-- make sure the gear tab is still in sync
+	Amr:RefreshGearTab()
+end
+
+-- initialize a gear op to start running it
+local function initializeGearOp(op, spec, pos)
+	op.pos = pos
+	op.spec = spec
+
+	-- fill the remaining slot list and set the starting slot
+	op.nextSlot = nil
+	op.slotsRemaining = {}	
+	op.isWaiting = false
+	for slotId, item in pairs(op.items) do
+		op.slotsRemaining[slotId] = true
+		if not op.nextSlot then
+			op.nextSlot = slotId
+		end			
+	end
+end
+
+function processCurrentGearOp()
+	if not _currentGearOp then return end
+
+	if _currentGearOp.remove then
+		-- remove the next item
+
+		-- check if the slot is already empty
+		local itemLink = GetInventoryItemLink("player", _currentGearOp.nextSlot)
+		if not itemLink then
+			nextGearOp()
+			return
+		end
+
 		-- find first empty bag slot
 		local invBag, invSlot = findFirstEmptyBagSlot()
 		if not invBag then
 			-- stop if bags are too full
 			Amr:Print(L.GearEquipErrorBagFull)
-			_pendingEquip = nil
+			disposeGearOp()
 			return
 		end
 
-		-- move from bank to bag
-		PickupContainerItem(bestItem.bag, bestItem.slot)
+		PickupInventoryItem(_currentGearOp.nextSlot)
 		PickupContainerItem(invBag, invSlot)
 
-		-- set flag so that when we clear cursor and release the item lock, we can respond to the event and continue
-		_waitingForItemLock = {
+		-- set an action to happen on ITEM_UNLOCKED, triggered by ClearCursor
+		_itemLockAction = {
 			bagId = invBag,
-			slotId = invSlot
+			slotId = invSlot,
+			isRemove = true			
 		}
-		
+
 		ClearCursor()
-		
-		-- now we need to wait for game event to continue and try this item again after it is in our bag
-		return
+		-- wait for remove to complete
 	else
-		if not Amr:CanEquip(bestItem.bag, bestItem.slot) then
+		-- equip the next item
+		
+		local bestItem, bestDiff, bestLink = findCurrentGearOpItem()
+		
+		_itemLockAction = nil
+		ClearCursor()
+	
+		if not bestItem then
+			-- stop if we can't find an item
+			Amr:Print(L.GearEquipErrorNotFound)
+			Amr:Print(L.GearEquipErrorNotFound2)
+			disposeGearOp()
+			
+		elseif bestItem and bestItem.bag and (bestItem.bag == BANK_CONTAINER or bestItem.bag >= NUM_BAG_SLOTS + 1 and bestItem.bag <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS) then
+			-- find first empty bag slot
+			local invBag, invSlot = findFirstEmptyBagSlot()
+			if not invBag then
+				-- stop if bags are too full
+				Amr:Print(L.GearEquipErrorBagFull)
+				disposeGearOp()
+				return
+			end
+	
+			-- move from bank to bag
+			PickupContainerItem(bestItem.bag, bestItem.slot)
+			PickupContainerItem(invBag, invSlot)
+	
+			-- set an action to happen on ITEM_UNLOCKED, triggered by ClearCursor
+			_itemLockAction = {
+				bagId = invBag,
+				slotId = invSlot,
+				isBank = true			
+			}
+			
+			ClearCursor()			
+			-- now we need to wait for game event to continue and try this item again after it is in our bag and unlocked
+
+		elseif (bestItem.bag or bestItem.bag == 0) and not Amr:CanEquip(bestItem.bag, bestItem.slot) then
 			-- if an item is not soulbound, then warn the user and quit
 			Amr:Print(L.GearEquipErrorSoulbound(bestLink))
-			_pendingEquip = nil
-			return
+			disposeGearOp()
+
 		else
-			local slotId = _pendingEquip.nextSlot
-			
+
+			--print("equipping " .. bestLink .. " in slot " .. _currentGearOp.nextSlot)
+
 			-- an item in the player's bags or already equipped, equip it
-			_pendingEquip.bag = bestItem.bag
-			_pendingEquip.slot = bestItem.slot
-			_pendingEquip.destSlot = slotId
-			
 			if bestItem.bag then
 				PickupContainerItem(bestItem.bag, bestItem.slot)
 			else
+				_gearOpWaiting.inventory[bestItem.slot] = true
 				PickupInventoryItem(bestItem.slot)
 			end
-			PickupInventoryItem(slotId)
-			ClearCursor()
-			
-			-- wait for game events to continue
+			_gearOpWaiting.inventory[_currentGearOp.nextSlot] = true
+			PickupInventoryItem(_currentGearOp.nextSlot)
+
+			-- don't wait for now, do all equips at once
+			--[[
+			-- set an action to happen on ITEM_UNLOCKED, triggered by ClearCursor
+			_itemLockAction = {
+				bagId = bestItem.bag,
+				slotId = bestItem.slot,
+				invSlot = _currentGearOp.nextSlot,
+				isEquip = true
+			}
+			]]
+
+			ClearCursor()			
+			nextGearOp()			
 		end
+
 	end
-	
 end
 
-local function removeNextItem()
-	if not _pendingRemove then return end
-	
-	local list = _pendingRemove.slotsToRemove
-	local slot = list[#list - _pendingRemove.remaining + 1]
-	
-	-- find first empty bag slot
-	local invBag, invSlot = findFirstEmptyBagSlot()
-	if not invBag then
-		-- stop if bags are too full
-		Amr:Print(L.GearEquipErrorBagFull)
-		_pendingRemove = nil
-		_pendingEquip = nil
-		return
-	end
-	
-	PickupInventoryItem(slot)
-	PickupContainerItem(invBag, invSlot)
-	
-	-- set flag so that when we clear cursor and release the item lock, we can respond to the event and continue
-	_waitingForItemLock = {
-		bagId = invBag,
-		slotId = invSlot,
-		isRemove = true
-	}
-	
-	ClearCursor()
-end
+-- when a gear op completes successfully, this will advance to the next op or finish
+function nextGearOp()
+	if not _currentGearOp then return end
 
-local function onItemUnlocked(bagId, slotId)
-	
-	if _waitingForItemLock then
-		-- waiting on a move from bank to bags to complete, or waiting on removing an item to complete, just continue as normal afterwards
-		if bagId == _waitingForItemLock.bagId and slotId == _waitingForItemLock.slotId then
-			local isremove = _waitingForItemLock.isRemove
-			_waitingForItemLock = nil
-			
-			if isremove then
-				_pendingRemove.remaining = _pendingRemove.remaining - 1
-				if _pendingRemove.remaining > 0 then
-					removeNextItem()
-				else
-					-- we have removed all items that we want to remove, now do the equip
-					_pendingRemove = nil
-					tryEquipNextItem()
-				end
-			else
-				tryEquipNextItem()
-			end
-		end
-		
-	elseif _pendingEquip and _pendingEquip.destSlot then
-		-- waiting on an item swap to complete successfully so that we can go on to the next item
-		
-		-- inventory slot we're swapping to is still locked, can't continue yet
-		if IsInventoryItemLocked(_pendingEquip.destSlot) then return end
+	local spec = _currentGearOp.spec
+	local pos = _currentGearOp.pos
+	local passes = _gearOpPasses	
 
-		if _pendingEquip.bag then
-			local _, _, locked = GetContainerItemInfo(_pendingEquip.bag, _pendingEquip.slot)
-			-- the bag slot we're swapping from is still locked, can't continue yet
-			if locked then return end
-		else
-			-- inventory slot we're swapping from is still locked, can't continue yet
-			if IsInventoryItemLocked(_pendingEquip.slot) then return end
-		end
-		
-		-- move on to the next item, this item is done or could not be swapped
-		
-		local item = _pendingEquip.itemsToEquip[_pendingEquip.destSlot]
-		local itemLink = GetInventoryItemLink("player", _pendingEquip.destSlot)
-		if itemLink then
-			local invItem = Amr.ParseItemLink(itemLink)
-			if invItem ~= nil then	
-				local diff = countItemDifferences(item, invItem)
-				if diff == 0 then
-					_pendingEquip.doneSlots[_pendingEquip.destSlot] = true
-				end
-			end
-		end
-		
-		_pendingEquip.itemsToEquip[_pendingEquip.destSlot] = nil
-		_pendingEquip.destSlot = nil
-		_pendingEquip.bag = nil
-		_pendingEquip.slot = nil
-		
-		_pendingEquip.remaining = _pendingEquip.remaining - 1
-		if _pendingEquip.remaining > 0 then
-			for slotId, item in pairs(_pendingEquip.itemsToEquip) do
-				_pendingEquip.nextSlot = slotId
+	-- mark the slot as done and move to the next
+	if _currentGearOp.nextSlot then
+		_currentGearOp.slotsRemaining[_currentGearOp.nextSlot] = nil
+		_currentGearOp.nextSlot = nil
+		for slotId, item in pairs(_currentGearOp.items) do
+			if _currentGearOp.slotsRemaining[slotId] then
+				_currentGearOp.nextSlot = slotId
 				break
 			end
-			tryEquipNextItem()
-		else
-			finishEquipGearSet()
 		end
-		
 	end
+
+	if not _currentGearOp.nextSlot then
+		-- see if anything is still in progress and we want to wait for it before continuing		
+		local inProgress = not Amr.IsEmpty(_gearOpWaiting.inventory)
+
+		if (_currentGearOp.wait or _currentGearOp.remove) and inProgress then
+			-- this will cause the item unlock handler to call nextGearOp again when all in-progress swaps have unlocked related slots
+			_currentGearOp.isWaiting = true
+		else
+			_currentGearOp = _pendingGearOps[pos + 1]
+			if _currentGearOp then
+				-- we have another op, do it
+				initializeGearOp(_currentGearOp, spec, pos + 1)
+				processCurrentGearOp()
+			else
+				-- we are done
+				disposeGearOp()
+
+				-- this will check if not all items were swapped, and either finish up, try again, or abort if have tried too many times
+				beginEquipGearSet(spec, passes + 1)
+			end
+		end
+	else
+		-- do the next item
+		processCurrentGearOp()
+	end
+
 end
 
-local function startEquipGearSet(spec)
+local function handleItemUnlocked(bagId, slotId)
+
+	-- mark anything that is waiting as unlocked if it is no longer locked
+	if _currentGearOp and _gearOpWaiting then
+		for i,s in ipairs(Amr.SlotIds) do
+			if not IsInventoryItemLocked(s) then
+				_gearOpWaiting.inventory[s] = nil
+			end
+		end
+	end
+
+	if _itemLockAction then
+		if _itemLockAction.isRemove then
+			-- waiting for a specific remove op to finish before continuing
+			if bagId == _itemLockAction.bagId and slotId == _itemLockAction.slotId then
+				_itemLockAction = nil
+				nextGearOp()
+			end
+		elseif _itemLockAction.isBank then
+			-- waiting for an item to move from bank into inventory, then reprocess the current op
+			if bagId == _itemLockAction.bagId and slotId == _itemLockAction.slotId then
+				_itemLockAction = nil
+				processCurrentGearOp()
+			end
+
+		elseif _itemLockAction.isEquip then
+			-- this is not currently used... we do all equips at once usually, but could go back to this if it causes problems
+
+			-- waiting for a specific equip op to finish
+			
+			-- inventory slot we're swapping to is still locked, can't continue yet
+			if IsInventoryItemLocked(_itemLockAction.invSlot) then return end
+
+			if _itemLockAction.bagId then
+				local _, _, locked = GetContainerItemInfo(_itemLockAction.bagId, _itemLockAction.slotId)
+				-- the bag slot we're swapping from is still locked, can't continue yet
+				if locked then return end
+			else
+				-- inventory slot we're swapping from is still locked, can't continue yet
+				if IsInventoryItemLocked(_itemLockAction.slotId) then return end
+			end
+			
+			_itemLockAction = nil
+			nextGearOp()
+		else
+			-- unknown... shouldn't happen
+			_itemLockAction = nil
+		end
+	else
+		
+		-- not waiting on a specific action, check if we are waiting for all locked slots to open up and they are done
+		if _currentGearOp and _gearOpWaiting and _currentGearOp.isWaiting and Amr.IsEmpty(_gearOpWaiting.inventory) then
+			nextGearOp()
+		end	
+	end
+	
+end
+
+local function shuffle(tbl)
+	local size = #tbl
+	for i = size, 1, -1 do
+		local rand = math.random(size)
+		tbl[i], tbl[rand] = tbl[rand], tbl[i]
+	end
+	return tbl
+end
+
+local _ohFirst = {
+    [20] = true, -- PaladinProtection
+    [32] = true, -- WarlockDemonology
+    [36] = true -- WarriorProtection
+}
+
+function beginEquipGearSet(spec, passes)
 
 	local gear = Amr.db.char.GearSets[spec]
 	if not gear then 
 		Amr:Print(L.GearEquipErrorEmpty)
 		return
 	end
-	
-	local player = Amr:ExportCharacter()
 
-	local itemsToEquip = {}
+	-- ensure all our stored data is up to date
+	local player = Amr:ExportCharacter()
+	local doOhFirst = _ohFirst[player.Specs[spec]]
+
+	local itemsToEquip = {
+		legendaries = {},
+		weapons = {},
+		mh = {},
+		oh = {},
+		rings = {},
+		trinkets = {},
+		others = {},
+		blanks = {}
+	}
 	local remaining = 0
 	local usedItems = {}
-	local firstSlot = nil
-	
-	-- check for items that need to be equipped
-	for slotNum = 1, #Amr.SlotIds do
-		local slotId = Amr.SlotIds[slotNum]
-		
+
+	-- check for items that need to be equipped, do in a random order to try and defeat any unique constraint issues we might hit
+	local slots = {}
+	for i,s in ipairs(Amr.SlotIds) do
+		table.insert(slots, s)
+	end
+	shuffle(slots)
+
+	for i,slotId in ipairs(slots) do
+
+		-- we do stuff in batches that avoids most unique conflicts
+		local list = itemsToEquip.others
+		if slotId == 16 then
+			list = itemsToEquip.mh
+		elseif slotId == 17 then
+			list = itemsToEquip.oh
+		elseif slotId == 11 or slotId == 12 then
+			list = itemsToEquip.rings
+		elseif slotId == 13 or slotId == 14 then
+			list = itemsToEquip.trinkets
+		end
+
 		local old = player.Equipped[spec][slotId]
-		old = Amr.ParseItemLink(old)
-		
 		local new = gear[slotId]
+		local prevRemaining = remaining
 		if new then
-			local diff = countItemDifferences(old, new)
-			if diff < 1000 then
-				-- same item, see if inventory has one that is closer (e.g. a duplicate item with correct enchants/gems)
-				local bestLink, bestItem, bestDiff = Amr:FindMatchingItem(new, player, usedItems)
-				if bestDiff and bestDiff < diff then
-					itemsToEquip[slotId] = new
+			-- if the new thing is an artifact, only match the item id
+			local newItem = Item:CreateFromItemID(new.id)
+			local quality = newItem and newItem:GetItemQuality() or 0
+			if quality == 6 then
+				if not old or new.id ~= old.id then
+					list[slotId] = new
+					if list == itemsToEquip.mh or list == itemsToEquip.oh then
+						itemsToEquip.weapons[slotId] = {}
+					end
 					remaining = remaining + 1
 				end
 			else
-				itemsToEquip[slotId] = new
-				remaining = remaining + 1
+				-- find the best matching item anywhere in the player's gear
+				local bestItem, bestDiff = Amr:FindMatchingItem(new, player, usedItems)
+				new = bestItem
+
+				local diff = countItemDifferences(old, new)
+
+				--[[
+				if diff > 0 and diff < 1000 then
+					-- same item, see if inventory has one that is closer (e.g. a duplicate item with correct enchants/gems)
+					local bestItem, bestDiff = Amr:FindMatchingItem(new, player, usedItems)
+					if bestDiff and bestDiff < diff then
+						new = bestItem
+						diff = bestDiff
+					end
+				end
+				]]
+
+				if diff > 0 then	
+					list[slotId] = new
+					if list == itemsToEquip.mh or list == itemsToEquip.oh then
+						itemsToEquip.weapons[slotId] = {}
+					end
+					remaining = remaining + 1
+				end
+			end
+		elseif old then
+			-- need to remove this item
+			itemsToEquip.blanks[slotId] = {}
+			remaining = remaining + 1
+		end
+
+		if remaining > prevRemaining then
+			-- if we need to swap this slot, see if the old item is a legendary, add a step to remove those first to avoid conflicts
+			if old then
+				local oldItem = Item:CreateFromItemID(old.id)
+				if oldItem and oldItem:GetItemQuality() == 5 then				
+					itemsToEquip.legendaries[slotId] = {}
+				end
 			end
 		end
 	end
-
+	
 	if remaining > 0 then
-		-- if this is not our first try, then remove weapons before starting
-		local toRemove = {}
-		local removesRemaining = 0
-		if _pendingEquip and _pendingEquip.tries > 0 then
-			for slotId, item in pairs(itemsToEquip) do
-				if slotId == 16 or slotId == 17 then
-					table.insert(toRemove, slotId)
-					removesRemaining = removesRemaining + 1
-				end
-			end			
-		end
-		
-		_pendingEquip = {
-			tries = _pendingEquip and _pendingEquip.spec == spec and _pendingEquip.tries or 0,
-			spec = spec,
-			itemsToEquip = itemsToEquip,
-			remaining = remaining,
-			doneSlots = _pendingEquip and _pendingEquip.spec == spec and _pendingEquip.doneSlots or {},
-			nextSlot = firstSlot
-		}
 
-		-- starting item
-		for slotId, item in pairs(_pendingEquip.itemsToEquip) do
-			_pendingEquip.nextSlot = slotId
-			break
-		end
-		
-		if removesRemaining > 0 then
-			_pendingRemove = {
-				slotsToRemove = toRemove,
-				remaining = removesRemaining
-			}
-			removeNextItem()
+		if passes < 5 then
+			_pendingGearOps = {}
+
+			if not Amr.IsEmpty(itemsToEquip.blanks) then				
+				-- if gear set wants slots to be blank, do that first
+				table.insert(_pendingGearOps, { items = itemsToEquip.blanks, remove = true, label = "blanks" }) 
+			end			
+			if not Amr.IsEmpty(itemsToEquip.weapons) then
+				-- change weapons first: remove both, wait, then equip each weapon one by one, waiting after each
+				table.insert(_pendingGearOps, { items = itemsToEquip.weapons, remove = true, label = "remove weapons" })
+				local thisWeapon = doOhFirst and itemsToEquip.oh or itemsToEquip.mh
+				if not Amr.IsEmpty(thisWeapon) then
+					table.insert(_pendingGearOps, { items = thisWeapon, wait = true, label = "equip weapon 1" })
+				end
+				thisWeapon = doOhFirst and itemsToEquip.mh or itemsToEquip.oh
+				if not Amr.IsEmpty(thisWeapon) then
+					table.insert(_pendingGearOps, { items = thisWeapon, wait = true, label = "equip weapon 2" })
+				end
+			end
+			if not Amr.IsEmpty(itemsToEquip.legendaries) then 
+				-- remove any legendaries, wait
+				table.insert(_pendingGearOps, { items = itemsToEquip.legendaries, remove = true, label = "remove legendaries" }) 
+			end
+			if not Amr.IsEmpty(itemsToEquip.rings) then 
+				-- remove both rings, wait, then equip new ones
+				table.insert(_pendingGearOps, { items = itemsToEquip.rings, remove = true, label = "remove rings" })
+				table.insert(_pendingGearOps, { items = itemsToEquip.rings, wait = true, label = "equip rings" })
+			end
+			if not Amr.IsEmpty(itemsToEquip.trinkets) then 
+				-- remove both trinkets, wait, then equip new ones
+				table.insert(_pendingGearOps, { items = itemsToEquip.trinkets, remove = true, label = "remove trinkets" })
+				table.insert(_pendingGearOps, { items = itemsToEquip.trinkets, wait = true, label = "equip trinkets" })
+			end
+			if not Amr.IsEmpty(itemsToEquip.others) then 
+				-- equip all other items, wait for completion
+				table.insert(_pendingGearOps, { items = itemsToEquip.others, wait = true, label = "equip others" }) 
+			end
+
+			-- make the last operation wait no matter what, before this gets called again to check if everything succeeded
+			_pendingGearOps[#_pendingGearOps].wait = true
+
+			if not _gearOpWaiting then
+				_gearOpWaiting = { inventory = {} }
+			end
+
+			_gearOpPasses = passes
+			_currentGearOp = _pendingGearOps[1]
+			initializeGearOp(_currentGearOp, spec, 1)
+
+			processCurrentGearOp()
 		else
-			tryEquipNextItem()
+			-- TODO: print message that gear set couldn't be equipped
 		end
+
 	else
-		_pendingEquip = nil
 		onEquipGearSetComplete()
-	end
+	end	
 end
 
 local function onActiveTalentGroupChanged()
 
 	local auto = Amr.db.profile.options.autoGear
 	local currentSpec = GetSpecialization()
-	
-	if currentSpec == _waitingForSpec or auto then
-		-- spec is what we want, now equip the gear
-		startEquipGearSet(currentSpec)
-	end
-	
+	local waitingSpec = _waitingForSpec
 	_waitingForSpec = 0
+	
+	if currentSpec == waitingSpec or auto then
+		-- spec is what we want, now equip the gear but after a short delay because the game auto-swaps artifact weapons
+		Amr.Wait(2, function()
+			beginEquipGearSet(GetSpecialization(), 0)
+		end)
+	end
 end
 
 -- activate the specified spec and then equip the saved gear set
@@ -846,17 +1106,17 @@ function Amr:EquipGearSet(spec)
 		return
 	end
 	
-	_waitingForSpec = spec
-	
 	local currentSpec = GetSpecialization()
 	if currentSpec ~= spec then
+		_waitingForSpec = spec
 		SetSpecialization(spec)
 	else
-		onActiveTalentGroupChanged()
+		-- spec is what we want, now equip the gear
+		beginEquipGearSet(currentSpec, 0)
 	end
 end
 
--- moves any gear in bags to the bank if not part of main or off spec gear set
+-- moves any gear in bags to the bank if not part of a gear set
 function Amr:CleanBags()
 	-- TODO: implement
 end
@@ -874,8 +1134,12 @@ function Amr:InitializeGear()
 	
 	Amr:AddEventHandler("UNIT_INVENTORY_CHANGED", function(unitID)
 		if unitID and unitID ~= "player" then return end
+		
+		-- don't update during a gear operation, wait until it is totally finished
+		if _pendingGearOps then return end
+
 		Amr:RefreshGearTab()
 	end)
 
-	Amr:AddEventHandler("ITEM_UNLOCKED", onItemUnlocked)
+	Amr:AddEventHandler("ITEM_UNLOCKED", handleItemUnlocked)
 end

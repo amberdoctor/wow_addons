@@ -90,7 +90,7 @@ end
 
 --------------------------------------------------------------------------------
 
-local onClick, onMouseUp, onMouseDown, onDragStart, onDragEnd, updatePosition
+local onClick, onMouseUp, onMouseDown, onDragStart, onDragStop, updatePosition
 
 do
 	local minimapShapes = {

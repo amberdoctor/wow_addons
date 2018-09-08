@@ -1,17 +1,3 @@
---[[-------------------------------------------------------------------------------------------------------------
-Master Localization File (English)
-
-Instructions for Translators:
-1. Copy this entire file into a new file in the same folder, named with your locale, e.g. deDE.lua for German.
-2. At the top, replace "enUS" in the first code line with your locale, and change the next parameter from true to false.
-3. Change all the English strings in your file as appropriate.
-
-Note that a couple of the "strings" are functions that are provided variables.  Feel free to modify these
-functions as necessary to output an appropriately worded statement in your language (but don't change the parameters).  
-If you need assistance with the syntax of any used methods like string.format, please contact Team Robot and we will gladly assist you.
----------------------------------------------------------------------------------------------------------------]]
-
--- replace enUS with your locale
 local L = LibStub("AceLocale-3.0"):NewLocale("AskMrRobot", "ruRU", false)
 
 if L then
@@ -85,10 +71,7 @@ L.StatsShort = {
 }
 
 L.InstanceNames = {
-	[1520] = "Emerald Nightmare",
-	[1530] = "Nighthold",
-	[1648] = "Trial of Valor",
-	[1676] = "Tomb of Sargeras"
+	[1861] = "Uldir"
 }
 
 L.DifficultyNames = {
@@ -138,9 +121,7 @@ L.CoverCancel = "отмена"
 L.MinimapTooltip = 
 [[Левый клик для открытия окна Ask Mr. Robot.
 
-Правый клик для смены спека и экипирования актуальных предметов.
-
-Ctrl + ЛКМ отметить бой как вайп.]]
+Правый клик для смены спека и экипирования актуальных предметов.]]
 
 L.MainStatusText = function(version, url)
 	return version .. " загружен. Инструкции доступны на " .. url
@@ -149,7 +130,6 @@ end
 L.TabExportText = "Экспорт"
 L.TabGearText = "Экипировка"
 L.TabLogText = "Логи"
-L.TabTeamText = "Оптимизатор"
 L.TabOptionsText = "Опции"
 
 L.VersionChatTitle = "AMR Addon Version:"
@@ -162,7 +142,7 @@ Export Tab
 ------------------------------------------------------------------------]]
 L.ExportTitle = "Инструкции Экспорта"
 L.ExportHelp1 = "1. Скопируйте текст ниже нажав Ctrl+C (или Cmd+C на Mac)"
-L.ExportHelp2 = "2. Перейдите на http://www.askmrrobot.com/wow/player и выберете своего персонажа"
+L.ExportHelp2 = "2. Перейдите на https://www.askmrrobot.com и выберете своего персонажа"
 L.ExportHelp3 = "3. Вставьте это в тектовое поле в разделее ADDON"
 
 L.ExportSplashTitle = "Начало работы"
@@ -289,104 +269,6 @@ L.LogInstructions =
 
 **AMR собирает дополнительные данные для всех игроков в рейде кто использует AskMrRobot. Другим игрокам включать запись логов не нужно! Аддон должен быть просто установлен и включен. Эти данные сохраняются только на диске, после того как вы выйдите из WoW или перезагрузите интерфейс.
 ]]
-
-
---[[----------------------------------------------------------------------
-Team Optimizer Tab
-------------------------------------------------------------------------]]
-L.TeamTabLeaderText = "Распределить добычу"
-L.TeamTabMemberText = "Команда"
-
-L.TeamSplashHeader = "Как вы планируете использовать Team Optimizer?"
-L.TeamSplashLeaderLabel = "Я тот, кто использует AskMrRobot для распределения добычи в рейде"
-L.TeamSplashMemberLabel = "Пускай другие используют Team Optimizer за меня"
-
-L.TeamMemberText = "Всё, бобер, выдыхай. Просто сядь и расслабься, все будет сделано Вашим лидером."
-L.TeamMemberShowLootLabel = "Распределние добычи в процессе!"
-L.TeamMemberShowLoot = "Показать окно добычи"
-
-L.TeamButtonVersionText = "Наличии аддона"
-L.TeamButtonExportRosterText = "Экспорт ростера"
-L.TeamButtonExportLootText = "Экспорт добычи"
-L.TeamButtonExportClose = "Закрыть"
-L.TeamButtonImportRankingsText = "Импорт Ранкинга"
-L.TeamButtonStartLootText = "Начать распределение"
-L.TeamButtonResumeLootText = "Продолжить распределять"
-
-L.TeamExportVersionLabel = "Team Optimizer является более точным и простыв в использовании если у всех в группе есть аддон AskMrRobot."
-L.TeamExportRosterLabel = "Сделайте это один раз в начале рейда для инициализации ростера в Team Optimizer на сайте. Если кто-то присоединяется или уходит из рейда во время РТ, сделайте тоже самое, только нажмите 'Import without Reload' на сайте, для быстрого обновления игроков который поменялись."
-L.TeamExportLootLabel = "Экспорт всего лута с последнего убитого босса на сайт AskMrRobot для дальнейшей работы с ним. Rankings automatically account for loot won on previous bosses or bonus rolls!"
-L.TeamExportLootLabel2 = "Требуется Мастер Лут"
-L.TeamImportRankingsLabel = "Импорт данных лута с сайта askmrrobot.com чтобы вы могли просматривать и легко распределять добычу в рейде."
-L.TeamStartLootLabel = function(numItems)
-	return numItems .. " предметов было импортировано."
-end
-
-L.TeamHistoryTitle = "История добычи"
-L.TeamHistoryNoGroup = "Вы находитесь вне группы или рейда."
-L.TeamHistoryEmpty = "Добыча ещё не была распределена."
-
-L.TeamVersionTitle = "Проверка версий"
-L.TeamVersionNoGroup = "Вы находитесь вне группы или рейда."
-L.TeamVersionGood = "У всех участников группы/рейда установлен аддон!"
-L.TeamVersionMissing = "НЕ УСТАНОВЛЕН"
-L.TeamVersionOld = "УСТАРЕВШИЙ"
-
-L.TeamExportRosterLoading = "Собираем Ваших рейдеров по крупице, пожалуйста подождите..."
-
-L.TeamAlertNoGroup = "Вы находитесь без группы!"
-L.TeamAlertNoLoot = "В последнее время с помощью мастер лута нечего не было распределено!"
-
-L.TeamExportHelp = "Нажмите Ctrl+C (или Cmd+C на Mac) чтобы скопировать текст ниже."
-L.TeamExportRosterText = "Далее идете на сайт, вкладка Team Optimizer, и вставляете в поле во вкладке Roster."
-L.TeamExportLootText = "Далее переходите во вкладке Team Optimizer на Rank Items и вставляете так же туда Лут."
--- note to translators: leave "Team Optimizer" in english in the above two texts because our website is not localized yet
-
-L.TeamImportRankingsHeader = "Нажмите Ctrl+V (Cmd+V на Mac) чтобы вставить данные с сайта в поле ниже."
-
-L.TeamLootOptionNeed = "Нужно"
-L.TeamLootOptionOff = "Офф спек"
-L.TeamLootOptionGreed = "Продать"
-L.TeamLootOptionPass = "Пропуск"
-L.TeamLootOptionDisenchant = "Распылить"
-
-
---[[----------------------------------------------------------------------
-Loot Window
-------------------------------------------------------------------------]]
-L.LootTitle = "Лут!"
-L.LootEmpty = "Здесь нет лута для раздачи прямо сейчас!"
-L.LootHelpItems = "For each drop..."
-L.LootHelpRanks = "Выберите опцию:"
-L.LootHelpMaster = "Мастер лут:"
-
-L.LootIneligible = "У Вас нет прав на этот предмет."
-
-L.LootRankHeaderRank = "Ранг"
-L.LootRankHeaderScore = "Процент улучшения"
-L.LootRankHeaderScoreDisenchant = "Игрок"
-
--- note to translators: these column headers should be short, abbreviate if necessary, keep to 5 characters max
-L.LootRankHeaderNeed = "Нужно"
-L.LootRankHeaderOff = "Офф"
-L.LootRankHeaderGreed = "Продать"
-L.LootRankHeaderPass = "Пас"
-L.LootRankHeaderRoll = "Ролл"
-
-L.LootRankLabelOff = "офф спек"
-L.LootRankLabelDisenchant = "дизинчантер"
-L.LootRankLabelMasterLooter = "Мастер лутер"
-L.LootRankLabelNoAddon = "АДДОН НЕ УСТАНОВЛЕН"
-
-L.LootMasterRollText = "Ролл"
-L.LootMasterDisenchantText = "Распылить/Продать"
-
-L.LootMasterRollLabel = "автоматически делает /roll за всех"
-L.LootMasterDisenchantLabel = "выберете это, если предмет никому не нужен"
-L.LootMasterGiveLoot = "Отдать"
-L.LootMasterGiveDisenchant = "Отдать на Распыл/Продажу"
-
-L.LootMasterGiveFail = "Этот предмет или выбранный игрок не найден :("
 
 
 --[[----------------------------------------------------------------------

@@ -29,7 +29,7 @@ local function onTextboxEnter(widget)
 	end
 end
 
-local function onCheckClick(widget)
+local function onCheckClick(widget)	
 	local setting = widget:GetUserData("setting")
 	local val = widget:GetChecked()
 	
@@ -42,11 +42,6 @@ local function onCheckClick(widget)
 	Amr:RefreshConfig()
 end
 
-local function onChkMinimapClick()
-	Amr.db.profile.minimap.hide = _chkMinimap:GetChecked()	
-	Amr:RefreshConfig()
-end
-
 local function createCheck(container, setting, text, description)
 
 	local chk = AceGUI:Create("AmrUiCheckBox")
@@ -56,11 +51,11 @@ local function createCheck(container, setting, text, description)
 	container:AddChild(chk)
 	
 	local desc = AceGUI:Create("AmrUiLabel")
+	container:AddChild(desc)
 	desc:SetWidth(800)
 	desc:SetText(description)
 	desc:SetFont(Amr.CreateFont("Italic", 12, Amr.Colors.TextTan))
 	desc:SetPoint("TOPLEFT", chk.frame, "BOTTOMLEFT", 24, -3)
-	container:AddChild(desc)
 	
 	return chk, desc
 end
@@ -77,18 +72,18 @@ local function createSmallTextbox(container, setting, text, description)
 	container:AddChild(txt)
 	
 	local lbl = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl)
 	lbl:SetWidth(600)
 	lbl:SetText(text)
 	lbl:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.Text))
 	lbl:SetPoint("LEFT", txt.frame, "RIGHT", 6, 0)
-	container:AddChild(lbl)
 	
 	local desc = AceGUI:Create("AmrUiLabel")
+	container:AddChild(desc)
 	desc:SetWidth(800)
 	desc:SetText(description)
 	desc:SetFont(Amr.CreateFont("Italic", 12, Amr.Colors.TextTan))
 	desc:SetPoint("TOPLEFT", lbl.frame, "BOTTOMLEFT", 0, -4)
-	container:AddChild(desc)
 	
 	return txt, desc
 end
@@ -97,11 +92,11 @@ end
 function Amr:RenderTabOptions(container)
 
 	local header = AceGUI:Create("AmrUiLabel")
+	container:AddChild(header)
 	header:SetWidth(600)
 	header:SetText(L.OptionsHeaderGeneral)
 	header:SetFont(Amr.CreateFont("Bold", 24, Amr.Colors.TextHeaderActive))
 	header:SetPoint("TOPLEFT", container.content, "TOPLEFT", 12, -40)
-	container:AddChild(header)
 
 	local desc, desc2
 	
@@ -126,6 +121,10 @@ end
 
 function Amr:ReleaseTabOptions()
 	_chkMinimap = nil
+	_chkAutoGear = nil
+	_chkAh = nil
+	_chkEm = nil
+	_txtScale = nil
 end
 
 function Amr:RefreshOptionsUi()

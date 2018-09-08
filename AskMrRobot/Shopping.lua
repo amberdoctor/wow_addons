@@ -59,7 +59,9 @@ local function onItemClick(widget)
 	end
 end
 
+
 function Amr:ShowShopWindow()
+
 	if not _frameShop then
 		_frameShop = AceGUI:Create("AmrUiFrame")
 		_frameShop:SetStatusTable(Amr.db.profile.shopWindow) -- window position is remembered in db
@@ -76,13 +78,13 @@ function Amr:ShowShopWindow()
 		end
 		
 		local lbl = AceGUI:Create("AmrUiLabel")
+		_frameShop:AddChild(lbl)
 		lbl:SetWidth(400)
 		lbl:SetFont(Amr.CreateFont("Bold", 28, Amr.Colors.White))
 		lbl:SetText(L.ShopTitle)
 		lbl:SetWordWrap(false)
 		lbl:SetJustifyH("CENTER")
 		lbl:SetPoint("TOP", _frameShop.content, "TOP", 0, 30)
-		_frameShop:AddChild(lbl)
 		
 		lbl:SetCallback("OnMouseDown", function(widget) _frameShop:StartMove() end)
 		lbl:SetCallback("OnMouseUp", function(widget) _frameShop:EndMove() end)
@@ -90,40 +92,40 @@ function Amr:ShowShopWindow()
 		-- player picker
 		_cboPlayers = AceGUI:Create("AmrUiDropDown")
 		_cboPlayers:SetWidth(400)
-		_cboPlayers:SetPoint("TOPLEFT", _frameShop.content, "TOPLEFT", 0, -30)
 		_frameShop:AddChild(_cboPlayers)
+		_cboPlayers:SetPoint("TOPLEFT", _frameShop.content, "TOPLEFT", 0, -30)
 		
 		-- spec pickers
 		_chk1 = AceGUI:Create("AmrUiCheckBox")
-		_chk1:SetPoint("TOPLEFT", _cboPlayers.frame, "BOTTOMLEFT", 0, -20)
 		_chk1:SetUserData("spec", 1)
 		_chk1:SetCallback("OnClick", onSpecClick)
 		_frameShop:AddChild(_chk1)
+		_chk1:SetPoint("TOPLEFT", _cboPlayers.frame, "BOTTOMLEFT", 0, -20)
 		
 		_chk2 = AceGUI:Create("AmrUiCheckBox")
-		_chk2:SetPoint("LEFT", _chk1.frame, "RIGHT", 30, 0)
 		_chk2:SetUserData("spec", 2)
 		_chk2:SetCallback("OnClick", onSpecClick)
 		_frameShop:AddChild(_chk2)
+		_chk2:SetPoint("LEFT", _chk1.frame, "RIGHT", 30, 0)
 		
 		_chk3 = AceGUI:Create("AmrUiCheckBox")
-		_chk3:SetPoint("LEFT", _chk2.frame, "RIGHT", 30, 0)
 		_chk3:SetUserData("spec", 3)
 		_chk3:SetCallback("OnClick", onSpecClick)
 		_frameShop:AddChild(_chk3)
+		_chk3:SetPoint("LEFT", _chk2.frame, "RIGHT", 30, 0)
 		
 		_chk4 = AceGUI:Create("AmrUiCheckBox")
-		_chk4:SetPoint("LEFT", _chk3.frame, "RIGHT", 30, 0)
 		_chk4:SetUserData("spec", 4)
 		_chk4:SetCallback("OnClick", onSpecClick)
 		_frameShop:AddChild(_chk4)
+		_chk4:SetPoint("LEFT", _chk3.frame, "RIGHT", 30, 0)
 		
 		_panelContent = AceGUI:Create("AmrUiPanel")
 		_panelContent:SetLayout("None")
 		_panelContent:SetTransparent()
+		_frameShop:AddChild(_panelContent)
 		_panelContent:SetPoint("TOPLEFT", _chk1.frame, "BOTTOMLEFT", 0, -10)
 		_panelContent:SetPoint("BOTTOMRIGHT", _frameShop.content, "BOTTOMRIGHT")
-		_frameShop:AddChild(_panelContent)
 		
 		-- update shopping list data
 		local player = Amr:ExportCharacter()
@@ -168,11 +170,11 @@ local function renderShopSection(list, scroll, header)
 	scroll:AddChild(panel)
 	
 	local lbl = AceGUI:Create("AmrUiLabel")
+	panel:AddChild(lbl)
 	lbl:SetWidth(w)
 	lbl:SetFont(Amr.CreateFont("Regular", 18, Amr.Colors.TextHeaderActive))
 	lbl:SetText(header)
 	lbl:SetPoint("BOTTOMLEFT", panel.content, "BOTTOMLEFT")
-	panel:AddChild(lbl)
 	
 	for itemId, count in pairs(list) do
 		panel = AceGUI:Create("AmrUiPanel")
@@ -183,20 +185,20 @@ local function renderShopSection(list, scroll, header)
 		scroll:AddChild(panel)
 		
 		lbl = AceGUI:Create("AmrUiLabel")
+		panel:AddChild(lbl)
 		lbl:SetWidth(40)
 		lbl:SetWordWrap(false)
 		lbl:SetFont(Amr.CreateFont("Bold", 20, Amr.Colors.White))
 		lbl:SetText(count .. "x")
 		lbl:SetPoint("LEFT", panel.content, "LEFT")
-		panel:AddChild(lbl)
 		
 		local icon = AceGUI:Create("AmrUiIcon")
 		icon:SetBorderWidth(1)
 		icon:SetIconBorderColor(Amr.Colors.White)
 		icon:SetWidth(18)
 		icon:SetHeight(18)
-		icon:SetPoint("LEFT", lbl.frame, "RIGHT", 5, 0)
 		panel:AddChild(icon)
+		icon:SetPoint("LEFT", lbl.frame, "RIGHT", 5, 0)
 		
 		local btn = AceGUI:Create("AmrUiTextButton")
 		btn:SetWidth(w - 30 - 18 - 15)
@@ -204,17 +206,20 @@ local function renderShopSection(list, scroll, header)
 		btn:SetWordWrap(false)
 		btn:SetFont(Amr.CreateFont("Bold", 14, Amr.Colors.White))
 		btn:SetHoverFont(Amr.CreateFont("Bold", 14, Amr.Colors.White))
-		btn:SetPoint("LEFT", icon.frame, "RIGHT", 5, 0)
 		btn:SetCallback("OnClick", onItemClick)
 		panel:AddChild(btn)
+		btn:SetPoint("LEFT", icon.frame, "RIGHT", 5, 0)
 		
-		Amr.GetItemInfo(itemId, function(obj, name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture)					
-			-- set icon, name, and a tooltip
-			obj.itemIcon:SetIcon(texture)
-			obj.itemText:SetText(link:gsub("%[", ""):gsub("%]", ""))
-			obj.itemText:SetUserData("itemName", name)
-			Amr:SetItemTooltip(obj.itemText, link)
-		end, { itemIcon = icon, itemText = btn })
+		local item = Item:CreateFromItemID(itemId)		
+		if item then
+			local itemLink = item:GetItemLink()
+			if itemLink then
+				icon:SetIcon(item:GetItemIcon())
+				btn:SetText(itemLink:gsub("%[", ""):gsub("%]", ""))
+				btn:SetUserData("itemName", item:GetItemName())
+				Amr:SetItemTooltip(btn, itemLink)
+			end
+		end
 	end
 	
 end
@@ -228,9 +233,13 @@ local function getOwnedCount(itemId)
 		ret = ret + list[itemId]
 	end
 	
-	list = Amr.db.char.BankItemsAndCounts
-	if list and list[itemId] then
-		ret = ret + list[itemId]
+	local bankBags = Amr.db.char.BankItemsAndCounts
+	if bankBags then
+		for bagId,bagList in pairs(bankBags) do
+			if bagList[itemId] then
+				ret = ret + bagList[itemId]
+			end
+		end
 	end
 	
 	return ret
@@ -279,11 +288,11 @@ function Amr:RefreshShoppingUi()
 		_panelContent:SetLayout("None")
 		
 		local lbl = AceGUI:Create("AmrUiLabel")
+		_panelContent:AddChild(lbl)
 		lbl:SetFont(Amr.CreateFont("Italic", 18, Amr.Colors.TextTan))
 		lbl:SetText(L.ShopEmpty)
 		lbl:SetJustifyH("CENTER")
 		lbl:SetPoint("TOP", _panelContent.content, "TOP", 0, -30)
-		_panelContent:AddChild(lbl)
 	else
 		local allStuff = { gems = {}, enchants = {}, materials = {} }
 		local hasStuff = false
@@ -354,8 +363,9 @@ function Amr:RefreshShoppingUi()
 				
 end
 
--- compare gear to everything the player owns, and return the minimum gems/enchants/materials needed to optimize, grouped by inventory ID so that we can combine multiple specs without double-counting
-local function getShoppingData(player, gear, spec)
+-- compare gear to everything the player owns, and return the minimum gems/enchants/materials needed to optimize, 
+-- grouped by inventory ID so that we can combine multiple specs without double-counting
+local function getShoppingData(player, gear)
 
 	local ret = {}
 	
@@ -363,18 +373,16 @@ local function getShoppingData(player, gear, spec)
 	local usedItems = {}
 	
 	for slotId, optimalItem in pairs(gear) do
-		local matchItemLink, matchItem = Amr:FindMatchingItem(optimalItem, player, usedItems)
-		local itemInfo = Amr.db.char.ExtraItemData[spec][optimalItem.id]
+		local matchItem = Amr:FindMatchingItem(optimalItem, player, usedItems)
 		local inventoryId = optimalItem.inventoryId or -1
 		
 		-- find gem/enchant differences on the best-matching item
 		
-		-- gems, but skip artifact relics (will have relicBonusIds set)
-		if not optimalItem.relicBonusIds and itemInfo and itemInfo.socketColors then
-			for i = 1, #itemInfo.socketColors do
+		-- gems
+		if not optimalItem.relicBonusIds and (not matchItem or not matchItem.relicBonusIds) then
+			for i = 1, 3 do
 				local g = optimalItem.gemIds[i]
-				local isGemEquipped = g ~= 0 and matchItem and matchItem.gemIds and matchItem.gemIds[i] == g
-				
+				local isGemEquipped = g == 0 or (matchItem and matchItem.gemIds and matchItem.gemIds[i] == g)
 				if not isGemEquipped then
 					if not ret[inventoryId] then
 						ret[inventoryId] = { gems = {}, enchants = {}, materials = {} }
@@ -390,15 +398,8 @@ local function getShoppingData(player, gear, spec)
 			local isEnchantEquipped = matchItem and matchItem.enchantId and matchItem.enchantId == e
 			
 			if not isEnchantEquipped then
-				-- enchant info, look in all spec extra info cache
-				local enchInfo = nil
-				for specPos = 1,4 do
-					if Amr.db.char.ExtraEnchantData[specPos] then
-						enchInfo = Amr.db.char.ExtraEnchantData[specPos][e]
-						if enchInfo then break end
-					end
-				end
-
+				-- enchant info
+				local enchInfo = Amr.db.char.ExtraEnchantData[e]
 				if enchInfo then
 					if not ret[inventoryId] then
 						ret[inventoryId] = { gems = {}, enchants = {}, materials = {} }
@@ -426,10 +427,13 @@ function Amr:UpdateShoppingData(player)
 		specs = player.Specs
 	}
 	
-	local enchantItemIdToId = {}
-	
-	for spec, gear in pairs(Amr.db.char.GearSets) do
-		required.stuff[spec] = getShoppingData(player, gear, spec)
+	for i, spec in ipairs(required.specs) do
+		local gear = Amr.db.char.GearSets[i]
+		if gear then
+			required.stuff[i] = getShoppingData(player, gear)
+		else
+			required.stuff[i] = {}
+		end
 	end
 	
 	Amr.db.global.Shopping[player.Name .. "-" .. player.Realm] = required

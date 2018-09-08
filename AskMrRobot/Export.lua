@@ -7,10 +7,10 @@ local _txt = nil
 
 local function createLabel(container, text, width)
 	local lbl = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl)
 	lbl:SetWidth(width or 800)
 	lbl:SetText(text)
 	lbl:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.Text))
-	container:AddChild(lbl)
 	return lbl
 end
 
@@ -50,23 +50,15 @@ local function renderSplash(container)
 	lbl2:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.Text))
 	lbl2:SetPoint("TOPLEFT", lbl.frame, "BOTTOMLEFT", 0, -15)
 	
-	lbl = createLabel(panel, L.ExportSplash3, 650)
-	lbl:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.Text))
-	lbl:SetPoint("TOPLEFT", lbl2.frame, "BOTTOMLEFT", 0, -15)
-
-	lbl2 = createLabel(panel, L.ExportSplash4, 650)
-	lbl2:SetFont(Amr.CreateFont("Regular", 14, Amr.Colors.Text))
-	lbl2:SetPoint("TOPLEFT", lbl.frame, "BOTTOMLEFT", 0, -15)
-	
 	local btn = AceGUI:Create("AmrUiButton")
 	btn:SetText(L.ExportSplashClose)
 	btn:SetBackgroundColor(Amr.Colors.Green)
 	btn:SetFont(Amr.CreateFont("Bold", 16, Amr.Colors.White))
 	btn:SetWidth(120)
 	btn:SetHeight(28)
-	btn:SetPoint("BOTTOM", panel.content, "BOTTOM", 0, 20)
 	btn:SetCallback("OnClick", onSplashClose)
 	panel:AddChild(btn)
+	btn:SetPoint("BOTTOM", panel.content, "BOTTOM", 0, 20)
 end
 
 -- renders the main UI for the Export tab
@@ -88,10 +80,10 @@ function Amr:RenderTabExport(container)
 	_txt = AceGUI:Create("AmrUiTextarea")
 	_txt:SetWidth(800)
 	_txt:SetHeight(300)
-	_txt:SetPoint("TOP", lbl2.frame, "BOTTOM", 0, -20)
 	_txt:SetFont(Amr.CreateFont("Regular", 12, Amr.Colors.Text))
 	_txt:SetCallback("OnTextChanged", onTextChanged)
 	container:AddChild(_txt)
+	_txt:SetPoint("TOP", lbl2.frame, "BOTTOM", 0, -20)
 	
 	local data = self:ExportCharacter()	
 	local txt = Amr.Serializer:SerializePlayerData(data, true)
@@ -119,24 +111,32 @@ end
 -- use some local variables to deal with the fact that a user can close the bank before a scan completes
 local _lastBankBagId = nil
 local _lastBankSlotId = nil
+local _bankOpen = false
 
 local function scanBag(bagId, isBank, bagTable, bagItemsWithCount)
 	local numSlots = GetContainerNumSlots(bagId)
+	local loc = ItemLocation.CreateEmpty()
 	for slotId = 1, numSlots do
 		local _, itemCount, _, _, _, _, itemLink = GetContainerItemInfo(bagId, slotId)
 		if itemLink ~= nil then
 			local itemData = Amr.Serializer.ParseItemLink(itemLink)
 			if itemData ~= nil then
-			
-				-- only add equippable items to bag data
-				--if IsEquippableItem(itemLink) or Amr.SetTokenIds[itemData.id] then
-	                if isBank then
-                    	_lastBankBagId = bagId
-                    	_lastBankSlotId = slotId
-                	end
+
+				-- see if this is an azerite item and read azerite power ids
+				loc:SetBagAndSlot(bagId, slotId)
+				if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(loc) then
+					local powers = Amr.ReadAzeritePowers(loc)
+					if powers then
+						itemData.azerite = powers
+					end
+				end
+
+				if isBank then
+					_lastBankBagId = bagId
+					_lastBankSlotId = slotId
+				end
 										
-                	table.insert(bagTable, itemLink)
-                --end
+				table.insert(bagTable, itemData)
 				
 				-- all items and counts, used for e.g. shopping list and reagents, etc.
                 if bagItemsWithCount then
@@ -151,14 +151,12 @@ local function scanBag(bagId, isBank, bagTable, bagItemsWithCount)
 	end
 end
 
--- get the player's current gear and save it, also returns the data from GetPlayerData for efficiency
-local function getEquipped()
-	local data = Amr.Serializer:GetPlayerData()
-	local spec = GetSpecialization()
+-- cache the currently equipped gear for this spec
+local function cacheEquipped()
+	local data = Amr.Serializer:GetEquipped()
 	
+	local spec = GetSpecialization()	
 	Amr.db.char.Equipped[spec] = data.Equipped[spec]
-	
-	return data
 end
 
 local function scanBags()
@@ -180,24 +178,61 @@ local function scanBank()
 
 	local bankItems = {}
 	local itemsAndCounts = {}
-
-	scanBag(BANK_CONTAINER, true, bankItems, itemsAndCounts)
-	scanBag(REAGENTBANK_CONTAINER, true, bankItems, itemsAndCounts)
+	
+	local bagList = {}
+	table.insert(bagList, BANK_CONTAINER)
+	table.insert(bagList, REAGENTBANK_CONTAINER)
 	for bagId = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
-		scanBag(bagId, true, bankItems, itemsAndCounts)
+		table.insert(bagList, bagId)
+	end
+
+	for i,bagId in ipairs(bagList) do
+		local bagItems = {}
+		local bagItemsAndCounts = {}
+		scanBag(bagId, true, bagItems, bagItemsAndCounts)
+
+		bankItems[bagId] = bagItems
+		itemsAndCounts[bagId] = bagItemsAndCounts
 	end
 	
 	-- see if the scan completed before the window closed, otherwise we don't overwrite with partial data
-	if _lastBankBagId ~= nil then
+	if _bankOpen and _lastBankBagId then
 		local itemLink = GetContainerItemLink(_lastBankBagId, _lastBankSlotId)
-		if itemLink ~= nil then --still open
+		if itemLink then --still open
             Amr.db.char.BankItems = bankItems
             Amr.db.char.BankItemsAndCounts = itemsAndCounts
 		end
 	end
-
 end
 
+local function onBankOpened()
+	_bankOpen = true
+	scanBank()
+end
+
+local function onBankClosed()
+	_bankOpen = false
+end
+
+-- if a bank bag is updated while the bank is open, re-scan that bag
+local function onBankUpdated(bagID)
+	if _bankOpen and (bagID == BANK_CONTAINER or bagID == REAGENTBANK_CONTAINER or (bagID >= NUM_BAG_SLOTS + 1 and bagID <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS)) then
+		local bagItems = {}
+		local bagItemsAndCounts = {}
+		scanBag(bagID, true, bagItems, bagItemsAndCounts)
+
+		-- see if the scan completed before the window closed, otherwise we don't overwrite with partial data
+		if _bankOpen and _lastBankBagId == bagID then
+			local itemLink = GetContainerItemLink(_lastBankBagId, _lastBankSlotId)
+			if itemLink then
+				Amr.db.char.BankItems[bagID] = bagItems
+				Amr.db.char.BankItemsAndCounts[bagID] = bagItemsAndCounts
+			end
+		end
+	end
+end
+
+--[[
 -- scan the player's void storage and save the contents, must be at void storage
 local function scanVoid()
 
@@ -222,25 +257,7 @@ local function scanVoid()
 	end
 	
 end
-
-local function getRepStanding(factionId)
-    local name, description, standingId, _ = GetFactionInfoByID(factionId)
-    return standingId - 1; -- our rep enum correspond to what the armory returns, are 1 less than what the game returns
-end
-
-local function getReputations()
-    local reps = {}
-    
-    local repList = {1375,1376,1270,1269,1341,1337,1387,1388,1435}
-    for i, repId in pairs(repList) do
-        local standing = getRepStanding(repId)
-        if standing >= 0 then
-            reps[repId] = standing
-        end
-    end
-    
-    return reps
-end
+]]
 
 local function scanTalents()	
 	local specPos = GetSpecialization()	
@@ -269,279 +286,36 @@ local function scanTalents()
 	Amr.db.char.Talents[specPos] = str
 end
 
-local function scanCrucible()
-	if not Amr.db or not Amr.db.char or not Amr.db.char.Artifacts or not C_ArtifactRelicForgeUI or not C_ArtifactRelicForgeUI.GetSocketedRelicTalents then return end
-
-	local equipped = {}
-	local preview = nil
-	
-	for i = 1,4 do
-		local talents = nil
-		if i == 4 then
-			talents = C_ArtifactRelicForgeUI.GetPreviewRelicTalents()
-			--talents = nil
-		else
-			talents = C_ArtifactRelicForgeUI.GetSocketedRelicTalents(i)
-			
-			--[[
-			-- test data
-			if i == 1 then
-				talents = {}
-				table.insert(talents, {
-					powerID = 1739,
-					isChosen = true				
-				})
-				table.insert(talents, {
-					powerID = 1781,
-					isChosen = true				
-				})
-				table.insert(talents, {
-					powerID = 1770,
-					isChosen = false				
-				})
-				table.insert(talents, {
-					powerID = 791,
-					isChosen = false
-				})
-				table.insert(talents, {
-					powerID = 786,
-					isChosen = false				
-				})
-				table.insert(talents, {
-					powerID = 1537,
-					isChosen = false				
-				})
-			end
-			]]
-		end
-		
-		if talents then
-			local obj = {
-				Powers = {},
-				Active = {}
-			}
-			
-			if i == 4 then
-				obj.ItemLink = C_ArtifactRelicForgeUI.GetPreviewRelicItemLink()
-				if not obj.ItemLink then
-					talents = nil
-				else
-					preview = obj
-				end
-			else
-				table.insert(equipped, obj)
-			end
-			
-			if talents then
-				for k,v in ipairs(talents) do
-					table.insert(obj.Powers, v.powerID)
-					table.insert(obj.Active, v.isChosen)
-				end
-			end
-			
-		elseif i ~= 4 then
-			table.insert(equipped, {})
-		end
-	end
-		
-	
-	local itemID = C_ArtifactUI.GetArtifactInfo()	
-	local spec = Amr.ArtifactIdToSpecNumber[itemID]
-	
-	if spec then
-	
-		-- sometimes this event can fire when no crucible data is available, don't overwrite non-blank crucible data with blank crucible data
-		local badEquipped = false
-		if Amr.db.char.Artifacts[spec] then
-			local oldCrucible = Amr.db.char.Artifacts[spec].Crucible
-			if oldCrucible then
-				if #oldCrucible.Equipped > 0 and oldCrucible.Equipped[1] and not equipped[1] then
-					badEquipped = true
-				end
-			end
-		end
-		
-		local dataz = Amr.db.char.Artifacts[spec]
-		if not dataz then
-			dataz = {}
-			Amr.db.char.Artifacts[spec] = dataz
-		end
-		
-		if not dataz.Crucible then
-			dataz.Crucible = {
-				Equipped = {},
-				Previewed = {}
-			}
-		end		
-		
-		local crucible = dataz.Crucible		
-		
-		if not badEquipped then
-			crucible.Equipped = equipped
-		end
-		
-		if preview then
-			local previewKey = {}
-			table.insert(previewKey, preview.ItemLink)
-			for i,v in ipairs(preview.Powers) do
-				table.insert(previewKey, v .. "=" .. tostring(preview.Active[i]))
-			end			
-			previewKey = table.concat(previewKey, "_")
-			
-			if not crucible.Previewed then
-				crucible.Previewed = {}
-			end
-			crucible.Previewed[previewKey] = preview
-		end
-	end
-end
-
-local function pruneCrucible()
-	if not Amr.db or not Amr.db.char or not Amr.db.char.Artifacts then return end
-	
-	local spec = GetSpecialization()
-	local dataz = Amr.db.char.Artifacts[spec]
-	if not dataz or not dataz.Crucible then return end
-	
-	local crucible = dataz.Crucible
-	
-	-- this was old format, transform to new format
-	if crucible.Inventory then
-		if not crucible.Previewed then
-			crucible.Previewed = {}
-		end
-		
-		for link,preview in pairs(crucible.Inventory) do
-			local previewKey = {}
-			table.insert(previewKey, preview.ItemLink)
-			for i,v in ipairs(preview.Powers) do
-				table.insert(previewKey, v .. "=" .. tostring(preview.Active[i]))
-			end			
-			previewKey = table.concat(previewKey, "_")
-			
-			crucible.Previewed[previewKey] = preview
-		end
-		
-		crucible.Inventory = nil
-	end
-	
-	-- get a hash of every owned, but not-equipped item
-	local ownedItems = {}
-	if Amr.db.char.BagItems then
-		for i,link in ipairs(Amr.db.char.BagItems) do
-			ownedItems[link] = true
-		end
-	end
-	if Amr.db.char.BankItems then
-		for i,link in ipairs(Amr.db.char.BankItems) do
-			ownedItems[link] = true
-		end
-	end
-	if Amr.db.char.VoidItems then
-		for i,link in ipairs(Amr.db.char.VoidItems) do
-			ownedItems[link] = true
-		end
-	end
-	
-	-- prune out any previewed relics that the player no longer owns
-	if crucible.Previewed then
-		local toRemove = {}
-		for k,v in pairs(crucible.Previewed) do
-			if not ownedItems[v.ItemLink] then
-				table.insert(toRemove, k)
-			end
-		end
-		for i,v in ipairs(toRemove) do
-			crucible.Previewed[v] = nil
-		end
-	end
-	
-end
-
-local function scanArtifact()
-	if not Amr.db or not Amr.db.char or not Amr.db.char.Artifacts then return end
-	
-	local powers = C_ArtifactUI.GetPowers()
-	if not powers then return end
-	
-	local powerRanks = {}
-	for k,v in pairs(powers) do
-		local powerInfo = C_ArtifactUI.GetPowerInfo(v)
-		if powerInfo.currentRank - powerInfo.bonusRanks > 0 then
-			powerRanks[v] = powerInfo.currentRank - powerInfo.bonusRanks
-		end
-	end
-	
-	local relicInfo = {}
-	for i = 1,3 do
-		local _, _, _, link = C_ArtifactUI.GetRelicInfo(i);
-		table.insert(relicInfo, link or "")
-	end
-	
-	-- make sure that the artifact UI didn't get closed while we were reading it, GetPowers seems to return nil unless it is open
-	powers = C_ArtifactUI.GetPowers()
-	if not powers then return end
-	
-	-- use the artifact item ID to figure out which spec this is for, since you can open your artifact on any spec
-	local itemID = C_ArtifactUI.GetArtifactInfo()	
-	local spec = Amr.ArtifactIdToSpecNumber[itemID]	
-	--local spec = GetSpecialization()
-	
-	if spec then
-	
-		-- sometimes this event can fire when no relic data is available, don't overwrite non-blank relic data with blank relic data
-		if Amr.db.char.Artifacts[spec] then
-			local oldRelics = Amr.db.char.Artifacts[spec].Relics
-			if oldRelics then
-				for i = 1,3 do
-					if oldRelics[i] and oldRelics[i] ~= "" and (not relicInfo[i] or relicInfo[i] == "") then
-						relicInfo[i] = oldRelics[i]
-					end
-				end
-			end
-		end
-		
-		local dataz = Amr.db.char.Artifacts[spec]
-		if not dataz then
-			dataz = {}
-			Amr.db.char.Artifacts[spec] = dataz
-		end
-
-		if not dataz.Crucible then
-			dataz.Crucible = {
-				Equipped = {},
-				Inventory = {}
-			}
-		end
-		
-		dataz.Powers = powerRanks
-		dataz.Relics = relicInfo	
-		
-	end
-	
-	--scanCrucible()
-end
-
 -- Returns a data object containing all information about the current player needed for an export:
 -- gear, spec, reputations, bag, bank, and void storage items.
 function Amr:ExportCharacter()
 	
-	local data = getEquipped()
+	-- get all necessary player data
+	local data = Amr.Serializer:GetPlayerData()
+
+	-- cache latest-seen equipped gear for current spec
+	local spec = GetSpecialization()	
+	Amr.db.char.Equipped[spec] = data.Equipped[spec]
+
+	-- scan current inventory just before export so that it is always fresh
 	scanBags()
 	
 	-- scan current spec's talents just before exporting
 	scanTalents()
 	
-	-- prune crucible info just before each time we export
-	pruneCrucible()
-	
-	data.Talents = Amr.db.char.Talents
-	data.Artifacts = Amr.db.char.Artifacts
-	data.Equipped = Amr.db.char.Equipped
-	data.Reputations = getReputations()
+	data.Talents = Amr.db.char.Talents	
+	data.Equipped = Amr.db.char.Equipped	
 	data.BagItems = Amr.db.char.BagItems
-	data.BankItems = Amr.db.char.BankItems
-	data.VoidItems = Amr.db.char.VoidItems
+
+	-- flatten bank data (which is stored by bag for more efficient updating)
+	data.BankItems = {}
+	for k,v in pairs(Amr.db.char.BankItems) do
+		for i,v2 in ipairs(v) do
+			table.insert(data.BankItems, v2)
+		end
+	end
+
+	--data.VoidItems = Amr.db.char.VoidItems
 	
 	return data
 end
@@ -549,19 +323,17 @@ end
 function Amr:InitializeExport()
 	Amr:AddEventHandler("UNIT_INVENTORY_CHANGED", function(unitID)
 		if unitID and unitID ~= "player" then return end
-		getEquipped()
+		cacheEquipped()
 	end)
 end
 
-Amr:AddEventHandler("BANKFRAME_OPENED", scanBank)
-Amr:AddEventHandler("PLAYERBANKSLOTS_CHANGED", scanBank)
+Amr:AddEventHandler("BANKFRAME_OPENED", onBankOpened)
+Amr:AddEventHandler("BANKFRAME_CLOSED", onBankClosed)
+Amr:AddEventHandler("BAG_UPDATE", onBankUpdated)
 
-Amr:AddEventHandler("VOID_STORAGE_OPEN", scanVoid)
-Amr:AddEventHandler("VOID_STORAGE_CONTENTS_UPDATE", scanVoid)
-Amr:AddEventHandler("VOID_STORAGE_DEPOSIT_UPDATE", scanVoid)
-Amr:AddEventHandler("VOID_STORAGE_UPDATE", scanVoid)
+--Amr:AddEventHandler("VOID_STORAGE_OPEN", scanVoid)
+--Amr:AddEventHandler("VOID_STORAGE_CONTENTS_UPDATE", scanVoid)
+--Amr:AddEventHandler("VOID_STORAGE_DEPOSIT_UPDATE", scanVoid)
+--Amr:AddEventHandler("VOID_STORAGE_UPDATE", scanVoid)
 
 Amr:AddEventHandler("PLAYER_TALENT_UPDATE", scanTalents)
-Amr:AddEventHandler("ARTIFACT_UPDATE", scanArtifact)
-Amr:AddEventHandler("ARTIFACT_RELIC_FORGE_UPDATE", scanCrucible)
-Amr:AddEventHandler("ARTIFACT_RELIC_FORGE_PREVIEW_RELIC_CHANGED", scanCrucible)

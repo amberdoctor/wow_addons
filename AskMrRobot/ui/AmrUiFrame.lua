@@ -5,7 +5,6 @@ local Type, Version = "AmrUiFrame", 1
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
-local L = LibStub("AceLocale-3.0"):GetLocale("AskMrRobot", true)
 local Amr = LibStub("AceAddon-3.0"):GetAddon("AskMrRobot")
 
 -- Lua APIs
@@ -13,7 +12,6 @@ local pairs, assert, type = pairs, assert, type
 local wipe = table.wipe
 
 -- WoW APIs
-local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded

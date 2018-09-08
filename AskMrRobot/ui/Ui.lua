@@ -47,6 +47,12 @@ for k,v in pairs(RAID_CLASS_COLORS) do
 	Amr.Colors.Classes[k] = { R = v.r, G = v.g, B = v.b }
 end
 
+-- get colors for item qualities from WoW's constants
+Amr.Colors.Qualities = {}
+for k,v in pairs(ITEM_QUALITY_COLORS) do
+	Amr.Colors.Qualities[k] = { R = v.r, G = v.g, B = v.b }
+end
+
 -- helper to take 0-1 value and turn into 2-digit hex value
 local function decToHex(num)
 	num = math.ceil(num * 255)
@@ -168,43 +174,43 @@ local function createMainWindow()
 		
 	-- some status text
 	local lblStatus = AceGUI:Create("AmrUiLabel")
+	f:AddChild(lblStatus)
 	lblStatus:SetWidth(900)
 	lblStatus:SetFont(Amr.CreateFont("Italic", 12, Amr.Colors.TextTan))
-	lblStatus:SetText("Ask Mr. Robot " .. L.MainStatusText("v" .. GetAddOnMetadata(Amr.ADDON_NAME, "Version"), "http://www.askmrrobot.com/wow/addon"))
+	lblStatus:SetText("Ask Mr. Robot " .. L.MainStatusText("v" .. GetAddOnMetadata(Amr.ADDON_NAME, "Version"), "https://www.askmrrobot.com/addon"))
 	lblStatus:SetJustifyH("CENTER")
 	lblStatus:SetWordWrap(false)
 	lblStatus:SetPoint("TOP", f.content, "BOTTOM")
-	f:AddChild(lblStatus)
 		
 	-- create the main UI container
 	local c = AceGUI:Create("AmrUiPanel")
 	c:SetLayout("Fill")
 	c:SetBackgroundColor(Amr.Colors.Black, 0)
+	f:AddChild(c)
 	c:SetPoint("TOPLEFT", f.content, "TOPLEFT")
 	c:SetPoint("BOTTOMRIGHT", f.content, "BOTTOMRIGHT")
-	f:AddChild(c)
 	
 	-- create the main tab strip
 	local t =  AceGUI:Create("AmrUiTabGroup")
+	c:AddChild(t)
 	t:SetLayout("None")
 	t:SetTabs({
 		{text=L.TabExportText, value="Export"}, 
 		{text=L.TabGearText, value="Gear"}, 
 		{text=L.TabLogText, value="Log"}, 
-		{text=L.TabTeamText, value="Team"},
+		--{text=L.TabTeamText, value="Team"},
 		{text=L.TabOptionsText, value="Options"}
 	})
 	t:SetCallback("OnGroupSelected", onMainTabSelected)
-	c:AddChild(t)
 	
 	-- create the cover/overlay container
 	c = AceGUI:Create("AmrUiPanel")
 	c:SetLayout("None")
 	c:EnableMouse(true)
 	c:SetBackgroundColor(Amr.Colors.Black, 0.75)
+	f:AddChild(c)
 	c:SetPoint("TOPLEFT", f.frame, "TOPLEFT")
 	c:SetPoint("BOTTOMRIGHT", f.frame, "BOTTOMRIGHT")
-	f:AddChild(c)
 
 	-- after adding, set cover to sit on top of everything, then hide it
 	c:SetStrata("FULLSCREEN_DIALOG")
@@ -213,13 +219,13 @@ local function createMainWindow()
 
 	-- put standard cover ui elements (label, cancel button)
 	local coverMsg = AceGUI:Create("AmrUiLabel")
+	c:AddChild(coverMsg)
 	coverMsg:SetWidth(600)
 	coverMsg:SetFont(Amr.CreateFont("Regular", 16, Amr.Colors.TextTan))
 	coverMsg:SetJustifyH("MIDDLE")
 	coverMsg:SetJustifyV("MIDDLE")
 	coverMsg:SetText("")
 	coverMsg:SetPoint("CENTER", c.frame, "CENTER", 0, 20)
-	c:AddChild(coverMsg)
 	
 	local coverCancel = AceGUI:Create("AmrUiTextButton")
 	coverCancel:SetWidth(200)
@@ -227,8 +233,8 @@ local function createMainWindow()
 	coverCancel:SetText(L.CoverCancel)
 	coverCancel:SetFont(Amr.CreateFont("Italic", 14, Amr.Colors.TextHeaderDisabled))
 	coverCancel:SetHoverFont(Amr.CreateFont("Italic", 14, Amr.Colors.TextHeaderActive))
-	coverCancel:SetPoint("CENTER", c.frame, "CENTER", 0, -20)
 	c:AddChild(coverCancel)
+	coverCancel:SetPoint("CENTER", c.frame, "CENTER", 0, -20)
 	
 	coverCancel:SetCallback("OnClick", function(widget)
 		Amr:HideCover()
@@ -238,9 +244,9 @@ local function createMainWindow()
 	local coverContent = AceGUI:Create("AmrUiPanel")
 	coverContent:SetLayout("None")
 	coverContent:SetBackgroundColor(Amr.Colors.Black, 0)
+	c:AddChild(coverContent)
 	coverContent:SetPoint("TOPLEFT", c.frame, "TOPLEFT")
 	coverContent:SetPoint("BOTTOMRIGHT", c.frame, "BOTTOMRIGHT")
-	c:AddChild(coverContent)
 
 	_mainFrame = f
 	_mainTabs = t
@@ -288,23 +294,23 @@ function Amr:ShowAlert(message, btnText)
 		border:SetBackgroundColor(Amr.Colors.BorderBlue)
 		border:SetWidth(400)
 		border:SetHeight(150)
-		border:SetPoint("CENTER", container.frame, "CENTER")
 		container:AddChild(border)
+		border:SetPoint("CENTER", container.frame, "CENTER")
 
 		local bg = AceGUI:Create("AmrUiPanel")
 		bg:SetLayout("None")
 		bg:SetBackgroundColor(Amr.Colors.Bg)
+		border:AddChild(bg)
 		bg:SetPoint("TOPLEFT", border.frame, "TOPLEFT", 1, -1)
 		bg:SetPoint("BOTTOMRIGHT", border.frame, "BOTTOMRIGHT", -1, 1)
-		border:AddChild(bg)
 		
 		local lbl = AceGUI:Create("AmrUiLabel")
+		bg:AddChild(lbl)
 		lbl:SetWidth(360)
 		lbl:SetFont(Amr.CreateFont("Regular", 16, Amr.Colors.Text))
 		lbl:SetJustifyH("CENTER")
 		lbl:SetText(message)
 		lbl:SetPoint("TOP", bg.content, "TOP", 0, -20)
-		bg:AddChild(lbl)
 
 		local btn = AceGUI:Create("AmrUiButton")
 		btn:SetBackgroundColor(Amr.Colors.Orange)
@@ -312,8 +318,8 @@ function Amr:ShowAlert(message, btnText)
 		btn:SetWidth(120)
 		btn:SetHeight(26)
 		btn:SetText(btnText)
-		btn:SetPoint("BOTTOM", bg.content, "BOTTOM", 0, 20)
 		bg:AddChild(btn)
+		btn:SetPoint("BOTTOM", bg.content, "BOTTOM", 0, 20)
 		
 		btn:SetCallback("OnClick", function(widget)
 			Amr:HideCover()
@@ -358,7 +364,7 @@ function Amr:Reset()
 	if not self:IsEnabled() then return end
 	
 	Amr:Hide()
-	Amr:HideLootWindow()
+	--Amr:HideLootWindow()
 	Amr:HideShopWindow()
 	Amr.db.profile.options.uiScale = 1
 	Amr.db.profile.window = {}
@@ -383,8 +389,10 @@ function Amr:SetItemTooltip(obj, itemLink, anchor, x, y)
 	obj:SetUserData("ttItemLink", itemLink)
 	obj:SetCallback("OnEnter", function(widget)
 		local tooltipLink = widget:GetUserData("ttItemLink")
-		GameTooltip:SetOwner(widget.frame, anchor and anchor or "ANCHOR_CURSOR", x, y)
-		GameTooltip:SetHyperlink(tooltipLink)
+		if tooltipLink then
+			GameTooltip:SetOwner(widget.frame, anchor and anchor or "ANCHOR_CURSOR", x, y)
+			GameTooltip:SetHyperlink(tooltipLink)
+		end
 	end)
 	obj:SetCallback("OnLeave", function(widget)
 		GameTooltip:Hide()
@@ -395,8 +403,10 @@ function Amr:SetSpellTooltip(obj, spellId, anchor, x, y)
 	obj:SetUserData("ttSpellId", spellId)
 	obj:SetCallback("OnEnter", function(widget)
 		local ttSpellId = widget:GetUserData("ttSpellId")
-		GameTooltip:SetOwner(widget.frame, anchor and anchor or "ANCHOR_CURSOR", x, y)
-		GameTooltip:SetSpellByID(ttSpellId)
+		if ttSpellId then
+			GameTooltip:SetOwner(widget.frame, anchor and anchor or "ANCHOR_CURSOR", x, y)
+			GameTooltip:SetSpellByID(ttSpellId)
+		end
 	end)
 	obj:SetCallback("OnLeave", function(widget)
 		GameTooltip:Hide()
@@ -410,15 +420,15 @@ function Amr:RenderCoverChrome(container, width, height)
 	border:SetBackgroundColor(Amr.Colors.BorderBlue)
 	border:SetWidth(width + 2)
 	border:SetHeight(height + 2)
-	border:SetPoint("CENTER", container.frame, "CENTER")
 	container:AddChild(border)
+	border:SetPoint("CENTER", container.frame, "CENTER")
 
 	local bg = AceGUI:Create("AmrUiPanel")
 	bg:SetLayout("None")
 	bg:SetBackgroundColor(Amr.Colors.Bg)
+	border:AddChild(bg)
 	bg:SetPoint("TOPLEFT", border.frame, "TOPLEFT", 1, -1)
 	bg:SetPoint("BOTTOMRIGHT", border.frame, "BOTTOMRIGHT", -1, 1)
-	border:AddChild(bg)
 	
 	return bg, border
 end
