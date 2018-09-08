@@ -31,7 +31,6 @@ local default = {
   height = 15,
   orientation = "HORIZONTAL",
   inverse = false,
-  alpha = 1.0,
   barColor = {1.0, 0.0, 0.0, 1.0},
   backgroundColor = {0.0, 0.0, 0.0, 0.5},
   spark = false,
@@ -40,7 +39,6 @@ local default = {
   sparkColor = {1.0, 1.0, 1.0, 1.0},
   sparkTexture = "Interface\\CastingBar\\UI-CastingBar-Spark",
   sparkBlendMode = "ADD",
-  sparkDesature = false,
   sparkOffsetX = 0,
   sparkOffsetY = 0,
   sparkRotationMode = "AUTO",
@@ -68,6 +66,7 @@ local default = {
 };
 
 WeakAuras.regionPrototype.AddAdjustedDurationToDefault(default);
+WeakAuras.regionPrototype.AddAlphaToDefault(default);
 
 local screenWidth, screenHeight = math.ceil(GetScreenWidth() / 20) * 20, math.ceil(GetScreenHeight() / 20) * 20;
 
@@ -81,6 +80,11 @@ local properties = {
     display = L["Icon Color"],
     setter = "SetIconColor",
     type = "color"
+  },
+  desaturate = {
+    display = L["Icon Desaturate"],
+    setter = "SetIconDesaturated",
+    type = "bool",
   },
   backgroundColor = {
     display = L["Background Color"],
@@ -140,6 +144,7 @@ local properties = {
     min = 6,
     softMax = 72,
     step = 1,
+    default = 12
   },
   timerSize = {
     display = L["Second Text Size"],
@@ -148,6 +153,7 @@ local properties = {
     min = 6,
     softMax = 72,
     step = 1,
+    default = 12
   },
   stacksSize = {
     display = L["Stacks Text Size"],
@@ -156,6 +162,7 @@ local properties = {
     min = 6,
     softMax = 72,
     step = 1,
+    default = 12
   },
   width = {
     display = L["Width"],
@@ -164,6 +171,7 @@ local properties = {
     min = 1,
     softMax = screenWidth,
     bigStep = 1,
+    defautl = 32,
   },
   height = {
     display = L["Height"],
@@ -171,7 +179,8 @@ local properties = {
     type = "number",
     min = 1,
     softMax = screenHeight,
-    bigStep = 1
+    bigStep = 1,
+    default = 32
   },
   orientation = {
     display = L["Orientation"],
@@ -186,7 +195,7 @@ local properties = {
   }
 };
 
-WeakAuras.regionPrototype.AddProperties(properties);
+WeakAuras.regionPrototype.AddProperties(properties, default);
 
 local function GetProperties(data)
   local overlayInfo = WeakAuras.GetOverlayInfo(data);
@@ -237,36 +246,36 @@ local GetTexCoordSpark = function(degree, mirror)
 end
 
 local GetTexCoordFunctions =
-{
-  ["HORIZONTAL"] = function(startProgress, endProgress)
-    local TLx,  TLy = startProgress, 0;
-    local TRx,  TRy = endProgress, 0;
-    local BLx,  BLy = startProgress, 1;
-    local BRx,  BRy = endProgress, 1;
-    return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
-  end,
-  ["HORIZONTAL_INVERSE"] = function(startProgress, endProgress)
-    local TLx,  TLy = endProgress, 0;
-    local TRx,  TRy = startProgress, 0;
-    local BLx,  BLy = endProgress, 1;
-    local BRx,  BRy = startProgress, 1;
-    return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
-  end,
-  ["VERTICAL"] = function(startProgress, endProgress)
-    local TLx,  TLy = startProgress, 1;
-    local TRx,  TRy = startProgress, 0;
-    local BLx,  BLy = endProgress, 1;
-    local BRx,  BRy = endProgress, 0;
-    return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
-  end,
-  ["VERTICAL_INVERSE"] = function(startProgress, endProgress)
-    local TLx,  TLy = endProgress, 0;
-    local TRx,  TRy = endProgress, 1;
-    local BLx,  BLy = startProgress, 0;
-    local BRx,  BRy = startProgress, 1;
-    return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
-  end
-}
+  {
+    ["HORIZONTAL"] = function(startProgress, endProgress)
+      local TLx,  TLy = startProgress, 0;
+      local TRx,  TRy = endProgress, 0;
+      local BLx,  BLy = startProgress, 1;
+      local BRx,  BRy = endProgress, 1;
+      return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
+    end,
+    ["HORIZONTAL_INVERSE"] = function(startProgress, endProgress)
+      local TLx,  TLy = endProgress, 0;
+      local TRx,  TRy = startProgress, 0;
+      local BLx,  BLy = endProgress, 1;
+      local BRx,  BRy = startProgress, 1;
+      return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
+    end,
+    ["VERTICAL"] = function(startProgress, endProgress)
+      local TLx,  TLy = startProgress, 1;
+      local TRx,  TRy = startProgress, 0;
+      local BLx,  BLy = endProgress, 1;
+      local BRx,  BRy = endProgress, 0;
+      return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
+    end,
+    ["VERTICAL_INVERSE"] = function(startProgress, endProgress)
+      local TLx,  TLy = endProgress, 0;
+      local TRx,  TRy = endProgress, 1;
+      local BLx,  BLy = startProgress, 0;
+      local BRx,  BRy = startProgress, 1;
+      return TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy;
+    end
+  }
 
 local anchorAlignment = {
   ["HORIZONTAL"] = { "TOPLEFT", "BOTTOMLEFT", "RIGHT" },
@@ -361,7 +370,7 @@ local barPrototype = {
         if (not self.extraTextures[index]) then
           local extraTexture = self:CreateTexture(nil, "ARTWORK");
           extraTexture:SetTexture(self:GetStatusBarTexture(), extraTextureWrapMode, extraTextureWrapMode);
-          extraTexture:SetDrawLayer("ARTWORK", index);
+          extraTexture:SetDrawLayer("ARTWORK", min(index, 7));
           self.extraTextures[index] = extraTexture;
         end
 
@@ -1028,9 +1037,6 @@ local function modify(parent, region, data)
     WeakAuras.DeepCopy(data.overlays, region.overlays);
   end
 
-  -- Set overall alpha
-  region:SetAlpha(data.alpha);
-
   -- Update border
   if data.border then
     -- Create border
@@ -1094,7 +1100,7 @@ local function modify(parent, region, data)
   bar:SetStatusBarTexture(texturePath);
   bar:SetBackgroundColor(data.backgroundColor[1], data.backgroundColor[2], data.backgroundColor[3], data.backgroundColor[4]);
   -- Update spark settings
-  bar.spark:SetTexture(data.sparkTexture);
+  WeakAuras.SetTextureOrAtlas(bar.spark, data.sparkTexture);
   bar.spark:SetVertexColor(data.sparkColor[1], data.sparkColor[2], data.sparkColor[3], data.sparkColor[4]);
   bar.spark:SetWidth(data.sparkWidth);
   bar.spark:SetHeight(data.sparkHeight);
@@ -1273,16 +1279,11 @@ local function modify(parent, region, data)
 
     -- Save custom text function
     region.UpdateCustomText = function()
-      -- Evaluate and update text
       WeakAuras.ActivateAuraEnvironment(region.id, region.cloneId, region.state);
-      local custom = customTextFunc(region.expirationTime, region.duration,
-        values.progress, values.duration, values.name, values.icon, values.stacks);
+      values.custom = {select(2, xpcall(customTextFunc, geterrorhandler(), region.expirationTime, region.duration,
+        values.progress, values.duration, values.name, values.icon, values.stacks))}
       WeakAuras.ActivateAuraEnvironment(nil);
-      custom = WeakAuras.EnsureString(custom);
-      if custom ~= values.custom then
-        values.custom = custom;
-        UpdateText(region, data);
-      end
+      UpdateText(region, data);
     end
 
     -- Add/Remove custom text update
@@ -1413,7 +1414,11 @@ local function modify(parent, region, data)
     then
       progress = 1 - progress;
     end
-    region.bar:SetValue(progress);
+    if (data.smoothProgress) then
+      region.bar:SetSmoothedValue(progress);
+    else
+      region.bar:SetValue(progress);
+    end
     UpdateText(region, data);
   end
 
@@ -1429,6 +1434,10 @@ local function modify(parent, region, data)
 
   function region:SetIconColor(r, g, b, a)
     self.icon:SetVertexColor(r, g, b, a);
+  end
+
+  function region:SetIconDesaturated(b)
+    self.icon:SetDesaturated(b);
   end
 
   function region:SetBackgroundColor(r, g, b, a)

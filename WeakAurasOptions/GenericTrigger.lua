@@ -26,13 +26,9 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
         local ret = {};
         WeakAuras.DeepCopy(baseRet, ret);
         local optionTriggerChoice = optionTriggerChoices[childId];
-        if (optionTriggerChoice == 0) then
-          tinsert(ret, 1, "trigger");
-        elseif (optionTriggerChoice > 0) then
-          tinsert(ret, 1, "trigger");
-          tinsert(ret, 1, optionTriggerChoice);
-          tinsert(ret, 1, "additional_triggers");
-        end
+        tinsert(ret, 1, "trigger");
+        tinsert(ret, 1, optionTriggerChoice)
+        tinsert(ret, 1, "triggers")
         result[childId] = ret;
       end
       return result;
@@ -45,35 +41,19 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
         local ret = {};
         WeakAuras.DeepCopy(baseRet, ret);
         local optionTriggerChoice = optionTriggerChoices[childId];
-        if (optionTriggerChoice == 0) then
-          tinsert(ret, 1, "untrigger");
-        elseif (optionTriggerChoice > 0) then
-          tinsert(ret, 1, "untrigger");
-          tinsert(ret, 1, optionTriggerChoice);
-          tinsert(ret, 1, "additional_triggers");
-        end
+        tinsert(ret, 1, "untrigger");
+        tinsert(ret, 1, optionTriggerChoice);
+        tinsert(ret, 1, "triggers");
         result[childId] = ret;
       end
       return result;
     end
-  elseif(optionTriggerChoices[id] == 0) then
-    function appendToTriggerPath(...)
-      local ret = {...};
-      tinsert(ret, 1, "trigger");
-      return ret;
-    end
-
-    function appendToUntriggerPath(...)
-      local ret = {...};
-      tinsert(ret, 1, "untrigger");
-      return ret;
-    end
-  elseif (optionTriggerChoices[id] > 0) then
+  else
     function appendToTriggerPath(...)
       local ret = {...};
       tinsert(ret, 1, "trigger");
       tinsert(ret, 1, optionTriggerChoices[id]);
-      tinsert(ret, 1, "additional_triggers");
+      tinsert(ret, 1, "triggers");
       return ret;
     end
 
@@ -81,7 +61,7 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
       local ret = {...};
       tinsert(ret, 1, "untrigger");
       tinsert(ret, 1, optionTriggerChoices[id]);
-      tinsert(ret, 1, "additional_triggers");
+      tinsert(ret, 1, "triggers");
       return ret;
     end
   end
@@ -142,7 +122,15 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
       order = 7,
       width = "double",
       values = custom_trigger_types,
-      hidden = function() return not (trigger.type == "custom") end
+      hidden = function() return not (trigger.type == "custom") end,
+      set = function(info, v)
+        trigger.custom_type = v;
+        WeakAuras.Add(data);
+        WeakAuras.SetThumbnail(data);
+        WeakAuras.SetIconNames(data);
+        WeakAuras.UpdateDisplayButton(data);
+        WeakAuras.ReloadOptions(data.id);
+      end
     },
     check = {
       type = "select",
@@ -246,11 +234,25 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
         WeakAuras.UpdateDisplayButton(data);
       end
     },
+    dynamicDuration = {
+      type = "toggle",
+      name = L["Dynamic Duration"],
+      order = 12.5,
+      hidden = function() return not (trigger.type == "custom" and trigger.custom_type == "event" and trigger.custom_hide ~= "custom") end,
+      set = function(info, v)
+        trigger.dynamicDuration = v;
+        WeakAuras.Add(data);
+        WeakAuras.SetThumbnail(data);
+        WeakAuras.SetIconNames(data);
+        WeakAuras.UpdateDisplayButton(data);
+        WeakAuras.ReloadOptions(data.id);
+      end
+    },
     duration = {
       type = "input",
       name = L["Duration (s)"],
       order = 13,
-      hidden = function() return not (trigger.type == "custom" and trigger.custom_type == "event" and trigger.custom_hide ~= "custom") end,
+      hidden = function() return not (trigger.type == "custom" and trigger.custom_type == "event" and trigger.custom_hide ~= "custom" and not trigger.dynamicDuration) end,
     },
     addOverlayFunction = {
       type = "execute",
@@ -302,10 +304,21 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
     WeakAuras.UpdateDisplayButton(data);
   end
 
+  local function extraSetFunctionReload()
+    extraSetFunction();
+    WeakAuras.ReloadOptions(data.id);
+  end
+
   local function hideCustomTrigger()
     return not (trigger.type == "custom")
   end
   WeakAuras.AddCodeOption(options, data, L["Custom Trigger"], "custom_trigger", 10, hideCustomTrigger, appendToTriggerPath("custom"), false, true, extraSetFunction, nil, true);
+
+  local function hideCustomVariables()
+    return not (trigger.type == "custom" and trigger.custom_type == "stateupdate");
+  end
+
+  WeakAuras.AddCodeOption(options, data, '|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0|t' .. L["Custom Variables"], "custom_variables", 11, hideCustomVariables, appendToTriggerPath("customVariables"), false, true, extraSetFunctionReload, nil, true);
 
   local function hideCustomUntrigger()
     return not (trigger.type == "custom"
@@ -315,9 +328,10 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
 
   local function hideCustomDuration()
     return not (trigger.type == "custom"
-      and (trigger.custom_type == "status" or (trigger.custom_type == "event" and trigger.custom_hide ~= "timed")))
+      and (trigger.custom_type == "status"
+           or (trigger.custom_type == "event" and (trigger.custom_hide ~= "timed" or trigger.dynamicDuration))))
   end
-  WeakAuras.AddCodeOption(options, data, L["Duration Info"], "custom_duration", 16, hideCustomDuration, appendToTriggerPath("customDuration"), false, true, extraSetFunction);
+  WeakAuras.AddCodeOption(options, data, L["Duration Info"], "custom_duration", 16, hideCustomDuration, appendToTriggerPath("customDuration"), false, true, extraSetFunctionReload);
 
   local function hideIfTriggerStateUpdate()
     return not (trigger.type == "custom" and trigger.custom_type ~= "stateupdate")
@@ -358,12 +372,7 @@ function WeakAuras.GetGenericTriggerOptions(data, trigger, untrigger)
       }
     }
 
-    local function extraSetFunctionOverlay()
-      extraSetFunction();
-      WeakAuras.ReloadOptions(data.id);
-    end
-
-    WeakAuras.AddCodeOption(options, data, string.format(L["Overlay %s Info"], i), "custom_overlay" .. i, 17 + i / 10, hideOverlay, appendToTriggerPath("customOverlay" .. i), false, true, extraSetFunctionOverlay, extraFunctions);
+    WeakAuras.AddCodeOption(options, data, string.format(L["Overlay %s Info"], i), "custom_overlay" .. i, 17 + i / 10, hideOverlay, appendToTriggerPath("customOverlay" .. i), false, true, extraSetFunctionReload, extraFunctions);
   end
 
   WeakAuras.AddCodeOption(options, data, L["Name Info"], "custom_name", 18, hideIfTriggerStateUpdate, appendToTriggerPath("customName"), false, true, extraSetFunction);
