@@ -32,11 +32,12 @@ local properties = {
     type = "number",
     min = 6,
     softMax = 72,
-    step = 1
+    step = 1,
+    default = 12
   }
 }
 
-WeakAuras.regionPrototype.AddProperties(properties);
+WeakAuras.regionPrototype.AddProperties(properties, default);
 
 local function GetProperties(data)
   return properties;
@@ -71,7 +72,7 @@ local function modify(parent, region, data)
   local fontPath = SharedMedia:Fetch("font", data.font);
   text:SetFont(fontPath, data.fontSize, data.outline);
   if not text:GetFont() then -- Font invalid, set the font but keep the setting
-    text:SetFont("Fonts\\FRIZQT__.TTF", data.fontSize, data.outline);
+    text:SetFont(STANDARD_TEXT_FONT, data.fontSize, data.outline);
   end
   if text:GetFont() then
     WeakAuras.regionPrototype.SetTextOnText(text, data.displayText);
@@ -82,10 +83,10 @@ local function modify(parent, region, data)
   text:ClearAllPoints();
   text:SetPoint("CENTER", UIParent, "CENTER");
 
-  data.width = text:GetWidth();
-  data.height = text:GetHeight();
-  region:SetWidth(data.width);
-  region:SetHeight(data.height);
+  region.width = text:GetWidth();
+  region.height = text:GetStringHeight();
+  region:SetWidth(region.width);
+  region:SetHeight(region.height);
 
   text:SetTextHeight(data.fontSize);
 
@@ -110,11 +111,11 @@ local function modify(parent, region, data)
         text:SetText(textStr);
       end
 
-      local height = text:GetHeight();
+      local height = text:GetStringHeight();
 
-      if(data.height ~= height) then
-        data.height = text:GetHeight();
-        region:SetHeight(data.height);
+      if(region.height ~= height) then
+        region.height = text:GetStringHeight();
+        region:SetHeight(region.height);
         if(data.parent and WeakAuras.regions[data.parent].region.ControlChildren) then
           WeakAuras.regions[data.parent].region:ControlChildren();
         end
@@ -131,12 +132,12 @@ local function modify(parent, region, data)
         end
       end
       local width = text:GetWidth();
-      local height = text:GetHeight();
-      if(width ~= data.width or height ~= data.height ) then
-        data.width = width;
-        data.height = height;
-        region:SetWidth(data.width);
-        region:SetHeight(data.height);
+      local height = text:GetStringHeight();
+      if(width ~= region.width or height ~= region.height ) then
+        region.width = width;
+        region.height = height;
+        region:SetWidth(region.width);
+        region:SetHeight(region.height);
         if(data.parent and WeakAuras.regions[data.parent].region.ControlChildren) then
           WeakAuras.regions[data.parent].region:ControlChildren();
         end
@@ -167,14 +168,10 @@ local function modify(parent, region, data)
     local values = region.values;
     region.UpdateCustomText = function()
       WeakAuras.ActivateAuraEnvironment(region.id, region.cloneId, region.state);
-      local custom = customTextFunc(region.expirationTime, region.duration,
-        values.progress, values.duration, values.name, values.icon, values.stacks);
+      values.custom = {select(2, xpcall(customTextFunc, geterrorhandler(), region.expirationTime, region.duration,
+        values.progress, values.duration, values.name, values.icon, values.stacks))}
       WeakAuras.ActivateAuraEnvironment(nil);
-      custom = WeakAuras.EnsureString(custom);
-      if(custom ~= values.custom) then
-        values.custom = custom;
-        UpdateText();
-      end
+      UpdateText();
     end
     if(data.customTextUpdate == "update") then
       WeakAuras.RegisterCustomTextUpdates(region);
@@ -276,7 +273,7 @@ local function fallbackmodify(parent, region, data)
   WeakAuras.regionPrototype.modify(parent, region, data);
   local text = region.text;
 
-  text:SetFont("Fonts\\FRIZQT__.TTF", data.fontSize, data.outline and "OUTLINE" or nil);
+  text:SetFont(STANDARD_TEXT_FONT, data.fontSize, data.outline and "OUTLINE" or nil);
   if text:GetFont() then
     text:SetText(WeakAuras.L["Region type %s not supported"]:format(data.regionType));
   end
@@ -285,7 +282,7 @@ local function fallbackmodify(parent, region, data)
   text:SetPoint("CENTER", region, "CENTER");
 
   region:SetWidth(text:GetWidth());
-  region:SetHeight(text:GetHeight());
+  region:SetHeight(text:GetStringHeight());
 end
 
 WeakAuras.RegisterRegionType("fallback", create, fallbackmodify, default);

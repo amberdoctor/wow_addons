@@ -5,7 +5,7 @@ local function createOptions(id, data)
     foregroundTexture = {
       type = "input",
       name = L["Foreground Texture"],
-      order = 0
+      order = 1
     },
     backgroundTexture = {
       type = "input",
@@ -160,7 +160,6 @@ local function createOptions(id, data)
         end
         WeakAuras.ResetMoverSizer();
       end,
-      hidden = function() return data.orientation == "CLOCKWISE" or data.orientation == "ANTICLOCKWISE"; end
     },
     crop_y = {
       type = "range",
@@ -185,33 +184,6 @@ local function createOptions(id, data)
         end
         WeakAuras.ResetMoverSizer();
       end,
-      hidden = function() return data.orientation == "CLOCKWISE" or data.orientation == "ANTICLOCKWISE"; end
-    },
-    crop = {
-      type = "range",
-      name = L["Crop"],
-      order = 47,
-      min = 0,
-      softMax = 2,
-      bigStep = 0.01,
-      isPercent = true,
-      set = function(info, v)
-        data.height = data.height * ((1 + data.crop or 0) / (1 + v));
-        data.width = data.width * ((1 + data.crop or 0) / (1 + v));
-        data.crop = v;
-        WeakAuras.Add(data);
-        WeakAuras.SetThumbnail(data);
-        WeakAuras.SetIconNames(data);
-        if(data.parent) then
-          local parentData = WeakAuras.GetData(data.parent);
-          if(parentData) then
-            WeakAuras.Add(parentData);
-            WeakAuras.SetThumbnail(parentData);
-          end
-        end
-        WeakAuras.ResetMoverSizer();
-      end,
-      hidden = function() return data.orientation ~= "CLOCKWISE" and data.orientation ~= "ANTICLOCKWISE"; end
     },
     rotation = {
       type = "range",
@@ -248,16 +220,39 @@ local function createOptions(id, data)
       order = 55.2,
       values = WeakAuras.texture_wrap_types
     },
+    slanted = {
+      type = "toggle",
+      name = L["Slanted"],
+      order = 55.3,
+      hidden = function() return data.orientation == "CLOCKWISE" or data.orientation == "ANTICLOCKWISE"; end
+    },
+    slant = {
+      type = "range",
+      name = L["Slant Amount"],
+      order = 55.4,
+      min = 0,
+      max = 1,
+      bigStep = 0.1,
+      hidden = function() return not data.slanted or data.orientation == "CLOCKWISE" or data.orientation == "ANTICLOCKWISE" end
+    },
+    slantFirst = {
+      type = "toggle",
+      name = L["Inverse Slant"],
+      order = 55.5,
+      hidden = function() return not data.slanted or data.orientation == "CLOCKWISE" or data.orientation == "ANTICLOCKWISE" end
+    },
+    slantMode = {
+      type = "select",
+      name = L["Slant Mode"],
+      order = 55.6,
+      hidden = function() return not data.slanted or data.orientation == "CLOCKWISE" or data.orientation == "ANTICLOCKWISE" end,
+      values = WeakAuras.slant_mode
+    },
     spacer = {
       type = "header",
       name = "",
       order = 56
     },
-    spacer2 = {
-      type = "header",
-      name = "",
-      order = 59
-    }
   };
   options = WeakAuras.regionPrototype.AddAdjustedDurationOptions(options, data, 57);
 
@@ -293,9 +288,10 @@ local function createOptions(id, data)
     end
   end
 
-  options = WeakAuras.AddPositionOptions(options, id, data);
-
-  return options;
+  return {
+    progresstexture = options,
+    position = WeakAuras.PositionOptions(id, data),
+  };
 end
 
 -- Credit to CommanderSirow for taking the time to properly craft the ApplyTransform function
@@ -383,6 +379,23 @@ local function createThumbnail(parent)
   local foreground = region:CreateTexture(nil, "ART");
   borderframe.foreground = foreground;
 
+  local OrgSetTexture = foreground.SetTexture;
+  -- WORKAROUND, setting the same texture with a different wrap mode does not change the wrap mode
+  foreground.SetTexture = function(self, texture, horWrapMode, verWrapMode)
+    if (GetAtlasInfo(texture)) then
+      self:SetAtlas(texture);
+    else
+      local needToClear = (self.horWrapMode and self.horWrapMode ~= horWrapMode) or (self.verWrapMode and self.verWrapMode ~= verWrapMode);
+      self.horWrapMode = horWrapMode;
+      self.verWrapMode = verWrapMode;
+      if (needToClear) then
+        OrgSetTexture(self, nil);
+      end
+      OrgSetTexture(self, texture, horWrapMode, verWrapMode);
+    end
+  end
+  background.SetTexture = foreground.SetTexture;
+
   borderframe.backgroundSpinner = WeakAuras.createSpinner(region, "BACKGROUND", 1);
   borderframe.foregroundSpinner = WeakAuras.createSpinner(region, "ARTWORK", 1);
 
@@ -423,7 +436,6 @@ local function modifyThumbnail(parent, borderframe, data, fullModify, size)
 
   region:ClearAllPoints();
   region:SetPoint("CENTER", borderframe, "CENTER");
-  region:SetAlpha(data.alpha);
 
   background:SetTexture(data.sameTexture and data.foregroundTexture or data.backgroundTexture);
   background:SetDesaturated(data.desaturateBackground)
@@ -706,6 +718,7 @@ local templates = {
   {
     title = L["Default"],
     data = {
+      inverse = true,
     };
   },
   {
@@ -719,6 +732,7 @@ local templates = {
       mirror = true,
       foregroundTexture = "Textures\\SpellActivationOverlays\\Backlash",
       orientation = "HORIZONTAL",
+      inverse = true,
     },
   },
   {
@@ -729,6 +743,7 @@ local templates = {
       height = 200,
       xOffset = -150,
       yOffset = 0,
+      inverse = true,
     },
   },
   {
@@ -739,6 +754,7 @@ local templates = {
       height = 200,
       xOffset = -200,
       yOffset = 0,
+      inverse = true,
     },
   },
   {
@@ -750,6 +766,7 @@ local templates = {
       xOffset = 150,
       yOffset = 0,
       mirror = true,
+      inverse = true,
     },
   },
   {
@@ -761,6 +778,7 @@ local templates = {
       xOffset = 200,
       yOffset = 0,
       mirror = true,
+      inverse = true,
     },
   },
 }

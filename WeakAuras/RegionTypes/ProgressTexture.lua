@@ -29,7 +29,6 @@ local default = {
   height = 200,
   orientation = "VERTICAL",
   inverse = false,
-  alpha = 1.0,
   foregroundColor = {1, 1, 1, 1},
   backgroundColor = {0.5, 0.5, 0.5, 0.5},
   startAngle = 0,
@@ -38,7 +37,6 @@ local default = {
   user_y = 0,
   crop_x = 0.41,
   crop_y = 0.41,
-  crop = 0.41,
   rotation = 0,
   selfPoint = "CENTER",
   anchorPoint = "CENTER",
@@ -50,8 +48,10 @@ local default = {
   stickyDuration = false,
   mirror = false,
   frameStrata = 1,
-  version = 2
+  slantMode = "INSIDE"
 };
+
+WeakAuras.regionPrototype.AddAlphaToDefault(default);
 
 WeakAuras.regionPrototype.AddAdjustedDurationToDefault(default);
 
@@ -85,6 +85,7 @@ local properties = {
     min = 1,
     softMax = screenWidth,
     bigStep = 1,
+    default = 32
   },
   height = {
     display = L["Height"],
@@ -92,7 +93,8 @@ local properties = {
     type = "number",
     min = 1,
     softMax = screenHeight,
-    bigStep = 1
+    bigStep = 1,
+    default = 32
   },
   orientation = {
     display = L["Orientation"],
@@ -107,7 +109,7 @@ local properties = {
   }
 }
 
-WeakAuras.regionPrototype.AddProperties(properties);
+WeakAuras.regionPrototype.AddProperties(properties, default);
 
 local function GetProperties(data)
   local overlayInfo = WeakAuras.GetOverlayInfo(data);
@@ -134,7 +136,7 @@ local spinnerFunctions = {};
 
 function spinnerFunctions.SetTexture(self, texture)
   for i = 1, 3 do
-    self.textures[i]:SetTexture(texture);
+    WeakAuras.SetTextureOrAtlas(self.textures[i], texture)
   end
 end
 
@@ -489,96 +491,179 @@ local orientationToAnchorPoint = {
 }
 
 local textureFunctions = {
-    SetValueFunctions = {
-      ["HORIZONTAL"] = function(self, startProgress, endProgress)
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", startProgress, 0 );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", startProgress, 1 );
+  SetValueFunctions = {
+    ["HORIZONTAL"] = function(self, startProgress, endProgress)
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", startProgress, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", startProgress, 1 );
 
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", endProgress, 0 );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", endProgress, 1 );
-      end,
-      ["HORIZONTAL_INVERSE"] = function(self, startProgress, endProgress)
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 1 - endProgress, 0 );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 1 - endProgress, 1 );
-
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1 - startProgress, 0 );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1 - startProgress, 1 );
-      end,
-      ["VERTICAL"] = function(self, startProgress, endProgress)
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 0, 1 - endProgress );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1, 1 - endProgress );
-
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 0, 1 - startProgress );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1, 1 - startProgress );
-      end,
-      ["VERTICAL_INVERSE"] = function(self, startProgress, endProgress)
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 0, startProgress );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1, startProgress );
-
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 0, endProgress );
-        self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1, endProgress );
-      end,
-    },
-
-    SetBackgroundOffset = function(self, backgroundOffset)
-      self.backgroundOffset = backgroundOffset;
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", endProgress, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", endProgress, 1 );
     end,
+    ["HORIZONTAL_INVERSE"] = function(self, startProgress, endProgress)
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 1 - endProgress, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 1 - endProgress, 1 );
 
-    SetOrientation = function(self, orientation, compress)
-      self.SetValueFunction = self.SetValueFunctions[orientation];
-      self.compress = compress;
-      if (self.compress) then
-        self:ClearAllPoints();
-        local anchor = orientationToAnchorPoint[orientation];
-        self:SetPoint(anchor, self.region, anchor);
-        self.horizontal = orientation == "HORIZONTAL" or orientation == "HORIZONTAL_INVERSE";
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1 - startProgress, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1 - startProgress, 1 );
+    end,
+    ["VERTICAL"] = function(self, startProgress, endProgress)
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 0, 1 - endProgress );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1, 1 - endProgress );
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 0, 1 - startProgress );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1, 1 - startProgress );
+    end,
+    ["VERTICAL_INVERSE"] = function(self, startProgress, endProgress)
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 0, startProgress );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1, startProgress );
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 0, endProgress );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1, endProgress );
+    end,
+  },
+
+  SetValueFunctionsSlanted = {
+    ["HORIZONTAL"] = function(self, startProgress, endProgress)
+      local slant = self.slant or 0;
+      if (self.slantMode == "EXTEND") then
+        startProgress = startProgress * (1 + slant) - slant;
+        endProgress = endProgress * (1 + slant) - slant;
       else
-        local offset = self.backgroundOffset or 0;
-        self:ClearAllPoints();
-        self:SetPoint("BOTTOMLEFT", self.region, "BOTTOMLEFT", -1 * offset, -1 * offset);
-        self:SetPoint("TOPRIGHT", self.region, "TOPRIGHT", offset, offset);
-      end
-      self:Update();
-    end,
-
-    SetValue = function(self, startProgress, endProgress)
-      self.startProgress = startProgress;
-      self.endProgress = endProgress;
-
-      if (self.compress) then
-        local progress = self.region.progress or 1;
-        local horScale = self.horizontal and progress or 1;
-        local verScale = self.horizontal and 1 or progress;
-        self:SetWidth(self.region:GetWidth() * horScale);
-        self:SetHeight(self.region:GetHeight() * verScale);
-
-        if (progress > 0.1) then
-          startProgress = startProgress / progress;
-          endProgress = endProgress / progress;
-        else
-          startProgress, endProgress = 0, 0;
-        end
+        startProgress = startProgress * (1 - slant);
+        endProgress = endProgress * (1 -  slant);
       end
 
-      self.coord:SetFull();
-      self:SetValueFunction(startProgress, endProgress);
+      local slant1 = self.slantFirst and 0 or slant;
+      local slant2 = self.slantFirst and slant or 0;
 
-      local region = self.region;
-      local scalex = region.scale_x or 1;
-      local scaley = region.scale_y or 1;
-      local rotation = region.rotation or 0;
-      local mirror_h = region.mirror_h or false;
-      local mirror_v = region.mirror_v or false;
-      local user_x = region.user_x;
-      local user_y = region.user_y;
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", startProgress + slant1, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", startProgress + slant2, 1 );
 
-      self.coord:Transform(scalex, scaley, rotation, mirror_h, mirror_v, user_x, user_y);
-      self.coord:Apply();
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", endProgress + slant1, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", endProgress + slant2, 1 );
     end,
+    ["HORIZONTAL_INVERSE"] = function(self, startProgress, endProgress)
+      local slant = self.slant or 0;
+      if (self.slantMode == "EXTEND") then
+        startProgress = startProgress * (1 + slant) - slant;
+        endProgress = endProgress * (1 + slant) - slant;
+      else
+        startProgress = startProgress * (1 - slant);
+        endProgress = endProgress * (1 -  slant);
+      end
 
-    Update = function(self)
-      self:SetValue(self.startProgress, self.endProgress);
+      local slant1 = self.slantFirst and slant or 0;
+      local slant2 = self.slantFirst and 0 or slant;
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 1 - endProgress - slant1, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 1 - endProgress - slant2, 1 );
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1 - startProgress - slant1, 0 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1 - startProgress - slant2, 1 );
     end,
+    ["VERTICAL"] = function(self, startProgress, endProgress)
+      local slant = self.slant or 0;
+      if (self.slantMode == "EXTEND") then
+        startProgress = startProgress * (1 + slant) - slant;
+        endProgress = endProgress * (1 + slant) - slant;
+      else
+        startProgress = startProgress * (1 - slant);
+        endProgress = endProgress * (1 -  slant);
+      end
+
+      local slant1 = self.slantFirst and slant or 0;
+      local slant2 = self.slantFirst and 0 or slant;
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 0, 1 - endProgress - slant1 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1, 1 - endProgress - slant2 );
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 0, 1 - startProgress - slant1 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1, 1 - startProgress - slant2 );
+    end,
+    ["VERTICAL_INVERSE"] = function(self, startProgress, endProgress)
+      local slant = self.slant or 0;
+      if (self.slantMode == "EXTEND") then
+        startProgress = startProgress * (1 + slant) - slant;
+        endProgress = endProgress * (1 + slant) - slant;
+      else
+        startProgress = startProgress * (1 - slant);
+        endProgress = endProgress * (1 -  slant);
+      end
+
+      local slant1 = self.slantFirst and 0 or slant;
+      local slant2 = self.slantFirst and slant or 0;
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UL", 0, startProgress + slant1 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "UR", 1, startProgress + slant2 );
+
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LL", 0, endProgress + slant1 );
+      self.coord:MoveCorner(self:GetWidth(), self:GetHeight(), "LR", 1, endProgress + slant2 );
+    end,
+  },
+
+  SetBackgroundOffset = function(self, backgroundOffset)
+    self.backgroundOffset = backgroundOffset;
+  end,
+
+  SetOrientation = function(self, orientation, compress, slanted, slant, slantFirst, slantMode)
+    self.SetValueFunction = slanted and self.SetValueFunctionsSlanted[orientation] or self.SetValueFunctions[orientation];
+    self.compress = compress;
+    self.slanted = slanted;
+    self.slant = slant;
+    self.slantFirst = slantFirst;
+    self.slantMode = slantMode;
+    if (self.compress) then
+      self:ClearAllPoints();
+      local anchor = orientationToAnchorPoint[orientation];
+      self:SetPoint(anchor, self.region, anchor);
+      self.horizontal = orientation == "HORIZONTAL" or orientation == "HORIZONTAL_INVERSE";
+    else
+      local offset = self.backgroundOffset or 0;
+      self:ClearAllPoints();
+      self:SetPoint("BOTTOMLEFT", self.region, "BOTTOMLEFT", -1 * offset, -1 * offset);
+      self:SetPoint("TOPRIGHT", self.region, "TOPRIGHT", offset, offset);
+    end
+    self:Update();
+  end,
+
+  SetValue = function(self, startProgress, endProgress)
+    self.startProgress = startProgress;
+    self.endProgress = endProgress;
+
+    if (self.compress) then
+      local progress = self.region.progress or 1;
+      local horScale = self.horizontal and progress or 1;
+      local verScale = self.horizontal and 1 or progress;
+      self:SetWidth(self.region:GetWidth() * horScale);
+      self:SetHeight(self.region:GetHeight() * verScale);
+
+      if (progress > 0.1) then
+        startProgress = startProgress / progress;
+        endProgress = endProgress / progress;
+      else
+        startProgress, endProgress = 0, 0;
+      end
+    end
+
+    self.coord:SetFull();
+    self:SetValueFunction(startProgress, endProgress);
+
+    local region = self.region;
+    local scalex = region.scale_x or 1;
+    local scaley = region.scale_y or 1;
+    local rotation = region.rotation or 0;
+    local mirror_h = region.mirror_h or false;
+    local mirror_v = region.mirror_v or false;
+    local user_x = region.user_x;
+    local user_y = region.user_y;
+
+    self.coord:Transform(scalex, scaley, rotation, mirror_h, mirror_v, user_x, user_y);
+    self.coord:Apply();
+  end,
+
+  Update = function(self)
+    self:SetValue(self.startProgress, self.endProgress);
+  end,
 }
 
 
@@ -593,13 +678,17 @@ local function createTexture(region, layer, drawlayer)
   local  OrgSetTexture = texture.SetTexture;
   -- WORKAROUND, setting the same texture with a different wrap mode does not change the wrap mode
   texture.SetTexture = function(self, texture, horWrapMode, verWrapMode)
-    local needToClear = (self.horWrapMode and self.horWrapMode ~= horWrapMode) or (self.verWrapMode and self.verWrapMode ~= verWrapMode);
-    self.horWrapMode = horWrapMode;
-    self.verWrapMode = verWrapMode;
-    if (needToClear) then
-      OrgSetTexture(self, nil);
+    if (GetAtlasInfo(texture)) then
+      self:SetAtlas(texture);
+    else
+      local needToClear = (self.horWrapMode and self.horWrapMode ~= horWrapMode) or (self.verWrapMode and self.verWrapMode ~= verWrapMode);
+      self.horWrapMode = horWrapMode;
+      self.verWrapMode = verWrapMode;
+      if (needToClear) then
+        OrgSetTexture(self, nil);
+      end
+      OrgSetTexture(self, texture, horWrapMode, verWrapMode);
     end
-    OrgSetTexture(self, texture, horWrapMode, verWrapMode);
   end
 
   texture.coord  = createTexCoord(texture);
@@ -663,10 +752,10 @@ end
 
 local function ensureExtraTextures(region, count)
   for i = #region.extraTextures + 1, count do
-    local extraTexture = createTexture(region, "ARTWORK", i);
-    extraTexture:SetTexture(region.foreground:GetTexture(), region.textureWrapMode, region.textureWrapMode)
+    local extraTexture = createTexture(region, "ARTWORK", min(i, 7));
+    extraTexture:SetTexture(region.currentTexture, region.textureWrapMode, region.textureWrapMode)
     extraTexture:SetBlendMode(region.foreground:GetBlendMode());
-    extraTexture:SetOrientation(region.orientation, region.compress);
+    extraTexture:SetOrientation(region.orientation, region.compress, region.slanted, region.slant, region.slantFirst, region.slantMode);
     region.extraTextures[i] = extraTexture;
   end
 end
@@ -674,8 +763,8 @@ end
 local function ensureExtraSpinners(region, count)
   local parent = region:GetParent();
   for i = #region.extraSpinners + 1, count do
-    local extraSpinner = createSpinner(region, "OVERLAY", parent:GetFrameLevel() + 3, i);
-    extraSpinner:SetTexture(region.foreground:GetTexture());
+    local extraSpinner = createSpinner(region, "OVERLAY", parent:GetFrameLevel() + 3, min(i, 7));
+    extraSpinner:SetTexture(region.currentTexture);
     extraSpinner:SetBlendMode(region.foreground:GetBlendMode());
     region.extraSpinners[i] = extraSpinner;
   end
@@ -840,13 +929,13 @@ local function SetOrientation(region, orientation)
     region.SetAdditionalProgress = SetAdditionalProgressCircular;
   else
     hideCircularProgress(region);
-    region.background:SetOrientation(orientation);
-    region.foreground:SetOrientation(orientation, region.compress);
+    region.background:SetOrientation(orientation, nil, region.slanted, region.slant, region.slantFirst, region.slantMode);
+    region.foreground:SetOrientation(orientation, region.compress, region.slanted, region.slant, region.slantFirst, region.slantMode);
     region.SetValueOnTexture = TextureSetValueFunction;
     region.SetAdditionalProgress = SetAdditionalProgress;
 
     for _, extraTexture in ipairs(region.extraTextures) do
-      extraTexture:SetOrientation(orientation, region.compress);
+      extraTexture:SetOrientation(orientation, region.compress, region.slanted, region.slant, region.slantFirst, region.slantMode);
     end
   end
   region:SetValueOnTexture(region.progress);
@@ -917,8 +1006,6 @@ local function modify(parent, region, data)
   region.scaley = 1;
   region.aspect =  data.width / data.height;
 
-  region:SetAlpha(data.alpha);
-
   region.textureWrapMode = data.textureWrapMode;
 
   background:SetBackgroundOffset(data.backgroundOffset);
@@ -932,6 +1019,7 @@ local function modify(parent, region, data)
   backgroundSpinner:Color(data.backgroundColor[1], data.backgroundColor[2], data.backgroundColor[3], data.backgroundColor[4]);
   backgroundSpinner:SetBlendMode(data.blendMode);
 
+  region.currentTexture = data.foregroundTexture;
   foreground:SetTexture(data.foregroundTexture, region.textureWrapMode, region.textureWrapMode);
   foreground:SetDesaturated(data.desaturateForeground)
   foreground:SetBlendMode(data.blendMode);
@@ -953,7 +1041,6 @@ local function modify(parent, region, data)
   region.mirror_h = data.mirror;
   region.scale_x = 1 + (data.crop_x or 0.41);
   region.scale_y = 1 + (data.crop_y or 0.41);
-  region.scale = 1 + (data.crop or 0.41);
   region.rotation = data.rotation or 0;
   region.user_x = -1 * (data.user_x or 0);
   region.user_y = data.user_y or 0;
@@ -979,6 +1066,10 @@ local function modify(parent, region, data)
 
   region.UpdateAdditionalProgress = UpdateAdditionalProgress;
 
+  region.slanted = data.slanted;
+  region.slant = data.slant;
+  region.slantFirst = data.slantFirst;
+  region.slantMode = data.slantMode;
   region:SetOrientation(data.orientation);
 
   function region:Scale(scalex, scaley)
@@ -1131,6 +1222,24 @@ local function modify(parent, region, data)
   function region:TimerTick()
     local adjustMin = region.adjustedMin or 0;
     self:SetTime( (region.adjustedMax or region.duration) - adjustMin, region.expirationTime - adjustMin, region.inverse);
+  end
+
+  function region:SetTexture(texture)
+    region.currentTexture = texture;
+    region.foreground:SetTexture(texture, region.textureWrapMode, region.textureWrapMode);
+    foregroundSpinner:SetTexture(texture);
+    if (data.sameTexture) then
+      background:SetTexture(texture, region.textureWrapMode, region.textureWrapMode);
+      backgroundSpinner:SetTexture(texture);
+    end
+
+    for _, extraTexture in ipairs(region.extraTextures) do
+      extraTexture:SetTexture(texture, region.textureWrapMode, region.textureWrapMode)
+    end
+
+    for _, extraSpinner in ipairs(region.extraSpinners) do
+      extraSpinner:SetTexture(texture);
+    end
   end
 
   function region:SetForegroundDesaturated(b)
