@@ -1,4 +1,4 @@
-local VERSION = 75
+local VERSION = 79
 
 --[[
 Special icons for rares, pvp or pet battle quests in list
@@ -216,10 +216,29 @@ Minor LFG updates
 LFG Hotfixes
 
 LFG fixes
+
+Added option to highlight quest for selected factions reputations
+Minor fixes
+
+LFG: no more 'wwwwwww' in searchbox if player is moving
+LFG: leave party popup only for quest groups
+Added shift+right click to expand azerite gear rewards
+Localizations updates by sprider00
+Minor fixes
+
+Added requeue button for current quest (replace eye in quest tracker)
+Fix for "addon blocked" error
+Minor updates
+
+Added option "Disable popup after quest completion (leave party)"
+Added "/wql way X Y" command for manual arrow
+Right click on LFG popup will hide it
+Minor fixes
 ]]
 
 local GlobalAddonName, WQLdb = ...
 
+--[[
 do
 	local version, buildVersion, buildDate, uiVersion = GetBuildInfo()
 	
@@ -229,6 +248,7 @@ do
 		return
 	end
 end
+]]
 
 local VWQL = nil
 
@@ -313,6 +333,7 @@ local LOCALE =
 		bottomLine = "Нижняя строка",
 		unlimited = "Неограниченно",
 		maxLines = "Лимит строк",
+		lfgDisablePopupLeave = "Отключить всплывающее окно после завершения задания (покинуть группу)",
 	} or
 	locale == "deDE" and {    --by Sunflow72
 		gear = "Ausrüstung",
@@ -343,7 +364,7 @@ local LOCALE =
 		addQuestsOpposite = "Fügt Quests von anderen Kontinent hinzu",
 		hideLegion = "Verbergt Quests von Legion",
 		disableArrowMove = "Deaktiviert das Verschieben",
-		shellGameHelper = "Aktiviert Schalen-Spiel Helfer",
+		shellGameHelper = "Aktiviert Panzer-Spiel Helfer",
 		iconsOnMinimap = "Aktiviert Symbole auf Kontinentkarten",
 		addQuestsArgus = "Fügt Quests von Argus hinzu",
 		lfgSearchOption = "Aktiviert die LFG-Suche",
@@ -369,6 +390,7 @@ local LOCALE =
 		bottomLine = "Untere Zeile",
 		unlimited = "Unbegrenzt",
 		maxLines = "maximale Anzahl an Zeilen",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	} or
 	locale == "frFR" and {
 		gear = "Équipement",
@@ -425,6 +447,7 @@ local LOCALE =
 		bottomLine = "Bottom line",
 		unlimited = "Unlimited",
 		maxLines = "Max lines",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	} or
 	(locale == "esES" or locale == "esMX") and {
 		gear = "Equipo",
@@ -481,6 +504,7 @@ local LOCALE =
 		bottomLine = "Bottom line",
 		unlimited = "Unlimited",
 		maxLines = "Max lines",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	} or	
 	locale == "itIT" and {
 		gear = "Equipaggiamento",
@@ -537,6 +561,7 @@ local LOCALE =
 		bottomLine = "Bottom line",
 		unlimited = "Unlimited",
 		maxLines = "Max lines",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	} or
 	locale == "ptBR" and {
 		gear = "Equipamento",
@@ -593,6 +618,7 @@ local LOCALE =
 		bottomLine = "Bottom line",
 		unlimited = "Unlimited",
 		maxLines = "Max lines",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	} or
 	locale == "koKR" and {
 		gear = "장비",
@@ -649,63 +675,122 @@ local LOCALE =
 		bottomLine = "Bottom line",
 		unlimited = "Unlimited",
 		maxLines = "Max lines",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	} or
-	(locale == "zhCN" or locale == "zhTW") and {	--by dxlmike, cuihuanyu1986
+	locale == "zhCN" and {	--by sprider00
 		gear = "装备",
-		gold = "黄金",
+		gold = "金币",
 		blood = "萨格拉斯之血",
-		knowledgeTooltip = "** 可在达到下一个神器知识等级后完成",
-		disableArrow = "禁用 箭头",
-		anchor = "插件位置",
-		totalap = "神器能量总数：",
-		totalapdisable = '禁用 "神器能量总数"',
-		timeToComplete = "剩余时间：",
+		knowledgeTooltip = "** 在达到下个神器知识等级后完成",
+		disableArrow = "关闭箭头",
+		anchor = "锚点",
+		totalap = "神器点数: ",
+		totalapdisable = '禁用列表点数汇总',
+		timeToComplete = "剩余: ",
 		bountyIgnoreFilter = "宝箱任务",
-		enigmaHelper = "开启 迷宫助手",
-		barrelsHelper = "开启 欢乐桶助手",
+		enigmaHelper = "开启解密助手",
+		barrelsHelper = "开启欢乐桶助手",
 		honorIgnoreFilter = "PvP 任务",
 		ignoreFilter = "不过滤：",
 		epicIgnoreFilter = '精英任务',
 		wantedIgnoreFilter = "通缉任务", 
-		apFormatSetup = "神器能量数字格式",
-		headerEnable = "开启 标题行",
-		disabeHighlightNewQuests = "禁用 新任务高亮",
+		apFormatSetup = "神器点显示格式",
+		headerEnable = "显示标题栏",
+		disabeHighlightNewQuests = "关闭新任务高亮",
 		distance = "距离",
-		disableBountyIcon = "大使任务不在列表中显示派系图标",
+		disableBountyIcon = "关闭列表中大使任务的阵营图标",
 		arrow = "箭头",
 		invasionPoints = "入侵点",
 		argusMap = "启用阿古斯地图",
-		ignoreList = "Ignore list",
-		addQuestsOpposite = "Add quests from the opposite continent",
-		hideLegion = "Hide quests from Legion",
-		disableArrowMove = "Disable moving",
-		shellGameHelper = "Enable Shell Game Helper",
-		iconsOnMinimap = "Enable icons on General maps",
-		addQuestsArgus = "Add quests from Argus",
-		lfgSearchOption = "Enable LFG search",
-		lfgAutoinvite = "Set autoinvite option on",
-		lfgTypeText = "Type numbers (QuestID) to edit box",
-		lfgLeftButtonClick = "Left Click - find group",
-		lfgLeftButtonClick2 = "Left Click + shift - find group by name",
-		lfgRightButtonClick = "Right Click - create group",
-		lfgDisablePopup = "Disable popup in questarea",
-		lfgDisableRightClickIcons = "Disable right click on map icons",
-		disableRewardIcons = "Enable reward on map icons",
-		mapIconsScale = "Map icons scale",
-		disableRibbon = "Disable ribbon graphic",
-		enableRibbonGeneralMap = "Enable ribbon on general maps",
-		enableArrowQuests = "Enable arrow for regular quests",
-		tryWithQuestID = "Try by quest ID",
-		lfgDisableAll = "Disable all, except LFG",
-		lfgDisableAll2 = "All addon settings will be lost. Disable all options, except LFG?",
-		lfgDisableEyeRight = "Disable eye for quest tracker on right",
-		lfgDisableEyeList = "Hide eye in list",
-		listSize = "List size",
-		topLine = "Top line",
-		bottomLine = "Bottom line",
-		unlimited = "Unlimited",
-		maxLines = "Max lines",
-	} or	
+		ignoreList = "忽略列表",
+		addQuestsOpposite = "相应地图显示任务",
+		hideLegion = "隐藏军团空袭任务",
+		disableArrowMove = "锁定位置",
+		shellGameHelper = "启用ShellGame助手",
+		iconsOnMinimap = "地图上显示任务图标",
+		addQuestsArgus = "列表中添加阿古斯任务",
+		lfgSearchOption = "启用LFG搜索",
+		lfgAutoinvite = "自动邀请选项",
+		lfgTypeText = "任务ID类型",
+		lfgLeftButtonClick = "查找(按任务名)：点击",
+		lfgLeftButtonClick2 = "查找(按任务ID)：Shift+点击",
+		lfgRightButtonClick = "创建(输入ID/任务名)：右键",
+		lfgDisablePopup = "禁止自动弹出组队框",
+		lfgDisableRightClickIcons = "禁用任务图标右键互动",
+		disableRewardIcons = "图标上显示奖励",
+		mapIconsScale = "任务图标缩放",
+		disableRibbon = "关闭背景条",
+		enableRibbonGeneralMap = "一般任务背景条",
+		enableArrowQuests = "一般任务也启用箭头",
+		tryWithQuestID = "刷新任务ID",
+		lfgDisableAll = "禁用所有LFG",
+		lfgDisableAll2 = "关闭所有LFG选项，LFG设置将丢失",
+		lfgDisableEyeRight = "追踪的任务禁用眼睛",
+		lfgDisableEyeList = "任务列表中禁用眼睛",
+		listSize = "列表大小",
+		topLine = "名称列",
+		bottomLine = "总数列",
+		unlimited = "无限制",
+		maxLines = "列数上限",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
+	} or
+	locale == "zhTW" and {	--by sprider00
+		gear = "裝備",
+		gold = "金幣",
+		blood = "薩格拉斯之血",
+		knowledgeTooltip = "** 可在達到下一個神器知識等級後完成",
+		disableArrow = "禁用 箭頭",
+		anchor = "外掛程式位置",
+		totalap = "神兵之力總數：",
+		totalapdisable = '禁用 "神兵之力總數"',
+		timeToComplete = "剩餘時間：",
+		bountyIgnoreFilter = "寶箱任務",
+		enigmaHelper = "開啟迷宮助手",
+		barrelsHelper = "開啟桶樂會助手",
+		honorIgnoreFilter = "PvP 任務",
+		ignoreFilter = "不過濾：",
+		epicIgnoreFilter = '精英任務',
+		wantedIgnoreFilter = "通緝任務", 
+		apFormatSetup = "神兵之力數位格式",
+		headerEnable = "開啟 標題行",
+		disabeHighlightNewQuests = "禁用新任務高亮",
+		distance = "距離",
+		disableBountyIcon = "大使任務不在清單中顯示派系圖示",
+		arrow = "箭頭",
+		invasionPoints = "入侵點",
+		argusMap = "啟用阿古斯地圖",
+		ignoreList = "忽略列表",
+		addQuestsOpposite = "顯示對面地圖的任務",
+		hideLegion = "隱藏軍團入侵的任務",
+		disableArrowMove = "鎖定箭頭位置",
+		shellGameHelper = "開啟龜殼遊戲助手",
+		iconsOnMinimap = "大地圖上顯示任務圖示",
+		addQuestsArgus = "顯示阿古斯的任務",
+		lfgSearchOption = "啟用預組搜索",
+		lfgAutoinvite = "自動邀請設定",
+		lfgTypeText = "輸入任務ID",
+		lfgLeftButtonClick = "左鍵 - 尋找隊伍（任務ID）",
+		lfgLeftButtonClick2 = "SHIFT + 左鍵 - 尋找隊伍（任務名稱）",
+		lfgRightButtonClick = "右鍵 - 編組隊伍",
+		lfgDisablePopup = "禁止自動彈出組隊框架",
+		lfgDisableRightClickIcons = "禁用任務圖示右鍵互動",
+		disableRewardIcons = "地圖圖標顯示獎勵",
+		mapIconsScale = "地圖圖標大小",
+		disableRibbon = "禁用背景條",
+		enableRibbonGeneralMap = "大地圖圖標上顯示背景條",
+		enableArrowQuests = "一般任務啟用箭頭",
+		tryWithQuestID = "刷新任務ID",
+		lfgDisableAll = "禁用所有設定，除了預組",
+		lfgDisableAll2 = "所有設定將會丟失。確定禁用所有設定，除了預組？",
+		lfgDisableEyeRight = "追蹤任務禁用眼睛",
+		lfgDisableEyeList = "任務列表禁用眼睛",
+		listSize = "列表大小",
+		topLine = "名稱列",
+		bottomLine = "總數列",
+		unlimited = "無限制",
+		maxLines = "列數上限",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
+	} or 
 	{
 		gear = "Gear",
 		gold = "Gold",
@@ -761,6 +846,7 @@ local LOCALE =
 		bottomLine = "Bottom line",
 		unlimited = "Unlimited",
 		maxLines = "Max lines",
+		lfgDisablePopupLeave = "Disable popup after quest completion (leave party)",
 	}
 
 local filters = {
@@ -1191,6 +1277,7 @@ WorldQuestList:SetScript("OnEvent",function(self,event,...)
 				DisableIconsGeneralMap947 = true,
 				AzeriteFormat = 20,
 				--DisableRewardIcons = true,
+				HideLegion = true,
 			}
 		end
 		VWQL = _G.VWQL
@@ -1872,6 +1959,15 @@ local function WorldQuestList_LineReward_OnClick(self,button)
 			end
 		end
 	elseif button == "RightButton" then
+		if ( IsModifiedClick("EXPANDITEM") ) then
+			local link = self:GetParent().rewardLink
+			if link and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(link) then
+				OpenAzeriteEmpoweredItemUIFromLink(link)
+				return
+			end
+		end
+
+
 		WorldQuestList_Line_OnClick(self:GetParent(),"RightButton")
 	end
 end
@@ -2902,7 +2998,13 @@ do
 			text = LOCALE.lfgDisablePopup,
 			func = function()
 				VWQL.DisableLFG_Popup = not VWQL.DisableLFG_Popup
-				WorldQuestList_Update()
+			end,
+			checkable = true,
+		},
+		{
+			text = LOCALE.lfgDisablePopupLeave,
+			func = function()
+				VWQL.DisableLFG_PopupLeave = not VWQL.DisableLFG_PopupLeave
 			end,
 			checkable = true,
 		},
@@ -3258,14 +3360,43 @@ do
 		checkable = true,
 	}
 	
+	local GetFaction = function(id,non_translated) 
+		return FACTION.." "..(GetFactionInfoByID(id) or non_translated or ("ID "..tostring(id)))
+	end
+	local function SetHighlighFaction(_, arg1)
+		VWQL[charKey][arg1] = not VWQL[charKey][arg1]
+		ELib.ScrollDropDown.UpdateChecks()
+		WorldQuestList_Update()
+	end
+	local highlightingSubmenu = {
+		{text = GetFaction(2164),	func = SetHighlighFaction,	arg1 = "faction2164Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2164) end	},
+		{text = GetFaction(2163),	func = SetHighlighFaction,	arg1 = "faction2163Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2163) end	},
+		{text = GetFaction(2157),	func = SetHighlighFaction,	arg1 = "faction2157Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2157) end	},
+		{text = GetFaction(2156),	func = SetHighlighFaction,	arg1 = "faction2156Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2156) end	},
+		{text = GetFaction(2103),	func = SetHighlighFaction,	arg1 = "faction2103Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2103) end	},
+		{text = GetFaction(2158),	func = SetHighlighFaction,	arg1 = "faction2158Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2158) end	},
+		{text = GetFaction(2159),	func = SetHighlighFaction,	arg1 = "faction2159Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2159) end	},
+		{text = GetFaction(2160),	func = SetHighlighFaction,	arg1 = "faction2160Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2160) end	},
+		{text = GetFaction(2162),	func = SetHighlighFaction,	arg1 = "faction2162Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2162) end	},
+		{text = GetFaction(2161),	func = SetHighlighFaction,	arg1 = "faction2161Highlight",	checkable = true,	shownFunc = function() return WorldQuestList:IsFactionAvailable(2161) end	},
+	}
+	
 	list[#list+1] = {
-		text = LOCALE.addQuestsOpposite,
+		text = HIGHLIGHTING.." "..REPUTATION,
+		padding = 16,
+		subMenu = highlightingSubmenu,
+		shownFunc = function() return not WorldQuestList:IsLegionZone() or not WorldQuestList.optionsDropDown:IsVisible() end,
+	}	
+	
+	list[#list+1] = {
+		text = (UnitFactionGroup("player") == "Alliance" and "|TInterface\\FriendsFrame\\PlusManz-Alliance:16|t " or "|TInterface\\FriendsFrame\\PlusManz-Horde:16|t ")..LOCALE.addQuestsOpposite,
 		func = function()
 			VWQL.OppositeContinent = not VWQL.OppositeContinent
 			WorldQuestList_Update()
 		end,
 		checkable = true,
 		shownFunc = function() return not WorldQuestList:IsLegionZone() or not WorldQuestList.optionsDropDown:IsVisible() end,
+		mark = "OppositeContinent",
 	}
 	list[#list+1] = {
 		text = LOCALE.addQuestsArgus,
@@ -3277,12 +3408,13 @@ do
 		shownFunc = function() return WorldQuestList:IsLegionZone() or not WorldQuestList.optionsDropDown:IsVisible() end,
 	}
 	list[#list+1] = {
-		text = LOCALE.hideLegion,
+		text = "|T1339312:16:16:0:0:512:128:246:262:111:126|t "..LOCALE.hideLegion,
 		func = function()
 			VWQL.HideLegion = not VWQL.HideLegion
 			WorldQuestList_Update()
 		end,
 		checkable = true,
+		mark = "HideLegion",
 	}
 	list[#list+1] = {
 		text = LOCALE.argusMap,
@@ -3349,9 +3481,9 @@ do
 				self.List[i].checkState = VWQL.DisableHighlightNewQuest
 			elseif self.List[i].text == LOCALE.disableBountyIcon then
 				self.List[i].checkState = VWQL.DisableBountyIcon
-			elseif self.List[i].text == LOCALE.addQuestsOpposite then
+			elseif self.List[i].mark == "OppositeContinent" then
 				self.List[i].checkState = VWQL.OppositeContinent
-			elseif self.List[i].text == LOCALE.hideLegion then
+			elseif self.List[i].mark == "HideLegion" then
 				self.List[i].checkState = VWQL.HideLegion
 			elseif self.List[i].text == LOCALE.shellGameHelper then
 				self.List[i].checkState = not VWQL.DisableShellGame
@@ -3389,15 +3521,19 @@ do
 			iconsGeneralSubmenu[i].checkState = not VWQL["DisableIconsGeneralMap"..iconsGeneralSubmenu[i].arg1]
 		end
 		lfgSubMenu[1].checkState = VWQL.DisableLFG_Popup
-		lfgSubMenu[2].checkState = VWQL.DisableLFG_RightClickIcon
-		lfgSubMenu[3].checkState = VWQL.DisableLFG_EyeRight
-		lfgSubMenu[4].checkState = VWQL.LFG_HideEyeInList
+		lfgSubMenu[2].checkState = VWQL.DisableLFG_PopupLeave
+		lfgSubMenu[3].checkState = VWQL.DisableLFG_RightClickIcon
+		lfgSubMenu[4].checkState = VWQL.DisableLFG_EyeRight
+		lfgSubMenu[5].checkState = VWQL.LFG_HideEyeInList
 		mapIconsScaleSubmenu[1].slider.val = (VWQL.MapIconsScale or 1) * 100
 		rewardsIconsSubMenu[1].checkState = VWQL.DisableRibbon
 		rewardsIconsSubMenu[2].checkState = VWQL.EnableRibbonGeneralMaps
 		listSizeSubmenu[1].checkState = not VWQL.DisableHeader
 		listSizeSubmenu[2].checkState = not VWQL.DisableTotalAP
 		listSizeSubmenu[4].slider.val = (VWQL.MaxLinesShow or 9)
+		for i=1,#highlightingSubmenu do
+			highlightingSubmenu[i].checkState = VWQL[charKey][highlightingSubmenu[i].arg1]
+		end
 	end	
 end
 
@@ -4294,15 +4430,17 @@ end
 
 
 do
+	local lastCheck = 0
 	local azeriteItemLocation
 	function WorldQuestList:FormatAzeriteNumber(azerite,ignorePercentForm)
 		if (VWQL.AzeriteFormat == 10 or VWQL.AzeriteFormat == 20) and not ignorePercentForm then
-			azeriteItemLocation = azeriteItemLocation or C_AzeriteItem.FindActiveAzeriteItem()
-			if azeriteItemLocation and not C_AzeriteItem.IsAzeriteItem(azeriteItemLocation) then
+			local currTime = GetTime()
+			if currTime - lastCheck > 5 then
 				azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
+				lastCheck = currTime
 			end
 			
-			if azeriteItemLocation then 			
+			if azeriteItemLocation then		
 				local xp, totalLevelXP = C_AzeriteItem.GetAzeriteItemXPInfo(azeriteItemLocation)
 				--local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
 				--local xpToNextLevel = totalLevelXP - xp
@@ -4457,8 +4595,8 @@ WorldQuestList.GeneralMaps = GENERAL_MAPS
 
 local ArgusZonesList = {830,885,882}
 
-function WorldQuestList_Update(preMapID)
-	if not WorldQuestList:IsVisible() and not VWQL[charKey].HideMap then
+function WorldQuestList_Update(preMapID,forceUpdate)
+	if not WorldQuestList:IsVisible() and not VWQL[charKey].HideMap and not forceUpdate then
 	--if not WorldQuestList:IsVisible() then
 		return
 	end
@@ -4710,6 +4848,7 @@ function WorldQuestList_Update(preMapID)
 				local isUnlimited
 				local questColor	--nil - white, 1 - blue, 2 - epic, 3 - invasion
 				local reputationList
+				local highlightFaction
 				
 				local professionFix
 				local IsPvPQuest
@@ -4785,6 +4924,10 @@ function WorldQuestList_Update(preMapID)
 					if ( factionName ) then
 						faction = factionName
 					end
+					
+					if VWQL[charKey]["faction"..factionID.."Highlight"] then
+						highlightFaction = true
+					end
 				end
 				
 				for bountyQuestID,bountyIcon in pairs(bountiesInProgress) do
@@ -4803,6 +4946,10 @@ function WorldQuestList_Update(preMapID)
 				for bountyQuestID,bountyFactionID in pairs(BOUNTY_QUEST_TO_FACTION) do
 					if IsQuestCriteriaForBounty(questID, bountyQuestID) then
 						reputationList = reputationList and (reputationList..","..bountyFactionID) or bountyFactionID
+						
+						if VWQL[charKey]["faction"..bountyFactionID.."Highlight"] then
+							highlightFaction = true
+						end
 					end
 				end
 				
@@ -4932,6 +5079,10 @@ function WorldQuestList_Update(preMapID)
 									end
 									rewardType = 33	+ currencyID / 10000
 									rewardColor = WorldQuestList.ColorYellow	
+									
+									if VWQL[charKey]["faction"..WorldQuestList:FactionCurrencyToID(currencyID).."Highlight"] then
+										highlightFaction = true
+									end
 								end
 							elseif i > 1 and reward ~= "" then
 								if currencyID == 1342 then	--War Supplies
@@ -5223,6 +5374,7 @@ function WorldQuestList_Update(preMapID)
 						reputationList = reputationList,
 						professionIndex = tradeskillLineIndex and tradeskillLineID,
 						disableLFG = WorldQuestList:IsQuestDisabledForLFG(questID) or worldQuestType == LE.LE_QUEST_TAG_TYPE_PET_BATTLE,
+						highlightFaction = highlightFaction,
 					})
 				end
 				
@@ -5433,7 +5585,9 @@ function WorldQuestList_Update(preMapID)
 		line.isRewardLink = nil
 		
 		line.faction:SetText(data.faction)
-		if data.factionInProgress then
+		if data.highlightFaction then
+			line.faction:SetTextColor(.8,.35,1)
+		elseif data.factionInProgress then
 			line.faction:SetTextColor(.5,1,.5)
 		else
 			line.faction:SetTextColor(1,1,1)
@@ -5669,6 +5823,9 @@ WorldMapButton_HookShowHide:SetScript('OnUpdate',function(self)
 	local currZone = GetCurrentMapAreaID()
 	if currZone ~= prevZone then
 		WorldQuestList_Update()
+		if not VWQL.DisableIconsGeneral and WorldMapFrame:IsMaximized() and not WorldQuestList:IsVisible() then
+			WorldQuestList_Update(nil,true)
+		end
 	end
 	prevZone = currZone
 	UpdateTicker = true
@@ -5718,6 +5875,25 @@ SlashCmdList["WQLSlash"] = function(arg)
 	elseif argL:find("^iconscale %d+") then 
 		VWQL.MapIconsScale = tonumber( argL:match("%d+"),nil ) / 100
 		print("Icons scale set to "..(VWQL.MapIconsScale * 100).."%")
+		return		
+	elseif argL:find("^way ") then 
+		local x,y = argL:match("([%d%.,]+) ([%d%.,]+)")
+		if x and y then
+			x = tonumber( x:gsub(",$",""),nil )
+			y = tonumber( y:gsub(",$",""),nil )
+			if x and y then
+				local mapID = C_Map.GetBestMapForUnit("player")
+				if WorldMapFrame:IsVisible() then
+					mapID = GetCurrentMapAreaID()
+				end
+				if mapID then
+					local wX,wY = WorldQuestList:GetQuestWorldCoord2(-10,mapID,x / 100,y / 100,true)
+					if wX and wY then
+						WQLdb.Arrow:ShowRunTo(wX,wY,5,nil,true)
+					end
+				end
+			end
+		end
 		return		
 	elseif argL == "options" then 
 		WorldQuestList.optionsDropDown.Button:Click()
@@ -6158,14 +6334,19 @@ WorldQuestList.TreasureData = WQLdb.TreasureData or {}
 
 --- LFG features
 
-local QuestCreationBox = CreateFrame("Frame","WQL_QuestCreationBox",UIParent)
+local QuestCreationBox = CreateFrame("Button","WQL_QuestCreationBox",UIParent)
 QuestCreationBox:SetSize(350,120)
 QuestCreationBox:SetPoint("CENTER",0,250)
 QuestCreationBox:SetMovable(false)
 QuestCreationBox:EnableMouse(true)
 QuestCreationBox:SetClampedToScreen(true)
 QuestCreationBox:RegisterForDrag("LeftButton")
+QuestCreationBox:RegisterForClicks("RightButtonUp")
 QuestCreationBox:Hide()
+
+QuestCreationBox:SetScript("OnClick",function(self)
+	self:Hide()
+end)
 
 --tinsert(UISpecialFrames, "WQL_QuestCreationBox")
 
@@ -6287,6 +6468,10 @@ function WQL_LFG_StartQuest(questID)
 	if GroupFinderFrame:IsVisible() or C_LFGList.GetActiveEntryInfo() then
 		return
 	end
+
+	local edit = LFGListFrame.EntryCreation.Name
+	local button = QuestCreationBox.ListGroup
+	local check = LFGListFrame.ApplicationViewer.AutoAcceptButton
 	
 	QuestCreationBox:Show()
 	QuestCreationBox:SetSize(350,120)
@@ -6300,16 +6485,20 @@ function WQL_LFG_StartQuest(questID)
 	PVEFrame:ClearAllPoints() 
 	PVEFrame:SetPoint("TOP",UIParent,"BOTTOM",0,-100)
 	
-	LFGListEntryCreation_Show(LFGListFrame.EntryCreation, LFGListFrame.baseFilters, 1, 0)
-	
+	local autoCreate = nil
+	if tostring(questID) == edit:GetText() then
+		LFGListEntryCreation_SetEditMode(LFGListFrame.EntryCreation, false)
+		LFGListEntryCreation_UpdateValidState(LFGListFrame.EntryCreation)
+		LFGListFrame_SetActivePanel(LFGListFrame.EntryCreation:GetParent(), LFGListFrame.EntryCreation)
+		autoCreate = true
+	else
+		LFGListEntryCreation_Show(LFGListFrame.EntryCreation, LFGListFrame.baseFilters, 1, 0)
+	end	
+
 	local activityID, categoryID, filters, questName = LFGListUtil_GetQuestCategoryData(questID)
 	if activityID then
 		LFGListEntryCreation_Select(LFGListFrame.EntryCreation, filters, categoryID, nil, activityID)
 	end
-
-	local edit = LFGListFrame.EntryCreation.Name
-	local button = QuestCreationBox.ListGroup
-	local check = LFGListFrame.ApplicationViewer.AutoAcceptButton
 	
 	if not defPoints then
 		defPoints = {
@@ -6333,14 +6522,18 @@ function WQL_LFG_StartQuest(questID)
 			edit.Instructions:SetText(LFG_LIST_ENTER_NAME)
 
 			PVEFrame_ToggleFrame()
-			QuestCreationBox:Hide()						
+			QuestCreationBox:Hide()		
+
+			if LFGListFrame:IsVisible() then
+				PVEFrame_ToggleFrame()
+			end				
 		end)
 		edit:HookScript("OnEnterPressed",function()
 			if not QuestCreationBox:IsShown() then
 				return
 			end
 			
-			button:Click()		
+			button:Click()
 		end)
 	end
 	
@@ -6352,6 +6545,18 @@ function WQL_LFG_StartQuest(questID)
 	edit:ClearAllPoints()
 	edit:SetPoint("TOP",QuestCreationBox,"TOP",0,-50)
 	edit.Instructions:SetText(questID)
+	if IsPlayerMoving() then
+		edit:ClearFocus()
+	end
+
+	local apps = C_LFGList.GetApplications()
+	for i=1, #apps do
+		C_LFGList.CancelApplication(apps[i])
+	end
+
+	if autoCreate then
+		button:Click()
+	end
 end
 WorldQuestList.LFG_StartQuest = WQL_LFG_StartQuest
 
@@ -6462,7 +6667,24 @@ function WQL_LFG_Search(questID)
 	local panel = LFGListFrame.CategorySelection
 	LFGListFrame_SetActivePanel(LFGListFrame, panel)
 	LFGListCategorySelection_SelectCategory(panel, 1, 0)
-	LFGListCategorySelection_StartFindGroup(panel)
+
+	local autoSearch = nil
+	if tostring(questID) == edit:GetText() then
+		--copy of LFGListCategorySelection_StartFindGroup
+		local baseFilters = panel:GetParent().baseFilters
+	
+		local searchPanel = panel:GetParent().SearchPanel
+		C_LFGList.ClearSearchResults()
+		searchPanel.selectedResult = nil
+		LFGListSearchPanel_UpdateResultList(searchPanel)
+		LFGListSearchPanel_UpdateResults(searchPanel)
+		LFGListSearchPanel_SetCategory(searchPanel, panel.selectedCategory, panel.selectedFilters, baseFilters)
+		LFGListSearchPanel_DoSearch(searchPanel)
+		LFGListFrame_SetActivePanel(panel:GetParent(), searchPanel)
+		autoSearch = true
+	else
+		LFGListCategorySelection_StartFindGroup(panel)
+	end
 
 	QuestCreationBox:Show()
 	QuestCreationBox:SetSize(350,120)
@@ -6480,6 +6702,9 @@ function WQL_LFG_Search(questID)
 	edit:SetPoint("TOP",QuestCreationBox,"TOP",0,-50)
 	edit.Instructions:SetText(questID)
 	edit:SetFocus()
+	if IsPlayerMoving() then
+		edit:ClearFocus()
+	end
 	
 	edit.WQL_questID = questID
 	
@@ -6501,6 +6726,10 @@ function WQL_LFG_Search(questID)
 			edit.Instructions:SetText(questID..", "..questName)
 		end
 	end	
+
+	if autoSearch then
+		button:Click()
+	end
 	
 end
 WorldQuestList.LFG_Search = WQL_LFG_Search
@@ -6521,7 +6750,7 @@ LFGListFrame.SearchPanel:HookScript("OnShow",function()
 end)
 
 local function IsTeoreticalWQ(name)
-	if name:find("k00000|") then
+	if name and name:find("k00000|") then
 		return true
 	end
 end
@@ -6680,6 +6909,8 @@ QuestCreationBox:RegisterEvent("PARTY_INVITE_REQUEST")
 QuestCreationBox:RegisterEvent("QUEST_TURNED_IN")
 QuestCreationBox:RegisterEvent("QUEST_ACCEPTED")
 QuestCreationBox:RegisterEvent("QUEST_REMOVED")
+QuestCreationBox:RegisterEvent("PARTY_LEADER_CHANGED")
+QuestCreationBox:RegisterEvent("GROUP_ROSTER_UPDATE")
 QuestCreationBox:SetScript("OnEvent",function (self,event,arg1,arg2)
 	if event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
 		if LFGListFrameSearchPanelStartGroup:IsShown() then
@@ -6721,7 +6952,7 @@ QuestCreationBox:SetScript("OnEvent",function (self,event,arg1,arg2)
 			StaticPopup_Hide("LFG_LIST_AUTO_ACCEPT_CONVERT_TO_RAID")
 			
 			if not autoAccept and
-				(IsInRaid() or (  GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) + C_LFGList.GetNumInvitedApplicantMembers() + C_LFGList.GetNumPendingApplicantMembers() <= (MAX_PARTY_MEMBERS+1)  ))
+				(  GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) + C_LFGList.GetNumInvitedApplicantMembers() + C_LFGList.GetNumPendingApplicantMembers() <= 5  )
 			then
 				local applicants = C_LFGList.GetApplicants()
 				for _,applicantID in pairs(applicants) do
@@ -6737,6 +6968,11 @@ QuestCreationBox:SetScript("OnEvent",function (self,event,arg1,arg2)
 				end
 			end
 		end	
+	elseif event == "PARTY_LEADER_CHANGED" then
+		if not VWQL or VWQL.DisableLFG or not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME) or not C_LFGList.GetActiveEntryInfo() then
+			return
+		end
+		self:GetScript("OnEvent")(self,"LFG_LIST_APPLICANT_LIST_UPDATED")
 	elseif event == "PARTY_INVITE_REQUEST" then
 		local name = arg1
 		if name then
@@ -6762,12 +6998,18 @@ QuestCreationBox:SetScript("OnEvent",function (self,event,arg1,arg2)
 			end
 		end		
 	elseif event == "QUEST_TURNED_IN" then
-		if not VWQL or VWQL.DisableLFG or not arg1 then
+		if not VWQL or VWQL.DisableLFG or not arg1 or VWQL.DisableLFG_PopupLeave then
 			return
 		end
-		--local name = select(5,C_LFGList.GetActiveEntryInfo())
-		--if name and name == tostring(arg1) and (not QuestCreationBox:IsVisible() or (QuestCreationBox.type ~= 1)) then
-		if C_LFGList.GetActiveEntryInfo() and QuestUtils_IsQuestWorldQuest(arg1) and CheckQuestPassPopup(arg1) and (not QuestCreationBox:IsVisible() or (QuestCreationBox.type ~= 1 and QuestCreationBox.type ~= 4) or (QuestCreationBox.type == 1 and QuestCreationBox.questID == arg1) or (QuestCreationBox.type == 4 and QuestCreationBox.questID == arg1)) then
+		if (C_LFGList.GetActiveEntryInfo() or LFGListFrame.SearchPanel.SearchBox:GetText()==tostring(arg1)) and QuestUtils_IsQuestWorldQuest(arg1) and CheckQuestPassPopup(arg1) and (not QuestCreationBox:IsVisible() or (QuestCreationBox.type ~= 1 and QuestCreationBox.type ~= 4) or (QuestCreationBox.type == 1 and QuestCreationBox.questID == arg1) or (QuestCreationBox.type == 4 and QuestCreationBox.questID == arg1)) then
+			local _, activityID = C_LFGList.GetActiveEntryInfo()
+			if activityID then
+				local _, _, categoryID = C_LFGList.GetActivityInfo(activityID)
+				if categoryID ~= 1 then
+					return
+				end
+			end
+			
 			QuestCreationBox.Text1:SetText("WQL")
 			QuestCreationBox.Text2:SetText("")
 			QuestCreationBox.PartyLeave:Show()
@@ -6814,6 +7056,10 @@ QuestCreationBox:SetScript("OnEvent",function (self,event,arg1,arg2)
 		if QuestCreationBox:IsVisible() and QuestCreationBox.type == 3 and QuestCreationBox.questID == arg1 then
 			QuestCreationBox:Hide()
 		end
+	elseif event == "GROUP_ROSTER_UPDATE" then
+		if GetNumGroupMembers() == 0 and QuestCreationBox:IsVisible() and QuestCreationBox.type == 2 and not C_LFGList.GetActiveEntryInfo() then
+			QuestCreationBox:Hide()
+		end
 	end
 end)
 
@@ -6846,8 +7092,17 @@ end)
 
 local objectiveTrackerButtons = {}
 WorldQuestList.LFG_objectiveTrackerButtons = objectiveTrackerButtons
+local objectiveTrackerMainFrame = CreateFrame("Frame",nil,UIParent)
+objectiveTrackerMainFrame:SetPoint("TOPRIGHT")
+objectiveTrackerMainFrame:SetSize(1,1)
 
 local function objectiveTrackerButtons_OnClick(self,button)
+	if C_LFGList.GetActiveEntryInfo() and tostring(self.questID) == LFGListFrame.EntryCreation.Name:GetText() then
+		return
+	elseif tostring(self.questID) == LFGListFrame.EntryCreation.Name:GetText() then
+		WorldQuestList.LFG_StartQuest(self.questID)
+		return
+	end
 	if C_LFGList.GetActiveEntryInfo() or ((GetNumGroupMembers() or 0) > 1 and not UnitIsGroupLeader("player")) then
 		StaticPopupDialogs["WQL_LFG_LEAVE"] = {
 			text = PARTY_LEAVE,
@@ -6882,6 +7137,11 @@ end
 local function objectiveTrackerButtons_OnLeave(self)
 	GameTooltip_Hide()
 end
+local function objectiveTrackerButtons_OnUpdate(self)
+	if not self.parent:IsVisible() then
+		self:Hide()
+	end
+end
 
 local function ObjectiveTracker_Update_hook(reason, questID)
 	for _,b in pairs(objectiveTrackerButtons) do
@@ -6896,6 +7156,7 @@ local function ObjectiveTracker_Update_hook(reason, questID)
 		if not ObjectiveTrackerFrame or not ObjectiveTrackerFrame.MODULES then
 			return
 		end
+		local createdID = LFGListFrame.EntryCreation.Name:GetText()
 		for _,module in pairs(ObjectiveTrackerFrame.MODULES) do
 			if module.usedBlocks then
 				for _,block in pairs(module.usedBlocks) do
@@ -6903,15 +7164,16 @@ local function ObjectiveTracker_Update_hook(reason, questID)
 					if questID and QuestUtils_IsQuestWorldQuest(questID) and not block.hasGroupFinderButton and not WorldQuestList:IsQuestDisabledForLFG(questID) then
 						local b = objectiveTrackerButtons[block]
 						if not b then
-							b = CreateFrame("Button",nil,block)
+							b = CreateFrame("Button",nil,objectiveTrackerMainFrame)
 							objectiveTrackerButtons[block] = b
+							b.parent = block
 							b:SetSize(26,26)
 							b:SetPoint("TOPLEFT",block,"TOPRIGHT",-18,0)
 							b:SetScript("OnClick",objectiveTrackerButtons_OnClick)
 							b:SetScript("OnEnter",objectiveTrackerButtons_OnEnter)
-							b:SetScript("OnLeave",objectiveTrackerButtons_OnLeave)							
+							b:SetScript("OnLeave",objectiveTrackerButtons_OnLeave)
+							b:SetScript("OnUpdate",objectiveTrackerButtons_OnUpdate)
 							b:RegisterForClicks("LeftButtonDown","RightButtonUp")
-							b.parent = block
 							
 							b.HighlightTexture = b:CreateTexture()
 							b.HighlightTexture:SetTexture("Interface\\Buttons\\UI-Common-MouseHilight")
@@ -6923,6 +7185,10 @@ local function ObjectiveTracker_Update_hook(reason, questID)
 							b.texture:SetPoint("CENTER")
 							b.texture:SetSize(26,26)
 							b.texture:SetAtlas("hud-microbutton-LFG-Up")
+
+							b.texture2 = b:CreateTexture(nil, "ARTWORK")
+							b.texture2:SetPoint("CENTER")
+							b.texture2:SetSize(14,14)
 						end
 						if block.itemButton and block.itemButton:IsVisible() and not b.icon_pos then
 							b:SetPoint("TOPLEFT",block,"TOPRIGHT",-44,0)
@@ -6931,8 +7197,26 @@ local function ObjectiveTracker_Update_hook(reason, questID)
 							b:SetPoint("TOPLEFT",block,"TOPRIGHT",-18,0)
 							b.icon_pos = false
 						end
+						b:SetFrameStrata(block:GetFrameStrata())
+						b:SetFrameLevel(block:GetFrameLevel()+1)
 						b.questID = questID
 						b:Show()
+						if createdID == tostring(questID) then
+							if C_LFGList.GetActiveEntryInfo() or (GetNumGroupMembers() >= 5) then
+								b:Hide()
+							end
+							if not b.texture.refresh then
+								b.texture:SetTexture("Interface\\Buttons\\UI-SquareButton-Up")
+								b.texture2:SetTexture("Interface\\Buttons\\UI-RefreshButton")
+								b.texture.refresh = true
+							end
+						else
+							if b.texture.refresh then
+								b.texture:SetAtlas("hud-microbutton-LFG-Up")
+								b.texture2:SetTexture()
+								b.texture.refresh = nil
+							end
+						end
 					end
 				end
 			end
@@ -6944,8 +7228,6 @@ WorldQuestList.ObjectiveTracker_Update_hook = ObjectiveTracker_Update_hook
 C_Timer.NewTicker(1,function()
 	WorldQuestList.ObjectiveTracker_Update_hook(2)
 end)
---hooksecurefunc("ObjectiveTracker_Update", ObjectiveTracker_Update_hook)
---C_Timer.After(5,function() ObjectiveTracker_Update_hook(2) end)
 
 
 --Add Map Icons
@@ -7244,7 +7526,7 @@ do
 							obj.WQL_iconTopRight:SetAtlas("worldquest-icon-pvp-ffa")
 							obj.WQL_iconTopRight.curr = "worldquest-icon-pvp-ffa"
 						end
-					elseif worldQuestType == LE.LE_QUEST_TAG_TYPE_PET_BATTLE and not (iconTexture or iconAtlas or iconVirtual) then
+					elseif worldQuestType == LE.LE_QUEST_TAG_TYPE_PET_BATTLE and (iconTexture or iconAtlas) then
 						if obj.WQL_iconTopRight.curr ~= "worldquest-icon-petbattle" then
 							obj.WQL_iconTopRight:SetAtlas("worldquest-icon-petbattle")
 							obj.WQL_iconTopRight.curr = "worldquest-icon-petbattle"

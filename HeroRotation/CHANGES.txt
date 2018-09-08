@@ -1,0 +1,375 @@
+lightweight tag 8241e675b1cdecd399e36f61410c623c51ce49c8 8.0.1.06
+Author:	Quentin Giraud <dev@aethys.io>
+Date:	Sat Aug 18 09:20:40 2018 +0200
+
+commit 8241e675b1cdecd399e36f61410c623c51ce49c8
+Author: Quentin Giraud <dev@aethys.io>
+Date:   Sat Aug 18 09:19:20 2018 +0200
+
+    8.0.1.06 Release
+
+commit 945dd5d53cfa721804dac692b094c8b91ca32d16
+Author: Matthew Redmond <mredmond@strava.com>
+Date:   Fri Aug 17 23:13:59 2018 -0700
+
+    [Balance] Refactors balance druid for BFA.
+    
+    Work in progress, please expect some bugs. Adds true multidot cycling
+    support much like assassination got recently. Lots of TODOs left.
+
+commit 2c2484fa8d0ad165c84f700ce12c536089c30a22
+Author: lithium720 <lithium720@users.noreply.github.com>
+Date:   Fri Aug 17 21:37:35 2018 -0700
+
+    [Shaman] Update to BfA items & adjust settings
+
+commit 119ec392c400de68444db505a256fd566f3d723f
+Author: Chris Lopez <pagarizabal2@gmail.com>
+Date:   Fri Aug 17 19:08:28 2018 +0200
+
+    [Blood] Blood is okaish
+
+commit fefb0a9e7977b9b730d7838e58200b4ae1f9317a
+Author: Chris Lopez <pagarizabal2@gmail.com>
+Date:   Fri Aug 17 15:55:38 2018 +0200
+
+    [DK] Updated
+
+commit 5ea54af11a85df6b1c08de198930377e1b3ceb72
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Fri Aug 17 02:08:34 2018 -0400
+
+    [Subtlety] Fix Secret Technique SteathMacro Issue
+    
+    * Resolves an issue where Shadow Dance + Eviscerate would sometimes be suggested when it should display Shadow Dance + Secret Technique
+
+commit 8b74df32d27688dcce7750b093db474b5373fab4
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Mon Aug 13 16:12:19 2018 +0200
+
+    [Readme] updated SP / balance > WIP
+
+commit 8b74df32d27688dcce7750b093db474b5373fab4
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Mon Aug 13 16:12:19 2018 +0200
+
+    [Readme] updated SP / balance > WIP
+
+commit 2cddd7418af53966851808af285c373fe04633f0
+Author: Nia <Nianel@users.noreply.github.com>
+Date:   Sun Aug 12 23:19:17 2018 +0200
+
+    [Survival] APL update
+
+commit 78d0265c6dae697d2163797db7fbac1c610eb99b
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Sun Aug 12 12:33:56 2018 +0200
+
+    [Balance] Fix warrior of elune
+
+commit 4ac0d8cf96aebb8472d5da64b180c9f3fe38b27c
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Sat Aug 11 12:15:42 2018 +0200
+
+    [Balance] First iteration of Balance
+
+commit f714903fdbe895c06ab8959de93558e14571b7a0
+Author: Julien Rechaussat <Kutikuti@users.noreply.github.com>
+Date:   Sat Aug 11 11:07:47 2018 +0200
+
+    [ShadowP] First iteration of shadow
+
+commit 6740a064b8ca7766af6f125ce2738d7740b98797
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Fri Aug 10 15:15:47 2018 +0200
+
+    [Outlaw] Add Off GCD display setting for Killing Spree and Blade Rush
+
+commit a7bfbc842e6416d1d3cc999d7ecf60803a41de2f
+Author: Glynnyx <glynny_battle.net@hotmail.co.uk>
+Date:   Thu Aug 9 23:09:42 2018 +0100
+
+    [Mage] Comment added to CS line as a reminder to fix it.
+    
+    Comment on the CS line to remind me to update it when I get the time.
+
+commit 05083a73ab41b219293c151557f2a820d7538bc5
+Author: Glynnyx <glynny_battle.net@hotmail.co.uk>
+Date:   Thu Aug 9 23:05:15 2018 +0100
+
+    [Mage] Comment out CS
+    
+    I don't have time to properly fix this for this because or IRL work so it's just a band aid for now. Sorry.
+
+commit b98679e10d4d067e59b9a9431b1b92a105c9dc83
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Wed Aug 8 15:59:09 2018 +0200
+
+    [Affliction] Precombat update
+
+commit 0420f89d0e0d848b701e7492526ecca5e562141c
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Wed Aug 8 15:43:56 2018 +0200
+
+    [Affliction] Move to WIP
+
+commit 81ed6c8c609a53a225916a5c861a2982adb40cde
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Wed Aug 8 13:38:43 2018 +0200
+
+    [Rogue] Update spec aura values
+
+commit 218ffa0bfeb2689c77eee14c29f5d1d4d7af729e
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Tue Aug 7 17:08:40 2018 +0200
+
+    [Assassination] Fix Garrote display issue
+
+commit 218ffa0bfeb2689c77eee14c29f5d1d4d7af729e
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Tue Aug 7 17:08:40 2018 +0200
+
+    [Assassination] Fix Garrote display issue
+
+commit 7ff7faa17fbd0dd7b56a0c8049a46c22fe2ffa9a
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Tue Aug 7 11:28:43 2018 +0200
+
+    [Frost] Add Frozen Orb ground AoE tracking, sync with generator changes
+
+commit ee9bedd80172d92df644fa3b09d301ea122a7a84
+Author: Florian Meißner <developer@mystler.eu>
+Date:   Tue Aug 7 00:49:55 2018 +0200
+
+    [Assassination] APL updates
+    Has still one unfixed issue with Garrote+Exsg during Subterfuge.
+
+commit b42e8445281a30b77644c8ed95569333af576c72
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Mon Aug 6 10:51:38 2018 +0200
+
+    [Arcane] Sync to generator changes
+
+commit 1d3b75491aa8c5b4e8e16c774bd723258204f59f
+Author: EvanMichaels <evan.michaels@gmail.com>
+Date:   Sun Aug 5 22:38:16 2018 -0400
+
+    [Outlaw] Improve Blade Flurry Detection
+    
+    * Instead of S.Dispatch for the range checks, increase the range check to 6 yards. This matches in-game testing.
+    * Additionally, add support for Acrobatic Strikes increasing this to 9 yards. Also matches in-game testing.
+    * Saber Slash is no more...
+
+commit 850bda4b95d02d40150c17447d16ca64cabca33d
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sun Aug 5 10:03:29 2018 +0200
+
+    [Fire] Sync with generator
+
+commit b2bb5b51c59d352473d709a1e4880cdf3170858e
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sat Aug 4 03:18:13 2018 +0200
+
+    [Arcane] Sync with new HRGen
+
+commit b2bb5b51c59d352473d709a1e4880cdf3170858e
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sat Aug 4 03:18:13 2018 +0200
+
+    [Arcane] Sync with new HRGen
+
+commit 454afe138ceef8b3a1b1faa43ac34ca1f8e49c41
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Sat Aug 4 21:18:14 2018 -0700
+
+    - Updated priority of ThunderClap when Avatar is up and Unstoppable Force is talented
+    -  Added Intercept to priority when running out of ranage of boss
+
+commit b2bb5b51c59d352473d709a1e4880cdf3170858e
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sat Aug 4 03:18:13 2018 +0200
+
+    [Arcane] Sync with new HRGen
+
+commit 3a4f7f1ee0b058462254c715739fe82784a54d53
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sat Aug 4 03:18:13 2018 +0200
+
+    [Arcane] Sync with new HRGen
+
+commit 2ce2baafd64859971e39a34979c659226d8a03d9
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Sat Aug 4 03:18:13 2018 +0200
+
+    [Arcane] Sync with new HRGen
+
+commit 19725e77b33a97ef3208871203adfb4f69a3d7cd
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Thu Aug 2 23:14:13 2018 -0700
+
+    Changed Avatar priority such that it will no longer be cast and cause a rage over cap
+    Changed Demoralizing Shout priority such that it will no longer be cast and cause a rage over cap
+    Adjusted casting/refreshing of Shield Block so that it will be cast within approx 1 GCD of remaining buff duration
+    Adjusted low priority Victory Rush such that it will be cast when health is below 50 percent instead of 80 percent
+    Added a low priority Revenge when at high levels of rage
+    Cleaned up some rage dump mechanics
+    Updated some comments
+
+commit 19725e77b33a97ef3208871203adfb4f69a3d7cd
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Thu Aug 2 23:14:13 2018 -0700
+
+    Changed Avatar priority such that it will no longer be cast and cause a rage over cap
+    Changed Demoralizing Shout priority such that it will no longer be cast and cause a rage over cap
+    Adjusted casting/refreshing of Shield Block so that it will be cast within approx 1 GCD of remaining buff duration
+    Adjusted low priority Victory Rush such that it will be cast when health is below 50 percent instead of 80 percent
+    Added a low priority Revenge when at high levels of rage
+    Cleaned up some rage dump mechanics
+    Updated some comments
+
+commit 19725e77b33a97ef3208871203adfb4f69a3d7cd
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Thu Aug 2 23:14:13 2018 -0700
+
+    Changed Avatar priority such that it will no longer be cast and cause a rage over cap
+    Changed Demoralizing Shout priority such that it will no longer be cast and cause a rage over cap
+    Adjusted casting/refreshing of Shield Block so that it will be cast within approx 1 GCD of remaining buff duration
+    Adjusted low priority Victory Rush such that it will be cast when health is below 50 percent instead of 80 percent
+    Added a low priority Revenge when at high levels of rage
+    Cleaned up some rage dump mechanics
+    Updated some comments
+
+commit 1318b114f512d28819b697aa5a30315607c15be6
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Tue Jul 31 21:00:55 2018 -0700
+
+    Minor improvement based upon code review feedback
+
+commit 1318b114f512d28819b697aa5a30315607c15be6
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Tue Jul 31 21:00:55 2018 -0700
+
+    Minor improvement based upon code review feedback
+
+commit 1318b114f512d28819b697aa5a30315607c15be6
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Tue Jul 31 21:00:55 2018 -0700
+
+    Minor improvement based upon code review feedback
+
+commit 1318b114f512d28819b697aa5a30315607c15be6
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Tue Jul 31 21:00:55 2018 -0700
+
+    Minor improvement based upon code review feedback
+
+commit 1318b114f512d28819b697aa5a30315607c15be6
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Tue Jul 31 21:00:55 2018 -0700
+
+    Minor improvement based upon code review feedback
+
+commit 46eab3ea64d3e57282de6f01b6883ab1382052b0
+Author: Krich <pagarizabal2@gmail.com>
+Date:   Tue Jul 31 19:10:54 2018 +0200
+
+    [Frost DK] removed useless checks
+
+commit 54f506e361d00418108bf13d78dcf3f2c4ba3975
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Tue Jul 31 15:47:31 2018 +0200
+
+    [UI/Settings] Add option to disable nameplate icons
+
+commit 54f506e361d00418108bf13d78dcf3f2c4ba3975
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Tue Jul 31 15:47:31 2018 +0200
+
+    [UI/Settings] Add option to disable nameplate icons
+
+commit aebd82cf6145110e9740dbdc5c88f5722ecd4e77
+Author: Krich <pagarizabal2@gmail.com>
+Date:   Tue Jul 31 13:41:34 2018 +0200
+
+    [Frost] better readability
+
+commit 0a13f60e25a2d54333bbb669232137e23da81fff
+Author: Krich <pagarizabal2@gmail.com>
+Date:   Tue Jul 31 13:37:58 2018 +0200
+
+    [Unholy] tried to find a way to unstuck the rotation when cds off
+    
+    *Apoc is now out of cds suggestions because the apl always uses it and made the rotation stuck with cds off
+    *Added a settings for apoc to be displayed in the offgcd icon
+    *Updated apl at the end of the module
+
+commit a046a79e44a54f12ed7bb7f9786ddfd01b499246
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Tue Jul 31 12:57:53 2018 +0200
+
+    [Frost] More prediction improvements
+
+commit af374ab78eb050eb52cbf5c63eac1510fc3b3b34
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Mon Jul 30 21:06:23 2018 -0700
+
+    Reverted my changes to UI scaling
+    Reverted my changed to BRM
+
+commit c383ee743776924686ac8717329d3cddf631813e
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Mon Jul 30 20:58:14 2018 -0700
+
+    Cleaned up some comments
+    Added support for GCDasOffGCD and OffGCDasOffGCD abilities
+    Added setting to enable/disable Last Stand as a filler during Shield Block down time
+    Removed Old War and Prolonged Power settings since these will be obsolete in BFA
+
+commit d6200a0311dbaf5a4ee22edf078375b3f9dab3bb
+Author: Cheezypeas <cheezypeas@gmail.com>
+Date:   Mon Jul 30 19:24:00 2018 -0700
+
+    Merged Prot Warrior changes from other repository
+
+commit 86da6bdb3ca76fadef77736694a7b6913841b88f
+Author: lithium720 <lithium720@users.noreply.github.com>
+Date:   Mon Jul 30 00:47:26 2018 -0700
+
+    [Enhancement] Tweaks, + add Lightning Shield to rotation
+
+commit e9c2c224fc5f4472627361ad5a848d155d6b982b
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Mon Jul 30 09:11:02 2018 +0200
+
+    [Fire] Still WIP, now 150% hotter
+
+commit 51af3f5fa337a77eb9014cf2615cedcf549f1421
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Mon Jul 30 09:10:31 2018 +0200
+
+    [Fire] Add WIP Overrides for prediction
+
+commit 86f6d782186fae54bc644ab8297120c401bb670d
+Author: lithium720 <lithium720@users.noreply.github.com>
+Date:   Sun Jul 29 23:52:13 2018 -0700
+
+    [Enhancement] WIP -> OK
+
+commit 5347b0b27612d4329c0e8978d550031ba468a6de
+Author: lithium720 <lithium720@users.noreply.github.com>
+Date:   Sun Jul 29 20:54:36 2018 -0700
+
+    [Enhancement] BfA WIP
+
+commit 5347b0b27612d4329c0e8978d550031ba468a6de
+Author: lithium720 <lithium720@users.noreply.github.com>
+Date:   Sun Jul 29 20:54:36 2018 -0700
+
+    [Enhancement] BfA WIP
+
+commit 5ca84519cc2629ea1b835f6764665db3c4a33798
+Author: ghr74 <28192634+ghr74@users.noreply.github.com>
+Date:   Mon Jul 30 00:59:10 2018 +0200
+
+    [Feral] OOC bloodtalons check
+
