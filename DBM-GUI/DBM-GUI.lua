@@ -43,7 +43,7 @@
 --
 
 
-local revision =("$Revision: 17608 $"):sub(12, -3)
+local revision =("$Revision: 17750 $"):sub(12, -3)
 local FrameTitle = "DBM_GUI_Option_"	-- all GUI frames get automatically a name FrameTitle..ID
 
 local PanelPrototype = {}
@@ -239,6 +239,7 @@ local function MixinSharedMedia3(mediatype, mediatable)
 	if not soundsRegistered then
 		local LSM = LibStub("LibSharedMedia-3.0")
 		soundsRegistered = true
+		--Internal Game Media
 		LSM:Register("sound", "Headless Horseman: Laugh", [[Sound\Creature\HeadlessHorseman\Horseman_Laugh_01.ogg]])
 		LSM:Register("sound", "Yogg Saron: Laugh", [[Sound\Creature\YoggSaron\UR_YoggSaron_Slay01.ogg]])
 		LSM:Register("sound", "Loatheb: I see you", [[Sound\Creature\Loathstare\Loa_Naxx_Aggro02.ogg]])
@@ -247,11 +248,16 @@ local function MixinSharedMedia3(mediatype, mediatable)
 		LSM:Register("sound", "Void Reaver: Marked", [[Sound\Creature\VoidReaver\TEMPEST_VoidRvr_Aggro01.ogg]])
 		LSM:Register("sound", "Kaz'rogal: Marked", [[Sound\Creature\KazRogal\CAV_Kaz_Mark02.ogg]])
 		LSM:Register("sound", "C'Thun: You Will Die!", [[Sound\Creature\CThun\CThunYouWillDIe.ogg]])
-		LSM:Register("sound", "Thrall: That's Incredible!", [[Interface\AddOns\DBM-Core\sounds\incredible.ogg]])
+		--Embedded Sound Clip media
+		LSM:Register("sound", "Jaina: Beware", [[Interface\AddOns\DBM-Core\sounds\SoundClips\beware.ogg]])
+		LSM:Register("sound", "Jaina: Beware (reverb)", [[Interface\AddOns\DBM-Core\sounds\SoundClips\beware_with_reverb.ogg]])
+		LSM:Register("sound", "Thrall: That's Incredible!", [[Interface\AddOns\DBM-Core\sounds\SoundClips\incredible.ogg]])
+		LSM:Register("sound", "Saurfang: Don't Die", [[Interface\AddOns\DBM-Core\sounds\SoundClips\dontdie.ogg]])
+		--Blakbyrd
 		LSM:Register("sound", "Blakbyrd Alert 1", [[Interface\AddOns\DBM-Core\sounds\BlakbyrdAlerts\Alert1.ogg]])
 		LSM:Register("sound", "Blakbyrd Alert 2", [[Interface\AddOns\DBM-Core\sounds\BlakbyrdAlerts\Alert2.ogg]])
 		LSM:Register("sound", "Blakbyrd Alert 3", [[Interface\AddOns\DBM-Core\sounds\BlakbyrdAlerts\Alert3.ogg]])
-		--Do to terrible coding in LSM formating, it's not possible to do this a nice looking way
+		--User Media
 		if DBM.Options.CustomSounds >= 1 then
 			LSM:Register("sound", "DBM: Custom 1", [[Interface\AddOns\DBM-CustomSounds\Custom1.ogg]])
 		end
@@ -1298,10 +1304,10 @@ local function CreateOptionsMenu()
 		local MiniMapIcon				= generaloptions:CreateCheckButton(L.EnableMiniMapIcon, true)
 		MiniMapIcon:SetScript("OnClick", function(self)
 			DBM:ToggleMinimapButton()
-			self:SetChecked( DBM.Options.ShowMinimapButton )
+			self:SetChecked( not DBM_MinimapIcon.hide )
 		end)
 		MiniMapIcon:SetScript("OnShow", function(self)
-			self:SetChecked( DBM.Options.ShowMinimapButton )
+			self:SetChecked( not DBM_MinimapIcon.hide )
 		end)
 		local soundChannelsList = {
 			{	text	= L.UseMasterChannel,	value 	= "Master"},
@@ -3066,6 +3072,22 @@ local function CreateOptionsMenu()
 		end)
 		VictorySoundDropdown3:SetPoint("TOPLEFT", DungeonMusicDropDown, "TOPLEFT", 0, -45)
 		
+		local TurtleDropDown = eventSoundsGeneralArea:CreateDropdown(L.EventTurtleMusic, useCombined and DBM.Music or DBM.BattleMusic, "DBM", "EventSoundTurle", function(value)
+			DBM.Options.EventSoundTurle = value
+			if value ~= "Random" then
+				if not DBM.Options.tempMusicSetting then
+					DBM.Options.tempMusicSetting = tonumber(GetCVar("Sound_EnableMusic"))
+					if DBM.Options.tempMusicSetting == 0 then
+						SetCVar("Sound_EnableMusic", 1)
+					else
+						DBM.Options.tempMusicSetting = nil--Don't actually need it
+					end
+				end
+				PlayMusic(value)
+			end
+		end)
+		TurtleDropDown:SetPoint("TOPLEFT", MusicDropDown, "TOPLEFT", 0, -45)
+		
 		local eventSoundsExtrasArea	= eventSoundsPanel:CreateArea(L.Area_EventSoundsExtras, nil, 52, true)
 		local combineMusic			= eventSoundsExtrasArea:CreateCheckButton(L.EventMusicCombined, true, nil, "EventSoundMusicCombined")
 		
@@ -3104,9 +3126,10 @@ local function CreateOptionsMenu()
 		spamArea:CreateCheckButton(L.DontShowFarWarnings, true, nil, "DontShowFarWarnings")
 		spamArea:CreateCheckButton(L.StripServerName, true, nil, "StripServerName")
 
-		local spamSpecArea = spamPanel:CreateArea(L.Area_SpecFilter, nil, 120, true)
+		local spamSpecArea = spamPanel:CreateArea(L.Area_SpecFilter, nil, 140, true)
 		spamSpecArea:CreateCheckButton(L.FilterTankSpec, true, nil, "FilterTankSpec")
 		spamSpecArea:CreateCheckButton(L.FilterDispels, true, nil, "FilterDispel")
+		spamSpecArea:CreateCheckButton(L.FilterTrashWarnings, true, nil, "FilterTrashWarnings2")
 		local FilterInterruptNote = spamSpecArea:CreateCheckButton(L.FilterInterruptNoteName, true, nil, "FilterInterruptNoteName")
 		
 		local interruptOptions = {

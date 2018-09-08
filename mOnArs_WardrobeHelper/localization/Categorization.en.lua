@@ -1,7 +1,7 @@
 local o = mOnWardrobe
 local c = {}
 o.categorization = c
-o.EXPS = {'Vanilla', 'Burning Crusade', 'WotLK', 'Cataclysm', 'Mists of Pandaria', 'Draenor', 'Legion'}
+o.EXPS = {'Vanilla', 'Burning Crusade', 'WotLK', 'Cataclysm', 'Mists of Pandaria', 'Draenor', 'Legion', 'Battle for Azeroth'}
 o.PARTY = {'Dungeon', 'Raid'}
 
 c["Ahn'kahet: The Old Kingdom"] = {3, 1, "Ahn'kahet: The Old Kingdom"}
@@ -143,3 +143,16 @@ c["Antorus, the Burning Throne"] = {7, 2, "Antorus, the Burning Throne"}
 c["Invasion Points"] = {7, 2, "Invasion Points"}
 c["Cathedral of Eternal Night"] = {7, 1, "Cathedral of Eternal Night"}
 c["Seat of the Triumvirate"] = {7, 1, "Seat of the Triumvirate"}
+
+c["Azeroth"] = {8, 2, "Azeroth"}
+c["Uldir"] = {8, 2, "Uldir"}
+c["Atal'Dazar"] = {8, 1, "Atal'Dazar"}
+c["Freehold"] = {8, 1, "Freehold"}
+c["Kings' Rest"] = {8, 1, "Kings' Rest"}
+c["Shrine of the Storm"] = {8, 1, "Shrine of the Storm"}
+c["Siege of Boralus"] = {8, 1, "Siege of Boralus"}
+c["Temple of Sethraliss"] = {8, 1, "Temple of Sethraliss"}
+c["The MOTHERLODE!!"] = {8, 1, "The MOTHERLODE!!"}
+c["The Underrot"] = {8, 1, "The Underrot"}
+c["Tol Dagor"] = {8, 1, "Tol Dagor"}
+c["Waycrest Manor"] = {8, 1, "Waycrest Manor"}

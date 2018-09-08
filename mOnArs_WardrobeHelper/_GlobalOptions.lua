@@ -15,5 +15,5 @@ if mOnAr_OptionsFrameGeneral == nil then
 	mOnAr_OptionsFrameGeneral.TextSub:SetJustifyH("LEFT")
 	mOnAr_OptionsFrameGeneral.TextSub:SetJustifyV("TOP")
 	mOnAr_OptionsFrameGeneral.TextSub:SetHeight(24)
-	mOnAr_OptionsFrameGeneral.TextSub:SetText("This category contains Settings for every addon made by mOnAr (Seamoon)")
+	mOnAr_OptionsFrameGeneral.TextSub:SetText("This category contains Settings for every addon made by mOnAr")
 end

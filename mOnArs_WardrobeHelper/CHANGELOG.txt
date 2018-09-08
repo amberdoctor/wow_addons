@@ -1,3 +1,13 @@
+﻿== 1.18.2 ==
+ * attempt to remove additional items that shouldn't be showing for your class (eg. trash mail items on plate character)
+
+== 1.18.1 ==
+ * hide completed categories
+
+﻿== 1.18 ==
+ * bumped TOC to 8.0
+ * fixes for 8.0
+
 ﻿== 1.17.1 ==
  * bumped TOC to 7.3
  * fixes for 7.3 (PlaySound) (thanks Petraca)

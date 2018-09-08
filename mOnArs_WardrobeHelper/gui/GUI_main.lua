@@ -406,7 +406,7 @@ local function everythingNeededExists(i)
 end
 
 local function getSpecialMessage()
-	local weekday, month, day, year = CalendarGetDate()
+	local weekday, month, day, year = C_Calendar.GetDate()
 	if day == 30 and month == 8 and year == 2016 then
 		return o.strings["Happy Leveling"]
 	elseif day == 29 or day == 15 then
@@ -439,9 +439,12 @@ o.GUIpagingHelper = function(N)
 	end
 
 	local FirstN = N - 1
-	for i=1,numRows do
-		if everythingNeededExists(i) then
-			local row = mOnWD_MainFrame.ListFrame.RowFrame.rows[i]
+	local adjustmentForDoneCategories = 0
+	local i = 0
+	while i <= (numRows + adjustmentForDoneCategories) do
+		i = i + 1
+		if everythingNeededExists(i - adjustmentForDoneCategories) then
+			local row = mOnWD_MainFrame.ListFrame.RowFrame.rows[i - adjustmentForDoneCategories]
 			if mOnWDSave.disableProgress then
 				row.percent:Hide()
 			else
@@ -485,6 +488,9 @@ o.GUIpagingHelper = function(N)
 							row.status:SetValue(percent)
 							row.percent:SetText(percent .. "%")
 							row.text1:SetText(collected .. " / " .. total)
+							if collected >= total and mOnWDSave.hideCompletedInstances then
+								adjustmentForDoneCategories = adjustmentForDoneCategories + 1
+							end
 						end
 					else
 						row.text1:SetText("")

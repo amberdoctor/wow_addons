@@ -3,6 +3,98 @@ if o.additionalData == nil then o.additionalData = {} end
 
 local DressUpModel = CreateFrame('DressUpModel')
 
+local HEAD = "INVTYPE_HEAD"
+local SHOULDER = "INVTYPE_SHOULDER"
+local BODY = "INVTYPE_BODY"
+local CHEST = "INVTYPE_CHEST"
+local ROBE = "INVTYPE_ROBE"
+local WAIST = "INVTYPE_WAIST"
+local LEGS = "INVTYPE_LEGS"
+local FEET = "INVTYPE_FEET"
+local WRIST = "INVTYPE_WRIST"
+local HAND = "INVTYPE_HAND"
+local CLOAK = "INVTYPE_CLOAK"
+local WEAPON = "INVTYPE_WEAPON"
+local SHIELD = "INVTYPE_SHIELD"
+local WEAPON_2HAND = "INVTYPE_2HWEAPON"
+local WEAPON_MAIN_HAND = "INVTYPE_WEAPONMAINHAND"
+local RANGED = "INVTYPE_RANGED"
+local RANGED_RIGHT = "INVTYPE_RANGEDRIGHT"
+local WEAPON_OFF_HAND = "INVTYPE_WEAPONOFFHAND"
+local HOLDABLE = "INVTYPE_HOLDABLE"
+local TABARD = "INVTYPE_TABARD"
+local BAG = "INVTYPE_BAG"
+
+local MISC = 0
+local CLOTH = 1
+local LEATHER = 2
+local MAIL = 3
+local PLATE = 4
+local COSMETIC = 5
+
+local armorTypeSlots = {
+  [HEAD] = true,
+  [SHOULDER] = true,
+  [CHEST] = true,
+  [ROBE] = true,
+  [WRIST] = true,
+  [HAND] = true,
+  [WAIST] = true,
+  [LEGS] = true,
+  [FEET] = true,
+}
+
+local classArmorTypeMap = {
+  ["DEATHKNIGHT"] = PLATE,
+  ["DEMONHUNTER"] = LEATHER,
+  ["DRUID"] = LEATHER,
+  ["HUNTER"] = MAIL,
+  ["MAGE"] = CLOTH,
+  ["MONK"] = LEATHER,
+  ["PALADIN"] = PLATE,
+  ["PRIEST"] = CLOTH,
+  ["ROGUE"] = LEATHER,
+  ["SHAMAN"] = MAIL,
+  ["WARLOCK"] = CLOTH,
+  ["WARRIOR"] = PLATE,
+}
+
+o.getPlayerArmorTypeName = function()
+  local playerArmorTypeID = classArmorTypeMap[select(2, UnitClass("player"))]
+  return select(1, GetItemSubClassInfo(4, playerArmorTypeID))
+end
+
+o.getItemSlotName = function(itemLink)
+  return select(4, GetItemInfoInstant(itemLink))
+end
+
+o.getItemSubClassName = function(itemLink)
+  return select(3, GetItemInfoInstant(itemLink))
+end
+
+o.isArmorCosmetic = function(itemLink)
+  return o.isArmorSubClassID(COSMETIC, itemLink)
+end
+
+o.isArmorSubClassID = function(subClassID, itemLink)
+  local itemSubClass = o.getItemSubClassName(itemLink)
+  if itemSubClass == nil then return end
+  return select(1, GetItemSubClassInfo(4, subClassID)) == itemSubClass
+end
+
+o.isArmorAppropriateForPlayer = function(itemLink)
+  local playerArmorTypeID = o.getPlayerArmorTypeName()
+  local slotName = o.getItemSlotName(itemLink)
+  if slotName == nil then return end
+  local isArmorCosmetic = o.isArmorCosmetic(itemLink)
+  if isArmorCosmetic == nil then return end
+  if armorTypeSlots[slotName] and isArmorCosmetic == false then
+      return playerArmorTypeID == o.getItemSubClassName(itemLink)
+  else
+      return true
+  end
+end
+
 o.getSourceID = function(itemLink)
   DressUpModel:SetUnit('player')
   DressUpModel:Undress()
@@ -54,17 +146,17 @@ o.addAdditionalData = function(instances, useCoroutine)
               local itemID = itemIDs[i]
               local itemLink = o.createLink(itemID, diffData.linkDifficulty)
               local appearanceID = o.getAppearanceID(itemLink)
-              if appearanceID then
+              if appearanceID and o.isArmorAppropriateForPlayer(itemLink) then
                 local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
                 if sources then
                   local collected = o.isCollected(sources) and (mOnWDSave.completionistMode == false)
-  								collected = collected or (o.isCollected(sources, itemID) and mOnWDSave.completionistMode)
+                  collected = collected or (o.isCollected(sources, itemID) and mOnWDSave.completionistMode)
                   if o.isBlacklisted(itemID) == false then
                     if instances[instanceName] == nil then
                       instances[instanceName] = {}
-  										instances[instanceName]['collected'] = 0
-  										instances[instanceName]['total'] = 0
-  										instances[instanceName]['difficulties'] = {}
+                      instances[instanceName]['collected'] = 0
+                      instances[instanceName]['total'] = 0
+                      instances[instanceName]['difficulties'] = {}
                     end
 
                     local diffs = o.difficulties[diff]
@@ -76,26 +168,26 @@ o.addAdditionalData = function(instances, useCoroutine)
 
                     if instances[instanceName]['difficulties'][foundDiff] == nil then
                       instances[instanceName]['difficulties'][foundDiff] = {}
-  										instances[instanceName]['difficulties'][foundDiff]['collected'] = 0
-  										instances[instanceName]['difficulties'][foundDiff]['total'] = 0
-  										instances[instanceName]['difficulties'][foundDiff]['bosses'] = {}
+                      instances[instanceName]['difficulties'][foundDiff]['collected'] = 0
+                      instances[instanceName]['difficulties'][foundDiff]['total'] = 0
+                      instances[instanceName]['difficulties'][foundDiff]['bosses'] = {}
                     end
 
                     if instances[instanceName]['difficulties'][foundDiff]['bosses'][source] == nil then
-  										instances[instanceName]['difficulties'][foundDiff]['bosses'][source] = {}
-  										instances[instanceName]['difficulties'][foundDiff]['bosses'][source]['items'] = {}
-  									end
+                      instances[instanceName]['difficulties'][foundDiff]['bosses'][source] = {}
+                      instances[instanceName]['difficulties'][foundDiff]['bosses'][source]['items'] = {}
+                    end
 
                     if collected then
-  										instances[instanceName]['collected'] = instances[instanceName]['collected'] + 1
-  										instances[instanceName]['difficulties'][foundDiff]['collected'] = instances[instanceName]['difficulties'][foundDiff]['collected'] + 1
-  									else
-  										table.insert(instances[instanceName]['difficulties'][foundDiff]['bosses'][source]['items'], {
-  											link = itemLink, id = itemID, visualID = appearanceID,	sourceID = sources[1].sourceID
-  										})
-  									end
-  									instances[instanceName]['total'] = instances[instanceName]['total'] + 1
-  									instances[instanceName]['difficulties'][foundDiff]['total'] = instances[instanceName]['difficulties'][foundDiff]['total'] + 1
+                      instances[instanceName]['collected'] = instances[instanceName]['collected'] + 1
+                      instances[instanceName]['difficulties'][foundDiff]['collected'] = instances[instanceName]['difficulties'][foundDiff]['collected'] + 1
+                    else
+                      table.insert(instances[instanceName]['difficulties'][foundDiff]['bosses'][source]['items'], {
+                        link = itemLink, id = itemID, visualID = appearanceID, sourceID = sources[1].sourceID
+                      })
+                    end
+                    instances[instanceName]['total'] = instances[instanceName]['total'] + 1
+                    instances[instanceName]['difficulties'][foundDiff]['total'] = instances[instanceName]['difficulties'][foundDiff]['total'] + 1
                   end
                 end
               end
@@ -104,11 +196,11 @@ o.addAdditionalData = function(instances, useCoroutine)
 
           if useCoroutine then
             counter = counter + 1
-  					if counter % blockSize == 0 then
-  						o.dotsString = o.dotsString .. "."
-  						if o.dotsString == "...." then o.dotsString = "" end
-  						coroutine.yield()
-  					end
+            if counter % blockSize == 0 then
+              o.dotsString = o.dotsString .. "."
+              if o.dotsString == "...." then o.dotsString = "" end
+              coroutine.yield()
+            end
           end
 
         end
