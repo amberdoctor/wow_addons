@@ -26,6 +26,7 @@ function isboxer.Character_LoadBinds()
 
 		isboxer.SetMacro("","ALT-SHIFT-Z","/cast Crimson Water Strider\n",nil,nil,nil,1);
 
+		isboxer.ManageJambaTeam=True
 		isboxer.ClearMembers();
 		isboxer.AddMember("Phîlo-Thrall");
 		isboxer.AddMember("Kishikaisei-Thrall");

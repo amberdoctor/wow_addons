@@ -3,6 +3,7 @@ isboxer.Character.ActualName = "Diomedës";
 isboxer.Character.QualifiedName = "Diomedës-Thrall";
 
 function isboxer.Character_LoadBinds()
+<<<<<<< HEAD
 	if (isboxer.CharacterSet.Name=="Philomela Ana Dio Lyssia Ubuy") then
 		isboxer.SetMacro("FTLAssist","BACKSPACE","/assist [nomod:alt,mod:lshift,nomod:ctrl]Philomela;[nomod:alt,mod:rshift,nomod:ctrl]Anastasoula;[nomod:alt,nomod:shift,mod:lctrl]Diomedës;[mod:lalt,nomod:shift,nomod:ctrl]Lyssiá;[nomod:alt,mod:lshift,mod:lctrl]Ubuy\n",1,1,1,1);
 
@@ -35,6 +36,8 @@ function isboxer.Character_LoadBinds()
 		isboxer.SetMaster("Philomela-Thrall");
 		return
 	end
+=======
+>>>>>>> 47bdb92583ab7e9863845a1cebf888a4c58ca519
 end
 isboxer.Character.LoadBinds = isboxer.Character_LoadBinds;
 

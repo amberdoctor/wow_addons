@@ -5,6 +5,7 @@ isboxer.CharacterSet = { LoadBinds=nil, Name="", Members={} }
 isboxer.Following = { Unit="", ReFollow=0 }
 isboxer.Master = { Name="", Self=1}
 isboxer.NextButton = 1;
+isboxer.ManageJambaTeam = false
 
 function isboxer.DetectJamba5()
 	if (isboxer.JambaDetectionRan) then
@@ -21,6 +22,14 @@ end
 
 
 function isboxer.ClearMembers()
+    
+	local max = table.getn(isboxer.CharacterSet.Members)
+	for i=1,max,1 do table.remove(isboxer.CharacterSet.Members) end
+
+	if (not isboxer.ManageJambaTeam) then
+		return
+	end
+
 	if (JambaComms) then
 		JambaComms:DisableAllMembersCommand(nil,nil);
 		return
@@ -34,6 +43,12 @@ function isboxer.ClearMembers()
 end
 
 function isboxer.AddMember(name)
+    table.insert(isboxer.CharacterSet.Members,name)
+
+	if (not isboxer.ManageJambaTeam) then
+		return
+	end
+
 	if (JambaComms) then
 		JambaComms:AddMemberCommand(nil,name);
 		JambaComms:EnableMemberCommand(nil,name);
