@@ -2,11 +2,10 @@ local Amr = LibStub("AceAddon-3.0"):GetAddon("AskMrRobot")
 local L = LibStub("AceLocale-3.0"):GetLocale("AskMrRobot", true)
 
 -- min import version that we will read from the website
-Amr.MIN_IMPORT_VERSION = 36
+Amr.MIN_IMPORT_VERSION = 58
 
--- min addon version that we will support for inter-addon communication for e.g. the team optimizer
---  last update to version 36 for Legion pre-patch
-Amr.MIN_ADDON_VERSION = 44
+-- min addon version that we will support for inter-addon communication
+Amr.MIN_ADDON_VERSION = 58
 
 -- import some constants from the serializer for convenience
 Amr.ChatPrefix = Amr.Serializer.ChatPrefix
@@ -22,11 +21,10 @@ Amr.SupportedInstanceIds = Amr.Serializer.SupportedInstanceIds
 Amr.ParseItemLink = Amr.Serializer.ParseItemLink
 Amr.IsSupportedInstanceId = Amr.Serializer.IsSupportedInstanceId
 Amr.IsSupportedInstance = Amr.Serializer.IsSupportedInstance
-Amr.SetTokenIds = Amr.Serializer.SetTokenIds
-Amr.GetItemTooltip = Amr.Serializer.GetItemTooltip
-Amr.GetItemLevel = Amr.Serializer.GetItemLevel
+--Amr.GetItemTooltip = Amr.Serializer.GetItemTooltip
+--Amr.GetItemLevel = Amr.Serializer.GetItemLevel
 Amr.GetItemUniqueId = Amr.Serializer.GetItemUniqueId
-Amr.ArtifactIdToSpecNumber = Amr.Serializer.ArtifactIdToSpecNumber
+Amr.ReadAzeritePowers = Amr.Serializer.ReadAzeritePowers
 
 -- map of slot ID to display text
 Amr.SlotDisplayText = {
@@ -107,7 +105,7 @@ Amr.SpecIcons = {
 }
 
 -- instance IDs ordered in preferred display order
-Amr.InstanceIdsOrdered = { 1520, 1530, 1676, 1648 }
+Amr.InstanceIdsOrdered = { 1861 }
 
 Amr.Difficulties = {
 	Lfr = 17,
@@ -129,8 +127,10 @@ end
 -- Item Methods
 ------------------------------------------------------------------------------------------
 
--- item link format:  |cffa335ee|Hitem:itemID:enchant:gem1:gem2:gem3:gem4:suffixID:uniqueID:level:upgradeId:instanceDifficultyID:numBonusIDs:bonusID1:bonusID2...|h[item name]|h|r
-
+--                 1      2    3      4      5      6    7   8   9   10   11       12         
+--                 itemId:ench:gem1  :gem2  :gem3  :gem4:suf:uid:lvl:spec:flags   :instdiffid:numbonusIDs:bonusIDs1...n     :varies:?:relic bonus ids
+--|cffe6cc80|Hitem:128866:    :152046:147100:152025:    :   :   :110:66  :16777472:9         :4          :736:1494:1490:1495:709   :1:3:3610:1472:3528:3:3562:1483:3528:3:3610:1477:3336|h[Truthguard]|h|r
+--
 function Amr.CreateItemLink(itemObj)
 
     if itemObj == nil or itemObj.id == nil or itemObj.id == 0 then return nil end
@@ -161,8 +161,6 @@ function Amr.CreateItemLink(itemObj)
 		table.insert(parts, 4)
 	elseif itemObj.level and itemObj.level ~= 0 then
 		table.insert(parts, 512)
-	elseif itemObj.relicBonusIds then
-		table.insert(parts, 256)
 	else
 		table.insert(parts, 0)
 	end
@@ -186,30 +184,16 @@ function Amr.CreateItemLink(itemObj)
 	else
 		table.insert(parts, 0)
 	end
-	
-	-- sometimes we provide relic bonus IDs
-	if itemObj.relicBonusIds then
-		for i = 1,3 do
-			local bonusList = itemObj.relicBonusIds[i]
-			if bonusList and #bonusList > 0 then
-				table.insert(parts, #bonusList)
-				for bi, bv in ipairs(bonusList) do
-					table.insert(parts, bv)
-				end
-			else
-				table.insert(parts, 0)
-			end
-		end
-	else
-		table.insert(parts, 0)
-		table.insert(parts, 0)
-		table.insert(parts, 0)
-	end
+    
+    -- we don't bother with relic bonus ids anymore when generating links
+    table.insert(parts, 0)
+    table.insert(parts, 0)
+    table.insert(parts, 0)
     
     return table.concat(parts, ":")
 end
 
-
+--[[
 -- the server event for getting item info does not specify which item it just fetched... have to track manually
 local _pendingItemIds = {}
 
@@ -253,3 +237,4 @@ Amr:AddEventHandler("GET_ITEM_INFO_RECEIVED", function()
 		end
 	end
 end)
+]]

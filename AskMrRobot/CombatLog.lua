@@ -2,6 +2,7 @@ local Amr = LibStub("AceAddon-3.0"):GetAddon("AskMrRobot")
 local L = LibStub("AceLocale-3.0"):GetLocale("AskMrRobot", true)
 local AceGUI = LibStub("AceGUI-3.0")
 
+local _lblLogging = nil
 local _btnToggle = nil
 local _panelUndoWipe = nil
 local _chkAutoAll = nil
@@ -19,41 +20,49 @@ local function createDifficultyCheckBox(instanceId, difficultyId)
 end
 
 -- render a group of controls for auto-logging of a raid zone
-local function renderAutoLogSection(instanceId, container)
+local function renderAutoLogSection(instanceId, container, i, autoLbls, autoChks)
 	_autoChecks[instanceId] = {}
 	
 	local lbl = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl)
 	lbl:SetWidth(200)
 	lbl:SetText(L.InstanceNames[instanceId])
 	lbl:SetFont(Amr.CreateFont("Regular", 20, Amr.Colors.White))
-	container:AddChild(lbl)
 	
+	if i == 1 then
+		lbl:SetPoint("TOPLEFT", _chkAutoAll.frame, "BOTTOMLEFT", -1, -15)
+	elseif i % 2 == 0 then
+		lbl:SetPoint("TOPLEFT", autoLbls[i - 1].frame, "TOPRIGHT", 40, 0)
+	else
+		lbl:SetPoint("TOPLEFT", autoChks[i - 2].frame, "BOTTOMLEFT", 0, -30)
+	end
+
 	local line = AceGUI:Create("AmrUiPanel")
+	container:AddChild(line)
 	line:SetHeight(1)
 	line:SetBackgroundColor(Amr.Colors.White)
 	line:SetPoint("TOPLEFT", lbl.frame, "BOTTOMLEFT", 1, -7)
 	line:SetPoint("TOPRIGHT", lbl.frame, "BOTTOMRIGHT", 0, -7)
-	container:AddChild(line)
 	
 	local chkMythic = createDifficultyCheckBox(instanceId, Amr.Difficulties.Mythic)
-	chkMythic:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", 0, -8)
 	container:AddChild(chkMythic)
+	chkMythic:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", 0, -8)
 	
 	local chkNormal = createDifficultyCheckBox(instanceId, Amr.Difficulties.Normal)
-	chkNormal:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", 0, -30)
 	container:AddChild(chkNormal)
-	
+	chkNormal:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", 0, -30)
+
 	-- find the widest of mythic/normal
 	local w = math.max(chkMythic:GetWidth(), chkNormal:GetWidth())
 	
 	local chkHeroic = createDifficultyCheckBox(instanceId, Amr.Difficulties.Heroic)
-	chkHeroic:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", w + 20, -8)
 	container:AddChild(chkHeroic)
+	chkHeroic:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", w + 20, -8)
 	
 	local chkLfr = createDifficultyCheckBox(instanceId, Amr.Difficulties.Lfr)
-	chkLfr:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", w + 20, -30)
 	container:AddChild(chkLfr)
-	
+	chkLfr:SetPoint("TOPLEFT", line.frame, "BOTTOMLEFT", w + 20, -30)
+		
 	return lbl, chkNormal
 end
 
@@ -67,17 +76,17 @@ function Amr:RenderTabLog(container)
 	_btnToggle:SetFont(Amr.CreateFont("Bold", 16, Amr.Colors.White))
 	_btnToggle:SetWidth(200)
 	_btnToggle:SetHeight(26)
-	_btnToggle:SetPoint("TOPLEFT", container.content, "TOPLEFT", 0, -40)
 	_btnToggle:SetCallback("OnClick", function() Amr:ToggleLogging() end)
 	container:AddChild(_btnToggle)
+	_btnToggle:SetPoint("TOPLEFT", container.content, "TOPLEFT", 0, -40)
 	
 	_lblLogging = AceGUI:Create("AmrUiLabel")
+	container:AddChild(_lblLogging)
 	_lblLogging:SetText(L.LogNote)
 	_lblLogging:SetWidth(200)	
 	_lblLogging:SetFont(Amr.CreateFont("Italic", 14, Amr.Colors.BrightGreen))
 	_lblLogging:SetJustifyH("MIDDLE")
 	_lblLogging:SetPoint("TOP", _btnToggle.frame, "BOTTOM", 0, -5)
-	container:AddChild(_lblLogging)
 	
 	local btnReload = AceGUI:Create("AmrUiButton")
 	btnReload:SetText(L.LogButtonReloadText)
@@ -85,9 +94,9 @@ function Amr:RenderTabLog(container)
 	btnReload:SetFont(Amr.CreateFont("Bold", 16, Amr.Colors.White))
 	btnReload:SetWidth(200)
 	btnReload:SetHeight(26)
-	btnReload:SetPoint("TOPLEFT", _btnToggle.frame, "TOPRIGHT", 40, 0)
 	btnReload:SetCallback("OnClick", ReloadUI)
 	container:AddChild(btnReload)
+	btnReload:SetPoint("TOPLEFT", _btnToggle.frame, "TOPRIGHT", 40, 0)
 	
 	--[[
 	local lbl = AceGUI:Create("AmrUiLabel")
@@ -160,17 +169,17 @@ function Amr:RenderTabLog(container)
 	
 	-- auto-logging controls
 	local lbl = AceGUI:Create("AmrUiLabel")
+	container:AddChild(lbl)
 	lbl:SetWidth(600)
 	lbl:SetText(L.LogAutoTitle)
 	lbl:SetFont(Amr.CreateFont("Bold", 24, Amr.Colors.TextHeaderActive))
 	lbl:SetPoint("TOPLEFT", _btnToggle.frame, "BOTTOMLEFT", 0, -40)
-	container:AddChild(lbl)
 	
 	_chkAutoAll = AceGUI:Create("AmrUiCheckBox")
 	_chkAutoAll:SetText(L.LogAutoAllText)
-	_chkAutoAll:SetPoint("TOPLEFT", lbl.frame, "BOTTOMLEFT", 1, -15)
 	_chkAutoAll:SetCallback("OnClick", function(widget) Amr:ToggleAllAutoLog() end)
 	container:AddChild(_chkAutoAll)
+	_chkAutoAll:SetPoint("TOPLEFT", lbl.frame, "BOTTOMLEFT", 1, -15)
 	
 	_autoChecks = {}
 	
@@ -178,20 +187,14 @@ function Amr:RenderTabLog(container)
 	local autoLbls = {}
 	local autoChks = {}
 	for i, instanceId in ipairs(Amr.InstanceIdsOrdered) do
-		local autoLbl, autoChk = renderAutoLogSection(instanceId, container)
-		if i == 1 then
-			autoLbl:SetPoint("TOPLEFT", _chkAutoAll.frame, "BOTTOMLEFT", -1, -15)
-		elseif i % 2 == 0 then
-			autoLbl:SetPoint("TOPLEFT", autoLbls[i - 1].frame, "TOPRIGHT", 40, 0)
-		else
-			autoLbl:SetPoint("TOPLEFT", autoChks[i - 2].frame, "BOTTOMLEFT", 0, -30)
-		end
+		local autoLbl, autoChk = renderAutoLogSection(instanceId, container, i, autoLbls, autoChks)		
 		
 		table.insert(autoLbls, autoLbl)
 		table.insert(autoChks, autoChk)
 	end
-	autoSections = nil
-	
+	autoLbls = nil
+	autoChks = nil
+
 	-- instructions
 	--[[
 	lbl = AceGUI:Create("AmrUiLabel")
@@ -214,6 +217,7 @@ function Amr:RenderTabLog(container)
 end
 
 function Amr:ReleaseTabLog()
+	_lblLogging = nil
 	_btnToggle = nil
 	_panelUndoWipe = nil
 	_chkAutoAll = nil
@@ -291,8 +295,10 @@ local function updateAutoLogging(force, noWait)
 	Amr.db.char.Logging.LastZone = zone
 	Amr.db.char.Logging.LastDiff = difficultyId
 
-	if not Amr.db.profile.Logging.Auto[tonumber(instanceId)] then
-		Amr.db.profile.Logging.Auto[tonumber(instanceId)] = {}
+	if Amr.IsSupportedInstanceId(instanceId) then
+		if not Amr.db.profile.Logging.Auto[tonumber(instanceId)] then
+			Amr.db.profile.Logging.Auto[tonumber(instanceId)] = {}
+		end
 	end
 	
 	if Amr.IsSupportedInstanceId(instanceId) and Amr.db.profile.Logging.Auto[tonumber(instanceId)][tonumber(difficultyId)] then
@@ -623,7 +629,7 @@ local function logPlayerExtraData()
 end
 
 function Amr:InitializeCombatLog()
-	--updateAutoLogging()
+	updateAutoLogging()
 end
 
 Amr:AddEventHandler("UPDATE_INSTANCE_INFO", updateAutoLogging)

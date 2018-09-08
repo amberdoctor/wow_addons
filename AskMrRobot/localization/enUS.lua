@@ -85,10 +85,7 @@ L.StatsShort = {
 }
 
 L.InstanceNames = {
-	[1520] = "Emerald Nightmare",
-	[1530] = "Nighthold",
-	[1648] = "Trial of Valor",
-	[1676] = "Tomb of Sargeras"
+    [1861] = "Uldir"
 }
 
 L.DifficultyNames = {
@@ -147,7 +144,6 @@ end
 L.TabExportText = "Export"
 L.TabGearText = "Gear"
 L.TabLogText = "Combat Logs"
-L.TabTeamText = "Team Optimizer"
 L.TabOptionsText = "Options"
 
 L.VersionChatTitle = "AMR Addon Version:"
@@ -160,15 +156,13 @@ Export Tab
 ------------------------------------------------------------------------]]
 L.ExportTitle = "Export Instructions"
 L.ExportHelp1 = "1. Copy the text below by pressing Ctrl+C (or Cmd+C on a Mac)"
-L.ExportHelp2 = "2. Go to http://beta.askmrrobot.com/wow/simulator/run and open the character picker"
-L.ExportHelp3 = "3. Paste into the textbox under the ADDON section"
+L.ExportHelp2 = "2. Go to https://www.askmrrobot.com and open the character picker"
+L.ExportHelp3 = "3. Paste into the textbox under the AMR ADDON section"
 
 L.ExportSplashTitle = "Getting Started"
 L.ExportSplashSubtitle = "This is your first time using the new version of the addon. Do the following things to initialize your item database:"
 L.ExportSplash1 = "1. Activate each of your specs once and equip your latest gear for each spec"
-L.ExportSplash2 = "2. Equip and open your artifact weapon for each spec"
-L.ExportSplash3 = "3. Open your bank and leave it open for at least two seconds"
-L.ExportSplash4 = "4. If you have gear in void storage, open it and leave it open for at least two seconds"
+L.ExportSplash2 = "2. Open your bank and leave it open for at least two seconds"
 L.ExportSplashClose = "Continue"
 
 
@@ -186,7 +180,7 @@ L.GearButtonShop = "Show Shopping List"
 L.GearEquipErrorCombat = "Cannot change spec/gear while in combat!"
 L.GearEquipErrorEmpty = "No saved gear set could be found for the current spec."
 L.GearEquipErrorNotFound = "An item in your saved gear set could not be equipped."
-L.GearEquipErrorNotFound2 = "Try opening your bank and running this command again, or check your void storage."
+L.GearEquipErrorNotFound2 = "Try opening your bank and running this command again."
 L.GearEquipErrorBagFull = "There is not enough room in your bags to equip your saved gear set."
 L.GearEquipErrorSoulbound = function(itemLink)
 	return itemLink .. " could not be equipped because it is not bound to you."
@@ -287,104 +281,6 @@ L.LogInstructions =
 
 **The AMR addon collects extra data at the start of each encounter for all players in your raid with the AMR addon. Other players do not need to enable logging! They just need to have the addon installed and enabled. This data is only saved to disk if you exit WoW or reload your UI before uploading.
 ]]
-
-
---[[----------------------------------------------------------------------
-Team Optimizer Tab
-------------------------------------------------------------------------]]
-L.TeamTabLeaderText = "Loot Ranker"
-L.TeamTabMemberText = "Team Member"
-
-L.TeamSplashHeader = "How do you usually use the Team Optimizer?"
-L.TeamSplashLeaderLabel = "I am the person who uses askmrrobot.com to rank the loot for our group"
-L.TeamSplashMemberLabel = "Someone else handles using the Team Optimizer for me"
-
-L.TeamMemberText = "Just sit back and relax, everything is being handled by your team leaders."
-L.TeamMemberShowLootLabel = "Looting is in progress!"
-L.TeamMemberShowLoot = "Show Loot Window"
-
-L.TeamButtonVersionText = "Check for Addon"
-L.TeamButtonExportRosterText = "Export Roster"
-L.TeamButtonExportLootText = "Export Loot"
-L.TeamButtonExportClose = "Close"
-L.TeamButtonImportRankingsText = "Import Rankings"
-L.TeamButtonStartLootText = "Start Looting"
-L.TeamButtonResumeLootText = "Resume Looting"
-
-L.TeamExportVersionLabel = "The Team Optimizer is more accurate and easier to use if everyone in your group has the AskMrRobot addon."
-L.TeamExportRosterLabel = "Do this once at the beginning of your raid to initialize the Team Optimizer on the web. If someone joins or leaves your group during a raid, do it again and press 'Import without Reload' on the web to do a quick update of just the players that changed."
-L.TeamExportLootLabel = "Export all drops from the last looted boss and rank them all at once on the web.  Rankings automatically account for loot won on previous bosses or bonus rolls!"
-L.TeamExportLootLabel2 = "Requires Master Loot"
-L.TeamImportRankingsLabel = "Import ranking data from askmrrobot.com so that you can easily view and distribute loot in-game."
-L.TeamStartLootLabel = function(numItems)
-	return numItems .. " items were imported."
-end
-
-L.TeamHistoryTitle = "Loot History"
-L.TeamHistoryNoGroup = "You are not in a group or raid."
-L.TeamHistoryEmpty = "No loot has been handed out yet."
-
-L.TeamVersionTitle = "Version Check"
-L.TeamVersionNoGroup = "You are not in a group or raid."
-L.TeamVersionGood = "Everyone in your group has the addon!"
-L.TeamVersionMissing = "NOT INSTALLED"
-L.TeamVersionOld = "OUT OF DATE"
-
-L.TeamExportRosterLoading = "Gathering player data, please wait..."
-
-L.TeamAlertNoGroup = "You are not in a group!"
-L.TeamAlertNoLoot = "Nothing has been master-looted recently in your party or raid!"
-
-L.TeamExportHelp = "Press Ctrl+C (or Cmd+C on a Mac) to copy the text below."
-L.TeamExportRosterText = "Then go to the Team Optimizer on the website and paste into the roster import box."
-L.TeamExportLootText = "Then go to the Team Optimizer on the website and paste into the loot import box."
--- note to translators: leave "Team Optimizer" in english in the above two texts because our website is not localized yet
-
-L.TeamImportRankingsHeader = "Press Ctrl+V (Cmd+V on a Mac) to paste data from the website into the box below."
-
-L.TeamLootOptionNeed = "Need"
-L.TeamLootOptionOff = "Off Spec"
-L.TeamLootOptionGreed = "Greed"
-L.TeamLootOptionPass = "Pass"
-L.TeamLootOptionDisenchant = "Disenchant"
-
-
---[[----------------------------------------------------------------------
-Loot Window
-------------------------------------------------------------------------]]
-L.LootTitle = "Loot!"
-L.LootEmpty = "There is no loot to hand out right now!"
-L.LootHelpItems = "For each drop..."
-L.LootHelpRanks = "Choose an option:"
-L.LootHelpMaster = "Then master loot:"
-
-L.LootIneligible = "You are not eligible for this drop."
-
-L.LootRankHeaderRank = "Rank"
-L.LootRankHeaderScore = "Percent Upgrade"
-L.LootRankHeaderScoreDisenchant = "Player"
-
--- note to translators: these column headers should be short, abbreviate if necessary, keep to 5 characters max
-L.LootRankHeaderNeed = "Need"
-L.LootRankHeaderOff = "Off"
-L.LootRankHeaderGreed = "Greed"
-L.LootRankHeaderPass = "Pass"
-L.LootRankHeaderRoll = "Roll"
-
-L.LootRankLabelOff = "off spec"
-L.LootRankLabelDisenchant = "disenchanter"
-L.LootRankLabelMasterLooter = "master looter"
-L.LootRankLabelNoAddon = "addon not running"
-
-L.LootMasterRollText = "Roll"
-L.LootMasterDisenchantText = "Disenchant/Sell"
-
-L.LootMasterRollLabel = "automatic /roll for everyone"
-L.LootMasterDisenchantLabel = "check this if no one wants this item"
-L.LootMasterGiveLoot = "Give Loot"
-L.LootMasterGiveDisenchant = "Give for Disenchant/Sell"
-
-L.LootMasterGiveFail = "Either this item or this master loot candidate could not be found :("
 
 
 --[[----------------------------------------------------------------------

@@ -12,7 +12,7 @@ local pairs = pairs
 
 -- WoW APIs
 local _G = _G
-local PlaySound, CreateFrame, UIParent = PlaySound, CreateFrame, UIParent
+local CreateFrame, UIParent = CreateFrame, UIParent
 
 
 --[[-----------------------------------------------------------------------------
@@ -20,6 +20,8 @@ Scripts
 -------------------------------------------------------------------------------]]
 local function buttonOnClick(frame, ...)
 	AceGUI:ClearFocus()
+	frame.obj:SetChecked(not frame.obj.isChecked)
+	
 	--PlaySound("igMainMenuOption")
 	frame.obj:Fire("OnClick", ...)
 end
@@ -37,6 +39,10 @@ local methods = {
 		self.frame:ClearAllPoints()
 	end,
 
+	--["OnRelease"] = function(self)
+	--	print(self.name .. " released")
+	--end,
+
 	["SetText"] = function(self, text)
 		self.label:SetText(text)
 		self.frame:SetWidth(16 + 6 + self.label:GetStringWidth())
@@ -47,12 +53,18 @@ local methods = {
 	end,
 	
 	["SetChecked"] = function(self, checked)
-		-- not sure if WoW expects boolean type or not, too lazy to find out so just cast it
-		self.frame:SetChecked(not not checked)
+		self.isChecked = not not checked
+		if checked then
+			self.texNormal:Hide()
+			self.texCheck:Show()
+		else
+			self.texCheck:Hide()
+			self.texNormal:Show()
+		end
 	end,
 	
-	["GetChecked"] = function(self)
-		return self.frame:GetChecked()
+	["GetChecked"] = function(self)		
+		return self.isChecked
 	end,
 	
 	["GetWidth"] = function(self)
@@ -82,7 +94,7 @@ Constructor
 -------------------------------------------------------------------------------]]
 local function Constructor()
 	local name = "AmrUiCheckBox" .. AceGUI:GetNextWidgetNum(Type)
-	local frame = CreateFrame("CheckButton", name, UIParent)
+	local frame = CreateFrame("Button", nil, UIParent)
 	frame:SetHeight(16)
 	frame:SetPushedTextOffset(0, 0)
 	frame:Hide()
@@ -92,29 +104,34 @@ local function Constructor()
 	
 	-- unchecked texture
 	local texNormal = frame:CreateTexture(nil, "BACKGROUND")
+	texNormal.name = name
 	texNormal:SetWidth(16)
 	texNormal:SetHeight(16)
 	texNormal:SetTexture("Interface\\AddOns\\" .. Amr.ADDON_NAME .. "\\Media\\check-off")
 	texNormal:SetPoint("LEFT", frame, "LEFT")
-	frame:SetNormalTexture(texNormal)
 	
 	-- checked texture
-	local texCheck = frame:CreateTexture(nil, "BORDER")
+	local texCheck = frame:CreateTexture(nil, "BACKGROUND")
+	texCheck.name = name
+	texCheck:SetWidth(16)
+	texCheck:SetHeight(16)
 	texCheck:SetTexture("Interface\\AddOns\\" .. Amr.ADDON_NAME .. "\\Media\\check-on")
 	texCheck:SetPoint("LEFT", frame, "LEFT")
-	frame:SetCheckedTexture(texCheck)
+	texCheck:Hide()
 	
 	-- label
-	local lbl = frame:CreateFontString(nil, "ARTWORK")
+	local lbl = frame:CreateFontString(nil, "BACKGROUND")
 	lbl:SetJustifyV("MIDDLE")
 	lbl:SetPoint("LEFT", texNormal, "RIGHT", 8, 0)
-	frame:SetFontString(lbl)
 
 	local widget = {
 		texNormal = texNormal,
+		texCheck  = texCheck,
 		label     = lbl,
 		frame     = frame,
-		type      = Type
+		type      = Type,
+		isChecked = false,
+		name      = name
 	}
 	for method, func in pairs(methods) do
 		widget[method] = func

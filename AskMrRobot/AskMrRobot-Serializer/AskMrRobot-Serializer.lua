@@ -1,7 +1,6 @@
 -- AskMrRobot-Serializer will serialize and communicate character data between users.
--- This is used primarily to associate character information to logs uploaded to askmrrobot.com.
 
-local MAJOR, MINOR = "AskMrRobot-Serializer", 54
+local MAJOR, MINOR = "AskMrRobot-Serializer", 64
 local Amr, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not Amr then return end -- already loaded by something else
@@ -137,7 +136,13 @@ Amr.RaceIds = {
     ["Undead"] = 10,
     ["Goblin"] = 11,
     ["Worgen"] = 12,
-    ["Pandaren"] = 13
+    ["Pandaren"] = 13,
+	["Nightborne"] = 14,
+    ["HighmountainTauren"] = 15,
+    ["VoidElf"] = 16,
+	["LightforgedDraenei"] = 17,
+	["DarkIronDwarf"] = 18,
+	["MagharOrc"] = 19
 }
 
 Amr.FactionIds = {
@@ -147,473 +152,12 @@ Amr.FactionIds = {
 }
 
 Amr.InstanceIds = {
-	EmeraldNightmare = 1520,
-	Nighthold = 1530,
-	TrialOfValor = 1648,
-	TombOfSargeras = 1676
+	Uldir = 1861
 }
 
 -- instances that AskMrRobot currently supports logging for
 Amr.SupportedInstanceIds = {
-	[1520] = true,
-	[1530] = true,
-	[1648] = true,
-	[1676] = true
-}
-
--- just to make life easier, maps ID of each artifact weapon to the spec number (1-4)
-Amr.ArtifactIdToSpecNumber = {
-	[128402] = 1, -- DK
-	[128292] = 2,
-	[128403] = 3,
-	[127829] = 1, -- DH
-	[128832] = 2,
-	[128858] = 1, -- Druid
-	[128860] = 2,
-	[128821] = 3,
-	[128306] = 4,
-	[128861] = 1, -- Hunter
-	[128826] = 2,
-	[128808] = 3,
-	[127857] = 1, -- Mage
-	[128820] = 2,
-	[128862] = 3,
-	[128938] = 1, -- Monk
-	[128937] = 2,
-	[128940] = 3,
-	[128823] = 1, -- Paladin
-	[128866] = 2,
-	[120978] = 3,
-	[128868] = 1, -- Priest
-	[128825] = 2,
-	[128827] = 3,
-	[128870] = 1, -- Rogue
-	[128872] = 2,
-	[128476] = 3,
-	[128935] = 1, -- Shaman
-	[128819] = 2,
-	[128911] = 3,
-	[128942] = 1, -- Warlock
-	[128943] = 2,
-	[128941] = 3,
-	[128910] = 1, -- Warrior
-	[128908] = 2,
-	[128289] = 3,
-	
-	--[128293] = 2, -- Frost OH
-	--[127830] = 1, -- Havoc OH
-	--[128831] = 2, -- Vengeance OH
-	--[128859] = 2, -- Feral OH
-	--[128822] = 3, -- Guardian OH
-	--[133959] = 2, -- Fire OH
-	--[133948] = 3, -- Windwalker OH
-	--[128867] = 2, -- Prot MH
-	--[133958] = 3, -- Shadow OH
-	--[128869] = 1, -- Rogue OH's
-	--[134552] = 2,
-	--[128479] = 3,
-	--[128936] = 1, -- Shaman OH's
-	--[128873] = 2,
-	--[128934] = 3,
-	--[137246] = 2, -- Demo MH
-	--[134553] = 2, -- Fury OH
-	--[128288] = 3  -- Prot MH
-}
-
--- IDs of set tokens that we would care about in a player's inventory
-Amr.SetTokenIds = {
-	[127970] = true,
-	[127969] = true,
-	[127968] = true,
-	[127967] = true,
-	[127966] = true,
-	[127965] = true,
-	[127964] = true,
-	[127963] = true,
-	[127962] = true,
-	[127961] = true,
-	[127960] = true,
-	[127959] = true,
-	[127958] = true,
-	[127957] = true,
-	[127956] = true,
-	[127955] = true,
-	[127954] = true,
-	[127953] = true,
-	[120285] = true,
-	[120284] = true,
-	[120283] = true,
-	[120282] = true,
-	[120281] = true,
-	[120280] = true,
-	[120279] = true,
-	[120278] = true,
-	[120277] = true,
-	[120256] = true,
-	[120255] = true,
-	[120254] = true,
-	[120253] = true,
-	[120252] = true,
-	[120251] = true,
-	[120250] = true,
-	[120249] = true,
-	[120248] = true,
-	[120247] = true,
-	[120246] = true,
-	[120245] = true,
-	[120244] = true,
-	[120243] = true,
-	[120242] = true,
-	[120241] = true,
-	[120240] = true,
-	[120239] = true,
-	[120238] = true,
-	[120237] = true,
-	[120236] = true,
-	[120235] = true,
-	[120234] = true,
-	[120233] = true,
-	[120232] = true,
-	[120231] = true,
-	[120230] = true,
-	[120229] = true,
-	[120228] = true,
-	[120227] = true,
-	[120226] = true,
-	[120225] = true,
-	[120224] = true,
-	[120223] = true,
-	[120222] = true,
-	[120221] = true,
-	[120220] = true,
-	[120219] = true,
-	[120218] = true,
-	[120217] = true,
-	[120216] = true,
-	[120215] = true,
-	[120214] = true,
-	[120213] = true,
-	[120212] = true,
-	[120211] = true,
-	[120210] = true,
-	[120209] = true,
-	[120208] = true,
-	[120207] = true,
-	[120206] = true,
-	[119323] = true,
-	[119322] = true,
-	[119321] = true,
-	[119320] = true,
-	[119319] = true,
-	[119318] = true,
-	[119316] = true,
-	[119315] = true,
-	[119314] = true,
-	[119313] = true,
-	[119312] = true,
-	[119311] = true,
-	[119310] = true,
-	[119309] = true,
-	[119308] = true,
-	[119307] = true,
-	[119306] = true,
-	[119305] = true,
-	[105868] = true,
-	[105867] = true,
-	[105866] = true,
-	[105865] = true,
-	[105864] = true,
-	[105863] = true,
-	[105862] = true,
-	[105861] = true,
-	[105860] = true,
-	[105859] = true,
-	[105858] = true,
-	[105857] = true,
-	[99756] = true,
-	[99755] = true,
-	[99754] = true,
-	[99753] = true,
-	[99752] = true,
-	[99751] = true,
-	[99750] = true,
-	[99749] = true,
-	[99748] = true,
-	[99747] = true,
-	[99746] = true,
-	[99745] = true,
-	[99744] = true,
-	[99743] = true,
-	[99742] = true,
-	[99740] = true,
-	[99739] = true,
-	[99738] = true,
-	[99737] = true,
-	[99736] = true,
-	[99735] = true,
-	[99734] = true,
-	[99733] = true,
-	[99732] = true,
-	[99731] = true,
-	[99730] = true,
-	[99729] = true,
-	[99728] = true,
-	[99727] = true,
-	[99726] = true,
-	[99725] = true,
-	[99724] = true,
-	[99723] = true,
-	[99722] = true,
-	[99721] = true,
-	[99720] = true,
-	[99719] = true,
-	[99718] = true,
-	[99717] = true,
-	[99716] = true,
-	[99715] = true,
-	[99714] = true,
-	[99713] = true,
-	[99712] = true,
-	[99711] = true,
-	[99710] = true,
-	[99709] = true,
-	[99708] = true,
-	[99707] = true,
-	[99706] = true,
-	[99705] = true,
-	[99704] = true,
-	[99703] = true,
-	[99702] = true,
-	[99701] = true,
-	[99700] = true,
-	[99699] = true,
-	[99698] = true,
-	[99697] = true,
-	[99696] = true,
-	[99695] = true,
-	[99694] = true,
-	[99693] = true,
-	[99692] = true,
-	[99691] = true,
-	[99690] = true,
-	[99689] = true,
-	[99688] = true,
-	[99687] = true,
-	[99686] = true,
-	[99685] = true,
-	[99684] = true,
-	[99683] = true,
-	[99682] = true,
-	[99681] = true,
-	[99680] = true,
-	[99679] = true,
-	[99678] = true,
-	[99677] = true,
-	[99676] = true,
-	[99675] = true,
-	[99674] = true,
-	[99673] = true,
-	[99672] = true,
-	[99671] = true,
-	[99670] = true,
-	[99669] = true,
-	[99668] = true,
-	[99667] = true,
-	[96701] = true,
-	[96700] = true,
-	[96699] = true,
-	[96633] = true,
-	[96632] = true,
-	[96631] = true,
-	[96625] = true,
-	[96624] = true,
-	[96623] = true,
-	[96601] = true,
-	[96600] = true,
-	[96599] = true,
-	[96568] = true,
-	[96567] = true,
-	[96566] = true,
-	[95957] = true,
-	[95956] = true,
-	[95955] = true,
-	[95889] = true,
-	[95888] = true,
-	[95887] = true,
-	[95881] = true,
-	[95880] = true,
-	[95879] = true,
-	[95857] = true,
-	[95856] = true,
-	[95855] = true,
-	[95824] = true,
-	[95823] = true,
-	[95822] = true,
-	[95583] = true,
-	[95582] = true,
-	[95581] = true,
-	[95580] = true,
-	[95579] = true,
-	[95578] = true,
-	[95577] = true,
-	[95576] = true,
-	[95575] = true,
-	[95574] = true,
-	[95573] = true,
-	[95572] = true,
-	[95571] = true,
-	[95570] = true,
-	[95569] = true,
-	[89278] = true,
-	[89277] = true,
-	[89276] = true,
-	[89275] = true,
-	[89274] = true,
-	[89273] = true,
-	[89272] = true,
-	[89271] = true,
-	[89270] = true,
-	[89269] = true,
-	[89268] = true,
-	[89267] = true,
-	[89266] = true,
-	[89265] = true,
-	[89264] = true,
-	[89263] = true,
-	[89262] = true,
-	[89261] = true,
-	[89260] = true,
-	[89259] = true,
-	[89258] = true,
-	[89257] = true,
-	[89256] = true,
-	[89255] = true,
-	[89254] = true,
-	[89253] = true,
-	[89252] = true,
-	[89251] = true,
-	[89250] = true,
-	[89249] = true,
-	[89248] = true,
-	[89247] = true,
-	[89246] = true,
-	[89245] = true,
-	[89244] = true,
-	[89243] = true,
-	[89242] = true,
-	[89241] = true,
-	[89240] = true,
-	[89239] = true,
-	[89238] = true,
-	[89237] = true,
-	[89236] = true,
-	[89235] = true,
-	[89234] = true,
-	[78876] = true,
-	[78875] = true,
-	[78874] = true,
-	[78873] = true,
-	[78872] = true,
-	[78871] = true,
-	[78867] = true,
-	[78866] = true,
-	[78865] = true,
-	[78864] = true,
-	[78863] = true,
-	[78862] = true,
-	[78861] = true,
-	[78860] = true,
-	[78859] = true,
-	[78858] = true,
-	[78857] = true,
-	[78856] = true,
-	[78855] = true,
-	[78854] = true,
-	[78853] = true,
-	[78849] = true,
-	[78848] = true,
-	[78847] = true,
-	[78184] = true,
-	[78183] = true,
-	[78181] = true,
-	[78180] = true,
-	[78179] = true,
-	[78178] = true,
-	[78176] = true,
-	[78175] = true,
-	[78174] = true,
-	[78173] = true,
-	[78171] = true,
-	[78170] = true,
-	[71687] = true,
-	[71686] = true,
-	[71685] = true,
-	[71683] = true,
-	[71682] = true,
-	[71680] = true,
-	[71679] = true,
-	[71678] = true,
-	[71676] = true,
-	[71675] = true,
-	[71673] = true,
-	[71672] = true,
-	[71671] = true,
-	[71669] = true,
-	[71668] = true,
-	[67431] = true,
-	[67430] = true,
-	[67429] = true,
-	[67428] = true,
-	[67427] = true,
-	[67426] = true,
-	[67425] = true,
-	[67424] = true,
-	[67423] = true,
-	[66998] = true,
-	[65089] = true,
-	[65088] = true,
-	[65087] = true,
-	[63684] = true,
-	[63683] = true,
-	[63682] = true,
-	[51320] = true,
-	[45652] = true,
-	[45651] = true,
-	[45650] = true,
-	[45649] = true,
-	[45648] = true,
-	[45647] = true,
-	[45643] = true,
-	[45642] = true,
-	[45641] = true,
-	[40630] = true,
-	[40629] = true,
-	[40628] = true,
-	[40621] = true,
-	[40620] = true,
-	[40619] = true,
-	[40618] = true,
-	[40617] = true,
-	[40616] = true,
-	[34544] = true,
-	[31100] = true,
-	[31099] = true,
-	[31098] = true,
-	[31097] = true,
-	[31096] = true,
-	[31095] = true,
-	[30247] = true,
-	[30246] = true,
-	[30245] = true,
-	[30244] = true,
-	[30243] = true,
-	[30242] = true,
-	[29767] = true,
-	[29766] = true,
-	[29765] = true,
-	[29761] = true,
-	[29760] = true,
-	[29759] = true
+	[1861] = true
 }
 
 
@@ -622,7 +166,7 @@ Amr.SetTokenIds = {
 ----------------------------------------------------------------------------------------
 
 local function readBonusIdList(parts, first, last)
-	local ret = {}
+	local ret = {}	
 	for i = first, last do
 		table.insert(ret, tonumber(parts[i]))
 	end
@@ -630,22 +174,10 @@ local function readBonusIdList(parts, first, last)
 	return ret
 end
 
-local function setRelicId(item, index, relicBonuses)
-	local relicId = item.gemIds[index] .. ""
-	for i = 1, #relicBonuses do
-		relicId = relicId .. "." .. relicBonuses[i]
-	end
-	local list = item.gemItemIds or {}
-	list[i] = relicId
-end
-
---|color|Hitem:135820:enchant:gem1:gem2:gem3:gem4:suffixID:uniqueID:playerlevel:spec?:flags:11:numBonusIDs:bonusID1:bonusID2...:playerlevelwhengotitem, 296 for warrior artifact:upgrade ID?:num artifact bonuses?:artifact bonus 1:artifact bonus 2:artifact bonus 3:[item name]
--- 133004 for relic on my warrior, gem2
--- 296::3:767:1507:1809:[item name] this is for warrior artifact with the above relic in storm slot, for parts after the bonus IDs
-
---|cffa335ee|Hitem:itemID:enchant:gem1:gem2:gem3:gem4:suffixID:uniqueID:level:unknown:unknown:instanceDifficultyID:numBonusIDs:bonusID1:bonusID2...|h[item name]|h|r
-
--- item link format:  |cffa335ee|Hitem:itemID:enchant:gem1:gem2:gem3:gem4:suffixID:uniqueID:level:unknown:unknown:instanceDifficultyID:numBonusIDs:bonusID1:bonusID2...|h[item name]|h|r
+--                 1      2    3      4      5      6    7   8   9   10   11       12         
+--                 itemId:ench:gem1  :gem2  :gem3  :gem4:suf:uid:lvl:spec:flags   :instdiffid:numbonusIDs:bonusIDs1...n     :varies:?:relic bonus ids
+--|cffe6cc80|Hitem:128866:    :152046:147100:152025:    :   :   :110:66  :16777472:9         :4          :736:1494:1490:1495:709   :1:3:3610:1472:3528:3:3562:1483:3528:3:3610:1477:3336|h[Truthguard]|h|r
+--
 -- get an object with all of the parts of the item link format that we care about
 function Amr.ParseItemLink(itemLink)
     if not itemLink then return nil end
@@ -655,7 +187,8 @@ function Amr.ParseItemLink(itemLink)
     
     local parts = { strsplit(":", str) }
     
-    local item = {}
+	local item = {}
+	item.link = itemLink
     item.id = tonumber(parts[1]) or 0
     item.enchantId = tonumber(parts[2]) or 0
     item.gemIds = { tonumber(parts[3]) or 0, tonumber(parts[4]) or 0, tonumber(parts[5]) or 0, tonumber(parts[6]) or 0 }
@@ -675,48 +208,55 @@ function Amr.ParseItemLink(itemLink)
 	item.upgradeId = 0
 	item.level = 0
 	
-	-- the next part after bonus IDs depends on the upgrade id type; is either the "drop level" or upgrade ID, or not sure for artifacts
+	-- the next part after bonus IDs depends on the upgrade id type
 	if upgradeIdType == 4 then
 		item.upgradeId = tonumber(parts[14 + offset]) or 0
 	elseif upgradeIdType == 512 then
 		item.level = tonumber(parts[14 + offset]) or 0
+	elseif #parts > 16 + offset then
+		-- check for relic info
+		item.relicBonusIds = { nil, nil, nil }
+		numBonuses = tonumber(parts[16 + offset])
+		if numBonuses then
+			if numBonuses > 0 then
+				item.relicBonusIds[1] = readBonusIdList(parts, 17 + offset, 16 + offset + numBonuses)
+			end
+					
+			offset = offset + numBonuses
+			if #parts > 17 + offset then
+				numBonuses = tonumber(parts[17 + offset])
+				if numBonuses then
+					if numBonuses > 0 then
+						item.relicBonusIds[2] = readBonusIdList(parts, 18 + offset, 17 + offset + numBonuses)
+					end
+
+					offset= offset + numBonuses
+					if #parts > 18 + offset then
+						numBonuses = tonumber(parts[18 + offset])
+						if numBonuses then
+							if numBonuses > 0 then
+								item.relicBonusIds[3] = readBonusIdList(parts, 19 + offset, 18 + offset + numBonuses)
+							end	
+						end
+					end
+				end
+			end
+		end
 	end
-	
-	-- ignore relic stuff in the item link for now, we read the relic information directly and save it with artifact power info
-	--[[
-	-- the next part is the number of bonus IDs on the first relic slot of the artifact
-	numBonuses = tonumber(parts[15 + offset]) or 0
-	if numBonuses > 0 then
-		local relicBonuses = readBonusIdList(16 + offset, 15 + offset + numBonuses, parts)
-		setRelicId(item, 1, relicBonuses)
-	end
-	
-	-- second relic slot bonus IDs
-	offset = offset + numBonuses
-	numBonuses = tonumber(parts[16 + offset]) or 0
-	if numBonuses > 0 then
-		local relicBonuses = readBonusIdList(17 + offset, 16 + offset + numBonuses, parts)
-		setRelicId(item, 2, relicBonuses)
-	end
-	
-	-- third relic slot bonus IDs
-	offset = offset + numBonuses
-	numBonuses = tonumber(parts[17 + offset]) or 0
-	if numBonuses > 0 then
-		local relicBonuses = readBonusIdList(18 + offset, 17 + offset + numBonuses, parts)
-		setRelicId(item, 3, relicBonuses)
-	end
-    ]]
 	
     return item
 end
 
-function Amr.GetItemUniqueId(item, noUpgrade)
+local AZERITE_EMPOWERED_BONUS_ID = 4775
+
+function Amr.GetItemUniqueId(item, noUpgrade, noAzeriteEmpoweredBonusId)
     if not item then return "" end
     local ret = item.id .. ""
     if item.bonusIds then
-        for i = 1, #item.bonusIds do
-            ret = ret .. "b" .. item.bonusIds[i]
+		for i = 1, #item.bonusIds do
+			if not noAzeriteEmpoweredBonusId or item.bonusIds[i] ~= AZERITE_EMPOWERED_BONUS_ID then
+				ret = ret .. "b" .. item.bonusIds[i]
+			end
         end
     end
     if item.suffixId ~= 0 then
@@ -742,34 +282,11 @@ end
 
 -- returns true if currently in a supported instance for logging
 function Amr.IsSupportedInstance()
-	local zone, _, difficultyIndex, _, _, _, _, instanceMapID = GetInstanceInfo()
+	local _, _, _, _, _, _, _, instanceMapID = GetInstanceInfo()
 	return Amr.IsSupportedInstanceId(instanceMapID)
 end
 
--- helper to iterate over a table in order by its keys
-local function spairs(t, order)
-    -- collect the keys
-    local keys = {}
-    for k in pairs(t) do keys[#keys+1] = k end
-
-    -- if order function given, sort by it by passing the table and keys a, b,
-    -- otherwise just sort the keys 
-    if order then
-        table.sort(keys, function(a,b) return order(t, a, b) end)
-    else
-        table.sort(keys)
-    end
-
-    -- return the iterator function
-    local i = 0
-    return function()
-        i = i + 1
-        if keys[i] then
-            return keys[i], t[keys[i]]
-        end
-    end
-end
-
+--[[
 -- scanning tooltip b/c for some odd reason the api has no way to get basic item properties...
 -- so you have to generate a fake item tooltip and search for pre-defined strings in the display text
 local _scanTt
@@ -794,8 +311,10 @@ function Amr.GetItemTooltip(bagId, slotId, link)
 	end
 	return tt
 end
+]]
 
-function Amr.GetItemLevel(bagId, slotId, link)
+--[[
+function Amr.GetItemLevel(bagId, slotId, link)	
 	local itemLevelPattern = _G["ITEM_LEVEL"]:gsub("%%d", "(%%d+)")
 	local tt = Amr.GetItemTooltip(bagId, slotId, link)
 	
@@ -815,6 +334,7 @@ function Amr.GetItemLevel(bagId, slotId, link)
 	-- 0 means we couldn't find it for whatever reason
 	return 0
 end
+]]
 
 
 ----------------------------------------------------------------------------------------
@@ -823,53 +343,14 @@ end
 
 local function readProfessionInfo(prof, ret)
 	if prof then
-		local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset, skillLine, skillModifier = GetProfessionInfo(prof);
+		local _, _, skillLevel, _, _, _, skillLine = GetProfessionInfo(prof);
 		if Amr.ProfessionSkillLineToName[skillLine] ~= nil then
 			ret.Professions[Amr.ProfessionSkillLineToName[skillLine]] = skillLevel;
 		end
 	end
 end
 
---[[
-local function getTalents(specPos)	
-    local talentInfo = {}
-    local maxTiers = 7
-    for tier = 1, maxTiers do
-        for col = 1, 3 do
-            local id, name, _, _, _, spellId, _, t, c, selected = GetTalentInfoBySpecialization(specPos, tier, col)
-            if selected then
-                talentInfo[tier] = col
-            end
-        end
-    end
-    
-    local str = ""
-    for i = 1, maxTiers do
-    	if talentInfo[i] then
-    		str = str .. talentInfo[i]
-    	else
-    		str = str .. '0'
-    	end
-    end    	
-
-	return str
-end
-]]
-
---[[
-local function getGlyphs(specGroup)
-	local glyphs = {}
-	for i = 1, NUM_GLYPH_SLOTS do
-		local _, _, _, glyphSpellID, _, glyphID = GetGlyphSocketInfo(i, specGroup)
-		if (glyphID) then
-			table.insert(glyphs, glyphSpellID)
-		end
-	end
-	return glyphs;
-end
-]]
-
--- get specs and talents
+-- get specs
 local function readSpecs(ret)
 
     for pos = 1, 4 do
@@ -877,25 +358,90 @@ local function readSpecs(ret)
         local specId = GetSpecializationInfo(pos)
         if specId then
             ret.Specs[pos] = Amr.SpecIds[specId]
-			-- TODO: figure out how to read inactive spec talents if possible... used to be able to but they changed it
-			--ret.Talents[pos] = getTalents(pos)
         end
+	end
+end
+
+local function dump(o)
+	if type(o) == 'table' then
+	   local s = '{ '
+	   for k,v in pairs(o) do
+		  if type(k) ~= 'number' then k = '"'..k..'"' end
+		  s = s .. '['..k..'] = ' .. dump(v) .. ','
+	   end
+	   return s .. '} '
+	else
+	   return tostring(o)
+	end
+end
+
+-- read azerite powers on the item in loc and put it on itemData
+function Amr.ReadAzeritePowers(loc)
+	local ret = {}
+	local hasSome = false
+	
+	local tiers = C_AzeriteEmpoweredItem.GetAllTierInfo(loc)
+	for tier, tierInfo in ipairs(tiers) do
+		for _, power in ipairs(tierInfo.azeritePowerIDs) do
+			if C_AzeriteEmpoweredItem.IsPowerSelected(loc, power) then
+				local powerInfo = C_AzeriteEmpoweredItem.GetPowerInfo(power)
+				table.insert(ret, powerInfo.spellID)
+				hasSome = true
+			end
+		end
+	end
+
+	if hasSome then
+		return ret
+	else
+		return nil
 	end
 end
 
 -- get currently equipped items, store with currently active spec
 local function readEquippedItems(ret)
-    local equippedItems = {};
+	local equippedItems = {};
+	local loc = ItemLocation.CreateEmpty()
 	for slotNum = 1, #Amr.SlotIds do
 		local slotId = Amr.SlotIds[slotNum]
 		local itemLink = GetInventoryItemLink("player", slotId)
 		if itemLink then
-			equippedItems[slotId] = itemLink
+			local itemData = Amr.ParseItemLink(itemLink)
+			if itemData then
+				-- see if this is an azerite item and read azerite power ids
+				loc:SetEquipmentSlot(slotId)
+				if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(loc) then
+					local powers = Amr.ReadAzeritePowers(loc)
+					if powers then
+						itemData.azerite = powers
+					end
+				end
+
+				equippedItems[slotId] = itemData
+			end
 		end
 	end
     
     -- store last-seen equipped gear for each spec
 	ret.Equipped[GetSpecialization()] = equippedItems
+end
+
+local function readHeartOfAzerothLevel(ret)
+	local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem();	
+	if azeriteItemLocation then 
+		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation); 
+		ret.HeartOfAzerothLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
+	else
+		ret.HeartOfAzerothLevel = 0
+	end	
+end
+
+-- Get just the player's currently equipped gear
+function Amr:GetEquipped()
+	local ret= {}
+	ret.Equipped = {}
+	readEquippedItems(ret)
+	return ret
 end
 
 -- Get all data about the player as an object, includes:
@@ -907,7 +453,6 @@ end
 -- level
 -- professions
 -- spec/talent for all specs
--- artifact for current spec
 -- equipped gear for the current spec
 --
 function Amr:GetPlayerData()
@@ -920,11 +465,12 @@ function Amr:GetPlayerData()
 	ret.Guild = GetGuildInfo("player")
     ret.ActiveSpec = GetSpecialization()
     ret.Level = UnitLevel("player");
-    
-    local cls, clsEn = UnitClass("player")
+	readHeartOfAzerothLevel(ret)
+	
+    local _, clsEn = UnitClass("player")
     ret.Class = clsEn;
     
-    local race, raceEn = UnitRace("player")
+    local _, raceEn = UnitRace("player")
 	ret.Race = raceEn;
 	ret.Faction = UnitFactionGroup("player")
     
@@ -941,9 +487,7 @@ function Amr:GetPlayerData()
     ret.Talents = {}
 	readSpecs(ret)
 	
-	ret.Artifacts = {}	
-	
-	ret.Equipped = {}
+	ret.Equipped = {}	
 	readEquippedItems(ret)
 	
 	return ret
@@ -991,20 +535,16 @@ local function appendItemsToExport(fields, itemObjects)
     local prevUpgradeId = 0
     local prevBonusId = 0
 	local prevLevel = 0
+	local prevAzeriteId = 0
+	local prevRelicBonusId = 0
     for i, itemData in ipairs(itemObjects) do
         local itemParts = {}
         
-		-- for now export the item level of artifacts as the "drop level" because it is a pain in the ass to figure it out from the bonus IDs
-		--local _, _, quality = GetItemInfo(itemData.link)
-		--if quality == 6 then
-		--	itemData.level = Amr.GetItemLevel(nil, nil, itemData.link)
-		--end
-		
         table.insert(itemParts, itemData.id - prevItemId)
         prevItemId = itemData.id
         
         if itemData.slot ~= nil then table.insert(itemParts, "s" .. itemData.slot) end
-        if itemData.suffixId ~= 0 then table.insert(itemParts, "f" .. itemData.suffixId) end
+        --if itemData.suffixId ~= 0 then table.insert(itemParts, "f" .. itemData.suffixId) end
         if itemData.upgradeId ~= 0 then 
             table.insert(itemParts, "u" .. (itemData.upgradeId - prevUpgradeId))
             prevUpgradeId = itemData.upgradeId
@@ -1018,7 +558,14 @@ local function appendItemsToExport(fields, itemObjects)
                 table.insert(itemParts, "b" .. (bValue - prevBonusId))
                 prevBonusId = bValue
             end
-        end
+		end
+		
+		if itemData.azerite then
+			for aIndex, aValue in ipairs(itemData.azerite) do
+                table.insert(itemParts, "a" .. (aValue - prevAzeriteId))
+                prevAzeriteId = aValue
+            end
+		end
 		
 		if itemData.gemIds[1] ~= 0 then 
 			table.insert(itemParts, "x" .. (itemData.gemIds[1] - prevGemId))
@@ -1031,44 +578,36 @@ local function appendItemsToExport(fields, itemObjects)
 		if itemData.gemIds[3] ~= 0 then 
 			table.insert(itemParts, "z" .. (itemData.gemIds[3] - prevGemId))
 			prevGemId = itemData.gemIds[3]
-		end
+		end		
         
         if itemData.enchantId ~= 0 then 
             table.insert(itemParts, "e" .. (itemData.enchantId - prevEnchantId))
             prevEnchantId = itemData.enchantId
         end
-    
+	
+		if itemData.relicBonusIds and itemData.relicBonusIds[1] ~= nil then
+			for bIndex, bValue in ipairs(itemData.relicBonusIds[1]) do
+                table.insert(itemParts, "p" .. (bValue - prevRelicBonusId))
+                prevRelicBonusId = bValue
+            end
+		end
+
+		if itemData.relicBonusIds and itemData.relicBonusIds[2] ~= nil then
+			for bIndex, bValue in ipairs(itemData.relicBonusIds[2]) do
+                table.insert(itemParts, "q" .. (bValue - prevRelicBonusId))
+                prevRelicBonusId = bValue
+            end
+		end
+
+		if itemData.relicBonusIds and itemData.relicBonusIds[3] ~= nil then
+			for bIndex, bValue in ipairs(itemData.relicBonusIds[3]) do
+                table.insert(itemParts, "r" .. (bValue - prevRelicBonusId))
+                prevRelicBonusId = bValue
+            end
+		end
+		
         table.insert(fields, table.concat(itemParts, ""))
     end
-end
-
-local function serializeCrucibleInfo(fields, info, pos, prevPowerId)
-
-	if not info.Powers or not info.Active then 
-		return prevPowerId
-	end
-	
-	local parts = {}
-	
-	if pos < 4 then
-		table.insert(parts, pos)
-	else
-		local relic = Amr.ParseItemLink(info.ItemLink)
-		table.insert(parts, Amr.GetItemUniqueId(relic) or "0")
-	end
-	
-	for i,powerId in ipairs(info.Powers) do
-		table.insert(parts, (powerId - prevPowerId) .. "")
-		prevPowerId = powerId
-	end
-	
-	for i,active in ipairs(info.Active) do
-		table.insert(parts, active and "1" or "0")
-	end
-	
-	table.insert(fields, table.concat(parts, ","))
-	
-	return prevPowerId
 end
 
 -- Serialize just the identity portion of a player (region/realm/name) in the same format used by the full serialization
@@ -1115,7 +654,8 @@ function Amr:SerializePlayerData(data, complete)
     if raceval == nil then raceval = 1 end
     table.insert(fields, raceval)
     
-    table.insert(fields, data.Level)
+	table.insert(fields, data.Level)
+	table.insert(fields, data.HeartOfAzerothLevel)
     
     local profs = {}
     local noprofs = true
@@ -1141,49 +681,7 @@ function Amr:SerializePlayerData(data, complete)
         if data.Specs[spec] and (complete or spec == data.ActiveSpec) then
             table.insert(fields, ".s" .. spec) -- indicates the start of a spec block
 			table.insert(fields, data.Specs[spec])
-            table.insert(fields, data.Talents[spec] or "")
-			
-			local powerids = {}
-			local powerranks = {}
-			local reliclinks = {}			
-			local crucibleinfos = {}
-			
-			local artifactInfo = data.Artifacts and data.Artifacts[spec]
-			if artifactInfo and artifactInfo.Powers then
-				for k, v in spairs(artifactInfo.Powers) do
-					table.insert(powerids, k)
-					table.insert(powerranks, v)
-				end	
-			end
-			if artifactInfo and artifactInfo.Relics then
-				for i, link in ipairs(artifactInfo.Relics) do
-					local relic = Amr.ParseItemLink(link)
-					table.insert(reliclinks, Amr.GetItemUniqueId(relic) or "")
-				end
-			end
-			if artifactInfo and artifactInfo.Crucible then
-				local prevPowerId = 0
-				for i = 1,3 do
-					local relicInfo = #artifactInfo.Crucible.Equipped >= i and artifactInfo.Crucible.Equipped[i]
-					if relicInfo then
-						prevPowerId = serializeCrucibleInfo(crucibleinfos, relicInfo, i, prevPowerId)
-					end
-				end
-				if artifactInfo.Crucible.Previewed then
-					for k,relicInfo in pairs(artifactInfo.Crucible.Previewed) do
-						if relicInfo then
-							prevPowerId = serializeCrucibleInfo(crucibleinfos, relicInfo, 4, prevPowerId)
-						end
-					end
-				end
-			end
-			
-			table.insert(fields, toCompressedNumberList(powerids))
-			table.insert(fields, table.concat(powerranks, ","))
-			table.insert(fields, table.concat(reliclinks, ","))
-			table.insert(fields, table.concat(crucibleinfos, "/"))
-			
-            --table.insert(fields, toCompressedNumberList(data.Glyphs[spec]))
+            table.insert(fields, data.Talents[spec] or "")			
         end
     end
     
@@ -1194,10 +692,8 @@ function Amr:SerializePlayerData(data, complete)
                 table.insert(fields, ".q" .. spec) -- indicates the start of an equipped gear block
                 
                 local itemObjects = {}
-                for k, v in pairs(data.Equipped[spec]) do
-                    local itemData = Amr.ParseItemLink(v)
+                for k, itemData in pairs(data.Equipped[spec]) do
                     itemData.slot = k
-					itemData.link = v
                     table.insert(itemObjects, itemData)
                 end
                 
@@ -1206,58 +702,25 @@ function Amr:SerializePlayerData(data, complete)
         end
 	end
     
-    -- if doing a complete export, include reputations and bank/bag items too
-    if complete then
-    
-        -- export reputations
-        local reps = {}
-		table.insert(reps, "_")
-		--[[
-        local noreps = true
-        if data.Reputations then
-            for k, v in pairs(data.Reputations) do
-                noreps = false
-                table.insert(reps, k .. ":" .. v)
-            end
-        end
-        if noreps then
-            table.insert(reps, "_")
-        end
-        ]]
-		
-        table.insert(fields, ".r")
-        table.insert(fields, table.concat(reps, ","))    
-    
-        -- export bag and bank
+    -- if doing a complete export, include bank/bag items too
+	if complete then
+		    
         local itemObjects = {}
     	if data.BagItems then
-	        for i, v in ipairs(data.BagItems) do
-				local itemData = Amr.ParseItemLink(v)
-				if itemData ~= nil --[[and (IsEquippableItem(v) or Amr.SetTokenIds[itemData.id])]] then
-					itemData.link = v
+	        for i, itemData in ipairs(data.BagItems) do
+				if itemData then
 					table.insert(itemObjects, itemData)
 				end
 	        end
 	    end
-	    if data.BankItems then
-	        for i, v in ipairs(data.BankItems) do
-	        	local itemData = Amr.ParseItemLink(v)
-				if itemData ~= nil --[[and (IsEquippableItem(v) or Amr.SetTokenIds[itemData.id])]] then
-					itemData.link = v
+		if data.BankItems then
+	        for i, itemData in ipairs(data.BankItems) do
+				if itemData then					
 					table.insert(itemObjects, itemData)
 				end
 	        end
-	    end
-	    if data.VoidItems then
-	        for i, v in ipairs(data.VoidItems) do
-	        	local itemData = Amr.ParseItemLink(v)
-				if itemData ~= nil --[[and (IsEquippableItem(v) or Amr.SetTokenIds[itemData.id])]] then
-					itemData.link = v
-					table.insert(itemObjects, itemData)
-				end
-		    end
-	    end
-        
+		end
+		
         table.insert(fields, ".inv")
         appendItemsToExport(fields, itemObjects)
     end

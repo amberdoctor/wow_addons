@@ -9,7 +9,7 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 local Amr = LibStub("AceAddon-3.0"):GetAddon("AskMrRobot")
 
 -- Lua APIs
-local max, select, pairs = math.max, select, pairs
+local pairs = pairs
 
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
@@ -76,7 +76,7 @@ local methods = {
 		-- reset the flag
 		self.resizing = nil
 		-- run the update explicitly
-		updateSize(self)
+		--updateSize(self)
 	end,
 	
 	-- ["OnRelease"] = nil,
@@ -134,6 +134,7 @@ local function Constructor()
 	frame:SetScript("OnMouseUp", frameOnMouseUp)
 
 	local label = frame:CreateFontString(nil, "ARTWORK")
+	label:SetPoint("TOPLEFT")
 	label:SetFontObject(Amr.CreateFont("Regular", 16, Amr.Colors.Text))
 
 	-- create widget
